@@ -24,7 +24,7 @@ import { dirname as dirname$1, resolve as resolve$1 } from 'file:///Users/fxck/w
 import { Server } from 'node:http';
 import nodeCrypto from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
-import { and, eq, isNull, sql as sql$1, desc, inArray } from 'file:///Users/fxck/www/robin/node_modules/.pnpm/drizzle-orm@0.44.7_@neondatabase+serverless@1.0.2_@prisma+client@5.22.0_prisma@5.22.0__@types_gvpe6c2y24xmceuuswt7uvdtue/node_modules/drizzle-orm/index.js';
+import { and, eq, isNull, sql as sql$1, desc, inArray, or, like, count } from 'file:///Users/fxck/www/robin/node_modules/.pnpm/drizzle-orm@0.44.7_@neondatabase+serverless@1.0.2_@prisma+client@5.22.0_prisma@5.22.0__@types_gvpe6c2y24xmceuuswt7uvdtue/node_modules/drizzle-orm/index.js';
 import { z } from 'file:///Users/fxck/www/robin/node_modules/.pnpm/zod@4.1.12/node_modules/zod/index.js';
 import { ulid } from 'file:///Users/fxck/www/robin/node_modules/.pnpm/ulidx@2.4.1/node_modules/ulidx/dist/node/index.js';
 import nodemailer from 'file:///Users/fxck/www/robin/node_modules/.pnpm/nodemailer@7.0.10/node_modules/nodemailer/lib/nodemailer.js';
@@ -940,16 +940,16 @@ const plugins = [
 const assets = {
   "/index.mjs": {
     "type": "text/javascript; charset=utf-8",
-    "etag": "\"14ef2-Wrel4jR8kFWgr5l99VQFtgofsuw\"",
-    "mtime": "2025-11-14T22:07:13.635Z",
+    "etag": "\"14ef2-DX/SfSCw/U/l3ErjO/tkiuIqZzc\"",
+    "mtime": "2025-11-14T22:16:26.708Z",
     "size": 85746,
     "path": "index.mjs"
   },
   "/index.mjs.map": {
     "type": "application/json",
-    "etag": "\"4b9c6-N043w7SYqeaX7adRtJ2V9lHq6Vs\"",
-    "mtime": "2025-11-14T22:07:13.635Z",
-    "size": 309702,
+    "etag": "\"4b9c1-nFrrlHz3elRmanMXvjkL0uz/udY\"",
+    "mtime": "2025-11-14T22:16:26.708Z",
+    "size": 309697,
     "path": "index.mjs.map"
   }
 };
@@ -2542,21 +2542,28 @@ const querySchema = z.object({
 });
 const index_get = defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, querySchema.parse);
-  const users = [
-    {
-      id: "1",
-      email: "demo@example.com",
-      name: "Demo User",
-      createdAt: (/* @__PURE__ */ new Date()).toISOString()
-    }
-  ];
+  const offset = (query.page - 1) * query.limit;
+  const whereClause = query.search ? or(
+    like(users.name, `%${query.search}%`),
+    like(users.email, `%${query.search}%`)
+  ) : void 0;
+  const [{ total }] = await db.select({ total: count() }).from(users).where(whereClause);
+  const users$1 = await db.select({
+    id: users.id,
+    email: users.email,
+    name: users.name,
+    image: users.image,
+    emailVerified: users.emailVerified,
+    createdAt: users.createdAt,
+    updatedAt: users.updatedAt
+  }).from(users).where(whereClause).orderBy(desc(users.createdAt)).limit(query.limit).offset(offset);
   return {
-    data: users,
+    data: users$1,
     pagination: {
       page: query.page,
       limit: query.limit,
-      total: users.length,
-      pages: Math.ceil(users.length / query.limit)
+      total,
+      pages: Math.ceil(total / query.limit)
     }
   };
 });

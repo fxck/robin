@@ -16,7 +16,11 @@
       "Bash(nx run:*)",
       "Bash(nx build:*)",
       "Bash(npx tsc:*)",
-      "Bash(pnpm --filter @robin/auth add:*)"
+      "Bash(pnpm --filter @robin/auth add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm --filter @robin/api remove:*)",
+      "Bash(pnpm install:*)",
+      "Bash(.npmrc)"
     ],
     "deny": [],
     "ask": []

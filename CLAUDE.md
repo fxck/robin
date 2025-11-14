@@ -109,7 +109,7 @@ Storage:       Unstorage v1.17.2
 Validation:    Zod v4.1.12
 Logging:       Consola v3.4.2
 IDs:           ULID (ulidx v2.4.1)
-Cache/Queue:   ioredis v5.8.2 (BullMQ v5.63.1 installed but unused)
+Cache:         ioredis v5.8.2
 Email:         nodemailer v7.0.10
 ```
 
@@ -118,7 +118,7 @@ Email:         nodemailer v7.0.10
 Bundlers:   esbuild v0.19.2 (Node), Vite v7.0.0 (React)
 Linting:    ESLint v9.8.0 + typescript-eslint v8.40.0
 Formatting: Prettier v2.6.2
-Testing:    Jest v30.0.2 + Testing Library
+Testing:    Jest v30.0.2 + Testing Library (Vitest removed)
 ```
 
 ---
@@ -466,8 +466,9 @@ const newPost: CreatePostInput = {
    - List users with pagination
    - Query params: `page`, `limit`, `search`
    - Zod validation
-   - Returns: `{ users: [], pagination: { page, limit, total } }`
-   - Currently uses placeholder data (TODO: Connect to database)
+   - Search by name or email (LIKE query)
+   - Returns: `{ data: [], pagination: { page, limit, total, pages } }`
+   - **Connected to database** with Drizzle ORM
    - File: [apps/api/src/routes/api/users/index.get.ts](apps/api/src/routes/api/users/index.get.ts)
 
 4. **GET /api/users/me** ✅
@@ -1153,9 +1154,8 @@ nx affected:test
 ```
 
 ### Testing Tools Available
-- **Unit Testing:** Jest
+- **Unit Testing:** Jest v30.0.2
 - **React Testing:** Testing Library
-- **Alternative:** Vitest (installed but not configured)
 - **Future:** E2E testing (Cypress/Playwright can be added)
 
 ---
@@ -1450,13 +1450,14 @@ nx g @nx/node:lib <name>
 6. ✅ VS Code debug configuration
 7. ✅ Environment variables setup
 
-### What's Partially Implemented ⏳
+### What Was Recently Completed ✅
 
-1. ⏳ **Users List Endpoint**
+1. ✅ **Users List Endpoint** (FIXED)
    - Route structure complete
    - Pagination and validation working
-   - **TODO:** Connect to real database
-   - Currently uses placeholder data
+   - **Connected to database** with Drizzle ORM
+   - Search functionality (name/email)
+   - Ordered by creation date (newest first)
 
 ### What's NOT Implemented ❌
 
@@ -1500,7 +1501,6 @@ nx g @nx/node:lib <name>
 6. ❌ **Testing**
    - Jest v30.0.2 configured for both API and app ✅
    - @testing-library/react installed ✅
-   - Vitest v3.0.0 installed (alternative, not configured) ✅
    - One test file exists: `apps/app/src/app/app.spec.tsx` ✅
    - **Needs:** Unit tests for API routes, services, utilities
    - **Needs:** Component tests for AuthForm and route components
@@ -1625,37 +1625,31 @@ The frontend received major improvements with unprecedented precision:
 
 ### ⚠️ Installed But Not Used
 
-**Should Consider Removing:**
-- `bullmq` (v5.63.1) - Queue system installed but never used
-- `unstorage` (v1.17.2) - Storage abstraction installed but never used
-- `uncrypto` (v0.1.3) - Crypto utilities installed but never used
-- `vitest` (v3.0.0) - Test runner installed but Jest is configured instead
-- `cmdk` (v1.1.1) - Command menu library installed but not implemented
-- `vaul` (v1.1.2) - Bottom sheet library installed but not implemented
+**UI Libraries (Future Features):**
+- `cmdk` (v1.1.1) - Command menu library (⌘K palette) - installed but not implemented
+- `vaul` (v1.1.2) - Bottom sheet library - installed but not implemented
 
-**Installed But Not Configured:**
+**Infrastructure (Not Configured):**
 - `@scalar/api-reference` (v1.39.3) - API documentation library installed but no route configured
-- `@t3-oss/env-core` (v0.13.8) - Environment validation installed but not visibly used
+
+### ✅ Recently Cleaned Up
+
+**Removed Unused Dependencies:**
+- ✅ `bullmq` (v5.63.1) - Queue system (removed - not used)
+- ✅ `unstorage` (v1.17.2) - Storage abstraction (removed - not used)
+- ✅ `uncrypto` (v0.1.3) - Crypto utilities (removed - not used)
+- ✅ `vitest` (v3.0.0) - Test runner (removed - Jest is configured)
+- ✅ `@vitest/ui` (v3.0.0) - Vitest UI (removed)
 
 ### 📊 Recommended Actions
 
-1. **Remove Unused Dependencies:**
-   ```bash
-   pnpm remove bullmq unstorage uncrypto
-   ```
-
-2. **Decide on Testing Strategy:**
-   - Keep Jest (configured) or switch to Vitest (installed but not configured)
-   - Remove one to avoid confusion
-
-3. **Plan Future Usage:**
-   - Keep `cmdk` if command palette is planned
-   - Keep `vaul` if bottom sheets are planned
+1. **Plan Future Usage:**
+   - Keep `cmdk` if command palette (⌘K) is planned
+   - Keep `vaul` if bottom sheets/drawers are planned
    - Otherwise remove to reduce bundle size
 
-4. **Implement or Remove:**
+2. **Implement or Remove:**
    - `@scalar/api-reference` - Either implement API docs route or remove
-   - `@t3-oss/env-core` - Either use for env validation or remove
 
 ---
 
