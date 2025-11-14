@@ -69,9 +69,9 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
           toast.success('Signed in successfully!');
         }
         onSuccess?.();
-      } catch (error: any) {
+      } catch (error) {
         // Handle specific error cases
-        const errorMessage = error.message || 'Authentication failed';
+        const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
 
         if (errorMessage.includes('already exists')) {
           toast.error('An account with this email already exists');

@@ -60,9 +60,9 @@ function ResetPasswordPage() {
 
       toast.success('Password reset successful! You can now sign in.');
       navigate({ to: '/auth' });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Reset password error:', error);
-      const errorMessage = error.message || 'Failed to reset password. The link may have expired.';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to reset password. The link may have expired.';
       toast.error(errorMessage);
     } finally {
       setLoading(false);

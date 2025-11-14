@@ -180,7 +180,7 @@ async function scanKeys(pattern: string): Promise<string[]> {
 /**
  * Increment counter
  */
-export async function incrementCounter(key: string, by: number = 1): Promise<number> {
+export async function incrementCounter(key: string, by = 1): Promise<number> {
   const redis = getRedis();
   return await redis.incrby(key, by);
 }
@@ -296,8 +296,8 @@ export async function addToSortedSet(
  */
 export async function getTopFromSortedSet(
   key: string,
-  count: number = 10,
-  withScores: boolean = false
+  count = 10,
+  withScores = false
 ): Promise<string[] | Array<{ member: string; score: number }>> {
   const redis = getRedis();
 
@@ -324,7 +324,7 @@ export async function getTopFromSortedSet(
 export async function incrementSortedSetScore(
   key: string,
   member: string,
-  increment: number = 1
+  increment = 1
 ): Promise<number> {
   const redis = getRedis();
   const newScore = await redis.zincrby(key, increment, member);

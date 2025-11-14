@@ -37,9 +37,9 @@ function ForgotPasswordPage() {
 
       setSent(true);
       toast.success('Password reset email sent! Check your inbox.');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Forgot password error:', error);
-      const errorMessage = error.message || 'An error occurred. Please try again later.';
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred. Please try again later.';
       toast.error(errorMessage);
     } finally {
       setLoading(false);

@@ -59,7 +59,7 @@ function EditPostPage() {
       queryClient.invalidateQueries({ queryKey: ['post', id] });
       navigate({ to: '/admin/posts' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to update post');
     },
   });
@@ -97,8 +97,8 @@ function EditPostPage() {
       const uploadData: UploadResponse = await response.json();
       setCoverImage(uploadData.url);
       toast.success('Image uploaded successfully!');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to upload image');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to upload image');
     } finally {
       setUploading(false);
     }
@@ -261,7 +261,7 @@ function EditPostPage() {
                   <Text size="2" weight="bold" mb="2" as="label">
                     Status
                   </Text>
-                  <Select.Root value={status} onValueChange={(v: any) => setStatus(v)}>
+                  <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
                     <Select.Trigger />
                     <Select.Content>
                       <Select.Item value="draft">Draft</Select.Item>

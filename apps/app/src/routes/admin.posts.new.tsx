@@ -39,7 +39,7 @@ function NewPostPage() {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       navigate({ to: `/admin/posts` });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to create post');
     },
   });
@@ -79,8 +79,8 @@ function NewPostPage() {
       const data: UploadResponse = await response.json();
       setCoverImage(data.url);
       toast.success('Image uploaded successfully!');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to upload image');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to upload image');
     } finally {
       setUploading(false);
     }
@@ -210,7 +210,7 @@ function NewPostPage() {
                   <Text size="2" weight="bold" mb="2" as="label">
                     Status
                   </Text>
-                  <Select.Root value={status} onValueChange={(v: any) => setStatus(v)}>
+                  <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
                     <Select.Trigger />
                     <Select.Content>
                       <Select.Item value="draft">Draft</Select.Item>

@@ -23,11 +23,11 @@ function PublicPostsPage() {
     queryKey: ['posts', view],
     queryFn: async ({ pageParam = 1 }) => {
       if (view === 'trending') {
-        return api.get<{ posts: any[] }>('/api/posts/trending?limit=20');
+        return api.get<{ posts: PostListItem[] }>('/api/posts/trending?limit=20');
       }
       return api.get<PostsListResponse>(`/api/posts?page=${pageParam}&limit=20`);
     },
-    getNextPageParam: (lastPage: any) => {
+    getNextPageParam: (lastPage: PostsListResponse | { posts: PostListItem[] }) => {
       if ('pagination' in lastPage) {
         const { page, totalPages } = lastPage.pagination;
         return page < totalPages ? page + 1 : undefined;
@@ -110,7 +110,7 @@ function PublicPostsPage() {
           ) : (
             <>
               <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="4">
-                {posts.map((post: any) => (
+                {posts.map((post: PostListItem) => (
                   <Link key={post.id} to={`/posts/${post.id}`} style={{ textDecoration: 'none' }}>
                     <Card style={{ height: '100%', cursor: 'pointer' }} className="post-card">
                       {post.coverImage && (
@@ -129,10 +129,10 @@ function PublicPostsPage() {
                       <Flex direction="column" gap="3" p="3">
                         <Flex justify="end" gap="3">
                           <Text size="1" color="gray">
-                            ❤️ {post.likesCount}
+                            <span role="img" aria-label="likes">❤️</span> {post.likesCount}
                           </Text>
                           <Text size="1" color="gray">
-                            👁️ {post.views}
+                            <span role="img" aria-label="views">👁️</span> {post.views}
                           </Text>
                         </Flex>
                         <Heading size="4">{post.title}</Heading>

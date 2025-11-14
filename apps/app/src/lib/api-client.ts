@@ -16,14 +16,14 @@ export class APIError extends Error {
   constructor(
     public status: number,
     message: string,
-    public data?: any
+    public data?: unknown
   ) {
     super(message);
     this.name = 'APIError';
   }
 }
 
-export async function apiRequest<T = any>(
+export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -51,30 +51,30 @@ export async function apiRequest<T = any>(
 }
 
 export const api = {
-  get: <T = any>(endpoint: string, options?: RequestInit) =>
+  get: <T>(endpoint: string, options?: RequestInit) =>
     apiRequest<T>(endpoint, { ...options, method: 'GET' }),
 
-  post: <T = any>(endpoint: string, data?: any, options?: RequestInit) =>
+  post: <T>(endpoint: string, data?: unknown, options?: RequestInit) =>
     apiRequest<T>(endpoint, {
       ...options,
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
-  put: <T = any>(endpoint: string, data?: any, options?: RequestInit) =>
+  put: <T>(endpoint: string, data?: unknown, options?: RequestInit) =>
     apiRequest<T>(endpoint, {
       ...options,
       method: 'PUT',
       body: JSON.stringify(data),
     }),
 
-  patch: <T = any>(endpoint: string, data?: any, options?: RequestInit) =>
+  patch: <T>(endpoint: string, data?: unknown, options?: RequestInit) =>
     apiRequest<T>(endpoint, {
       ...options,
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
 
-  delete: <T = any>(endpoint: string, options?: RequestInit) =>
+  delete: <T>(endpoint: string, options?: RequestInit) =>
     apiRequest<T>(endpoint, { ...options, method: 'DELETE' }),
 };

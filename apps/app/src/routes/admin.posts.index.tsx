@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Container, Heading, Flex, Button, Card, Text, Badge, Box, Table } from '@radix-ui/themes';
+import { Container, Heading, Flex, Button, Card, Text, Badge, Box, Table, AlertDialog } from '@radix-ui/themes';
 import { PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { useState } from 'react';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
 import type { PostsListResponse } from '@robin/types';
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/admin/posts/')({
 function AdminPostsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [deleteDialog, setDeleteDialog] = useState<{ id: string; title: string } | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-posts'],
@@ -31,15 +33,16 @@ function AdminPostsPage() {
     onSuccess: () => {
       toast.success('Post deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
+      setDeleteDialog(null);
     },
-    onError: (error: any) => {
+    onError: (error: { message?: string }) => {
       toast.error(error.message || 'Failed to delete post');
     },
   });
 
-  const handleDelete = (id: string, title: string) => {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      deleteMutation.mutate(id);
+  const handleDeleteConfirm = () => {
+    if (deleteDialog) {
+      deleteMutation.mutate(deleteDialog.id);
     }
   };
 
@@ -153,7 +156,7 @@ function AdminPostsPage() {
                             size="1"
                             variant="soft"
                             color="red"
-                            onClick={() => handleDelete(post.id, post.title)}
+                            onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
                             disabled={deleteMutation.isPending}
                           >
                             <Trash2 size={14} />
@@ -168,6 +171,29 @@ function AdminPostsPage() {
           </Card>
         </Flex>
       </Container>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog.Root open={!!deleteDialog} onOpenChange={(open) => !open && setDeleteDialog(null)}>
+        <AlertDialog.Content maxWidth="450px">
+          <AlertDialog.Title>Delete Post</AlertDialog.Title>
+          <AlertDialog.Description size="2">
+            Are you sure you want to delete "{deleteDialog?.title}"? This action cannot be undone.
+          </AlertDialog.Description>
+
+          <Flex gap="3" mt="4" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Action>
+              <Button variant="solid" color="red" onClick={handleDeleteConfirm}>
+                Delete Post
+              </Button>
+            </AlertDialog.Action>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
     </Box>
   );
 }

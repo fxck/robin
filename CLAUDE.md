@@ -1,9 +1,9 @@
 # Robin Project - Claude AI Context
 
-> **Last Updated:** 2025-11-14 (Documentation Update - Comprehensive Status)
-> **Project Status:** Production-Ready Full-Stack Application
+> **Last Updated:** 2025-01-14 (Complete Repository Analysis - All Features Documented)
+> **Project Status:** Production-Ready Full-Stack Blogging Platform
 > **Architecture:** Nx Monorepo with Full-Stack Applications + Shared Packages
-> **Features:** Authentication, Posts/Articles System, Redis Caching, S3 File Uploads
+> **Features:** Authentication + Password Reset, Posts/Articles System, Redis Caching, S3 File Uploads, Email Integration
 
 ---
 
@@ -34,10 +34,13 @@
 
 **Authentication & Authorization:**
 - ✅ Full authentication system (Better Auth with email/password)
+- ✅ **Password reset flow** (request + reset with email)
+- ✅ Email integration with nodemailer (SMTP configured)
 - ✅ OAuth providers ready (GitHub, Google - needs credentials)
 - ✅ Session management with 7-day expiry
 - ✅ Protected routes with auth guards
 - ✅ User management endpoints
+- ✅ Test email endpoint for development
 
 **Posts/Articles System:**
 - ✅ Complete CRUD API (create, read, update, delete)
@@ -106,7 +109,8 @@ Storage:       Unstorage v1.17.2
 Validation:    Zod v4.1.12
 Logging:       Consola v3.4.2
 IDs:           ULID (ulidx v2.4.1)
-Queue:         BullMQ v5.63.1 + ioredis v5.8.2
+Cache/Queue:   ioredis v5.8.2 (BullMQ v5.63.1 installed but unused)
+Email:         nodemailer v7.0.10
 ```
 
 ### Build & Dev Tools
@@ -141,6 +145,7 @@ robin/
 │   │   │   │       │   ├── [id]/like.post.ts # Like/unlike post
 │   │   │   │       │   └── trending.get.ts   # Get trending posts
 │   │   │   │       ├── upload.post.ts        # File upload to S3
+│   │   │   │       ├── test-email.post.ts    # Test email endpoint (dev)
 │   │   │   │       └── auth/[...all].ts      # Better Auth handler
 │   │   │   ├── middleware/
 │   │   │   │   ├── cors.ts                    # CORS middleware
@@ -165,6 +170,8 @@ robin/
 │       │   │   ├── __root.tsx                 # Root layout + providers
 │       │   │   ├── index.tsx                  # Home page
 │       │   │   ├── auth.tsx                   # Auth page
+│       │   │   ├── forgot-password.tsx        # Password reset request
+│       │   │   ├── reset-password.tsx         # Password reset confirmation
 │       │   │   ├── dashboard.tsx              # Protected dashboard
 │       │   │   ├── posts/
 │       │   │   │   ├── index.tsx              # Posts feed (infinite scroll)
@@ -312,6 +319,8 @@ const users = await db.select().from(schema.users);
 - **Server Configuration:**
   - Drizzle adapter with PostgreSQL (pg provider)
   - Email/password authentication (emailVerification disabled for development)
+  - **Password reset flow** with email integration (nodemailer)
+  - Styled HTML email templates for password reset
   - OAuth providers: GitHub, Google (configurable, needs credentials)
   - OpenAPI plugin for API documentation
   - Session management (7-day expiry, 1-day update age, 5-minute cookie cache)
@@ -319,6 +328,7 @@ const users = await db.select().from(schema.users);
   - Trusted origins support
 - **Client Configuration:**
   - React hooks: `useSession()`, `signIn()`, `signUp()`, `signOut()`
+  - Password reset functions: `forgetPassword()`, `resetPassword()`
   - Type-safe API client with automatic URL detection
   - Base URL configurable via `VITE_API_URL` environment variable
 
@@ -539,6 +549,14 @@ const newPost: CreatePostInput = {
     - Returns S3 URL
     - File: [apps/api/src/routes/api/upload.post.ts](apps/api/src/routes/api/upload.post.ts)
 
+13. **POST /api/test-email** ✅
+    - Test email sending functionality
+    - Development only endpoint
+    - Sends test email with SMTP configuration details
+    - Beautiful HTML email template
+    - Returns success/error status
+    - File: [apps/api/src/routes/api/test-email.post.ts](apps/api/src/routes/api/test-email.post.ts)
+
 #### Services
 
 1. **db.ts** ✅
@@ -672,7 +690,24 @@ nx prune api     # Prune lockfile for deployment
    - Redirects to home on success
    - File: [apps/app/src/routes/auth.tsx](apps/app/src/routes/auth.tsx)
 
-3. **/posts** ✅ **MAJOR FEATURE**
+3. **/forgot-password** ✅
+   - Password reset request page
+   - Email input with validation
+   - Success confirmation screen
+   - Resend functionality
+   - Beautiful UI with Radix components
+   - File: [apps/app/src/routes/forgot-password.tsx](apps/app/src/routes/forgot-password.tsx)
+
+4. **/reset-password** ✅
+   - Password reset confirmation page
+   - Token validation from URL query params
+   - Password strength indicator (weak/medium/strong)
+   - Password matching validation
+   - Show/hide password toggle
+   - Beautiful error states
+   - File: [apps/app/src/routes/reset-password.tsx](apps/app/src/routes/reset-password.tsx)
+
+5. **/posts** ✅ **MAJOR FEATURE**
    - Public posts feed with infinite scroll
    - Toggle between "Latest" and "Trending" views
    - Beautiful card grid layout with cover images
@@ -681,7 +716,7 @@ nx prune api     # Prune lockfile for deployment
    - TanStack Query infinite scroll
    - File: [apps/app/src/routes/posts/index.tsx](apps/app/src/routes/posts/index.tsx)
 
-4. **/posts/:id** ✅
+6. **/posts/:id** ✅
    - Individual post viewer
    - Full post content display
    - Cover image hero section
@@ -693,7 +728,7 @@ nx prune api     # Prune lockfile for deployment
 
 **Protected Routes (Require Authentication):**
 
-5. **/dashboard** ✅
+7. **/dashboard** ✅
    - Protected dashboard page
    - Displays user information
    - Uses React Query to fetch session data
@@ -702,7 +737,7 @@ nx prune api     # Prune lockfile for deployment
    - Sign out functionality
    - File: [apps/app/src/routes/dashboard.tsx](apps/app/src/routes/dashboard.tsx)
 
-6. **/admin/posts** ✅
+8. **/admin/posts** ✅
    - Admin posts management
    - List all user's posts (drafts and published)
    - Create new post button
@@ -710,7 +745,7 @@ nx prune api     # Prune lockfile for deployment
    - Status badges
    - File: [apps/app/src/routes/admin.posts.index.tsx](apps/app/src/routes/admin.posts.index.tsx)
 
-7. **/admin/posts/new** ✅ **MAJOR FEATURE**
+9. **/admin/posts/new** ✅ **MAJOR FEATURE**
    - Create new post editor
    - Cover image upload with drag-and-drop
    - Live markdown preview
@@ -719,17 +754,17 @@ nx prune api     # Prune lockfile for deployment
    - TanStack Form with validation
    - File: [apps/app/src/routes/admin.posts.new.tsx](apps/app/src/routes/admin.posts.new.tsx)
 
-8. **/admin/posts/:id/edit** ✅
-   - Edit existing post
-   - Pre-populated form with post data
-   - Cover image upload/replacement
-   - Version conflict detection
-   - Live preview
-   - File: [apps/app/src/routes/admin.posts.$id.edit.tsx](apps/app/src/routes/admin.posts.$id.edit.tsx)
+10. **/admin/posts/:id/edit** ✅
+    - Edit existing post
+    - Pre-populated form with post data
+    - Cover image upload/replacement
+    - Version conflict detection
+    - Live preview
+    - File: [apps/app/src/routes/admin.posts.$id.edit.tsx](apps/app/src/routes/admin.posts.$id.edit.tsx)
 
 **Layout:**
 
-9. **__root.tsx** ✅
+11. **__root.tsx** ✅
    - Root layout component
    - Providers: QueryClientProvider, Radix Theme, Toaster, ErrorBoundary
    - Dark theme with purple accent color
@@ -775,8 +810,10 @@ nx prune api     # Prune lockfile for deployment
 2. **auth.ts** ✅
    - `authClient` from Better Auth
    - Exports: `useSession()`, `signIn()`, `signUp()`, `signOut()`
+   - **Password reset functions:** `forgetPassword()`, `resetPassword()`
    - Configured with API base URL
    - Uses `@robin/auth/client`
+   - Note: Password reset uses direct API calls (Better Auth client has wrong endpoint)
    - File: [apps/app/src/lib/auth.ts](apps/app/src/lib/auth.ts)
 
 #### Key Features
@@ -987,6 +1024,8 @@ routes/
 ├── __root.tsx                    # Root layout with providers and devtools
 ├── index.tsx                     # Home page (/)
 ├── auth.tsx                      # Authentication page (/auth)
+├── forgot-password.tsx           # Password reset request (/forgot-password)
+├── reset-password.tsx            # Password reset confirmation (/reset-password)
 ├── dashboard.tsx                 # Protected dashboard (/dashboard)
 ├── posts/
 │   ├── index.tsx                 # Posts feed (/posts)
@@ -1195,9 +1234,10 @@ nx g @nx/js:lib validation
 ### Recommended Enhancements
 
 1. **Complete Authentication Flow:**
-   - Implement email verification
-   - Add password reset functionality
-   - Configure OAuth providers (GitHub, Google)
+   - ✅ Password reset functionality (COMPLETE)
+   - ✅ Email integration with nodemailer (COMPLETE)
+   - Implement email verification (optional - disabled for development)
+   - Configure OAuth providers (GitHub, Google - needs credentials)
    - Add 2FA support
 
 2. **Enhance API:**
@@ -1565,6 +1605,60 @@ The frontend received major improvements with unprecedented precision:
 
 ---
 
+## Dependency Analysis & Cleanup Recommendations
+
+### ✅ Actively Used Dependencies
+
+**Backend:**
+- `@aws-sdk/client-s3` & `@aws-sdk/lib-storage` - S3 file storage ✅
+- `ioredis` - Redis client (412 lines of production code) ✅
+- `nodemailer` - Email sending for password reset ✅
+- `ulidx` - ULID ID generation ✅
+- `zod` - Validation schemas ✅
+- `consola` - Logging ✅
+
+**Frontend:**
+- All Radix UI components - Actively used ✅
+- `sonner` - Toast notifications ✅
+- `lucide-react` - Icon library ✅
+- `@tanstack/*` - Router, Query, Form ✅
+
+### ⚠️ Installed But Not Used
+
+**Should Consider Removing:**
+- `bullmq` (v5.63.1) - Queue system installed but never used
+- `unstorage` (v1.17.2) - Storage abstraction installed but never used
+- `uncrypto` (v0.1.3) - Crypto utilities installed but never used
+- `vitest` (v3.0.0) - Test runner installed but Jest is configured instead
+- `cmdk` (v1.1.1) - Command menu library installed but not implemented
+- `vaul` (v1.1.2) - Bottom sheet library installed but not implemented
+
+**Installed But Not Configured:**
+- `@scalar/api-reference` (v1.39.3) - API documentation library installed but no route configured
+- `@t3-oss/env-core` (v0.13.8) - Environment validation installed but not visibly used
+
+### 📊 Recommended Actions
+
+1. **Remove Unused Dependencies:**
+   ```bash
+   pnpm remove bullmq unstorage uncrypto
+   ```
+
+2. **Decide on Testing Strategy:**
+   - Keep Jest (configured) or switch to Vitest (installed but not configured)
+   - Remove one to avoid confusion
+
+3. **Plan Future Usage:**
+   - Keep `cmdk` if command palette is planned
+   - Keep `vaul` if bottom sheets are planned
+   - Otherwise remove to reduce bundle size
+
+4. **Implement or Remove:**
+   - `@scalar/api-reference` - Either implement API docs route or remove
+   - `@t3-oss/env-core` - Either use for env validation or remove
+
+---
+
 ## Resources
 
 ### Documentation
@@ -1604,10 +1698,12 @@ This file provides comprehensive project context. For additional information, se
 
 ### ✅ Fully Implemented Features
 
-**Backend (12 API Routes):**
+**Backend (13 API Routes):**
 - Complete authentication system (Better Auth)
+- **Password reset flow with email** (request + confirmation)
 - Full Posts CRUD API with 7 endpoints
 - File upload to S3/Minio with validation
+- Test email endpoint for development
 - Redis caching (posts, lists) with 5-15 minute TTL
 - Redis rate limiting (sliding window)
 - Redis pub/sub for real-time events
@@ -1617,10 +1713,11 @@ This file provides comprehensive project context. For additional information, se
 - Soft deletes with S3 cleanup
 - View tracking and like system
 
-**Frontend (9 Routes):**
-- Public: Home, Auth, Posts feed (infinite scroll), Single post viewer
+**Frontend (11 Routes):**
+- Public: Home, Auth, **Password reset (2 routes)**, Posts feed (infinite scroll), Single post viewer
 - Protected: Dashboard, Admin posts list, Create post, Edit post
 - Beautiful UI with Radix UI Themes (dark mode, purple accent)
+- **Password strength indicator** and show/hide toggle
 - TanStack Router with type-safe navigation
 - TanStack Query for data fetching
 - TanStack Form with Zod validation
@@ -1669,11 +1766,13 @@ This file provides comprehensive project context. For additional information, se
 6. Deploy to production
 
 **Project Metrics:**
-- API Routes: 12 endpoints
-- Frontend Routes: 9 pages
+- API Routes: **13 endpoints** (including password reset & test email)
+- Frontend Routes: **11 pages** (including 2 password reset routes)
 - Database Tables: 6 tables
-- Services: 4 major services (DB, Auth, Redis, S3)
+- Services: 4 major services (DB, Auth, Redis: 412 LOC, S3: 175 LOC)
 - Middleware: 2 (CORS, Error handling)
 - Shared Packages: 5 (database, auth, types, utils, config)
-- Lines of Code: ~5,000+ TypeScript/TSX
+- Lines of Code: **~6,000+ TypeScript/TSX**
+- Password Reset: ✅ Fully implemented (413 lines)
+- Email Integration: ✅ nodemailer with styled HTML templates
 - Ready for Production: ✅ Yes (after database migration)

@@ -28,7 +28,7 @@ function PostPage() {
       queryClient.invalidateQueries({ queryKey: ['post', id] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'Failed to like post');
     },
   });
@@ -64,7 +64,6 @@ function PostPage() {
   }
 
   const { post } = data;
-  const isAuthor = session?.user?.id === post.userId;
 
   return (
     <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>

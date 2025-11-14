@@ -142,7 +142,7 @@ export function validateImageFile(mimeType: string): boolean {
 /**
  * Validate file size
  */
-export function validateFileSize(size: number, maxSizeMB: number = 10): boolean {
+export function validateFileSize(size: number, maxSizeMB = 10): boolean {
   const maxBytes = maxSizeMB * 1024 * 1024;
   return size <= maxBytes;
 }
