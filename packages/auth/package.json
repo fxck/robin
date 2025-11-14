@@ -1,0 +1,17 @@
+{
+  "name": "@robin/auth",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "dependencies": {
+    "better-auth": "1.4.0-beta.20",
+    "nodemailer": "^7.0.10",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@better-auth/cli": "^1.3.34",
+    "@types/nodemailer": "^7.0.3"
+  }
+}

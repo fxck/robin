@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(curl:*)",
+      "Bash(nx dev:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm exec nitro dev --help:*)",
+      "Bash(pnpm why:*)",
+      "Bash(pnpm info:*)",
+      "Bash(cat:*)",
+      "Bash(npx @better-auth/cli generate:*)",
+      "Bash(npx @better-auth/cli --help)",
+      "Bash(nx run-many:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(nx run:*)",
+      "Bash(nx build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm --filter @robin/auth add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

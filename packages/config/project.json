@@ -1,0 +1,19 @@
+{
+  "name": "config",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/auth/packages/config/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/auth/packages/config",
+        "main": "packages/auth/packages/config/src/index.ts",
+        "tsConfig": "packages/auth/packages/config/tsconfig.lib.json",
+        "assets": ["packages/auth/packages/config/*.md"]
+      }
+    }
+  }
+}
