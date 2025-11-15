@@ -25,7 +25,7 @@ zerops:
           httpSupport: true
       initCommands:
         # Run migrations once per deployment version (execOnce provides idempotency)
-        - cd migrate && zsc execOnce apiprod-${appVersionId} -- pnpm exec drizzle-kit migrate
+        - cd migrate && zsc execOnce apiprod-${appVersionId} -- ./node_modules/.bin/drizzle-kit migrate
       start: node apps/api/.output/server/index.mjs
       envVariables:
         NODE_ENV: production
