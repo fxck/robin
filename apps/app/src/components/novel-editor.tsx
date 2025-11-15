@@ -1,6 +1,47 @@
-import { EditorRoot, EditorContent, type JSONContent } from 'novel';
+import {
+  EditorRoot,
+  EditorContent,
+  EditorCommand,
+  EditorCommandItem,
+  EditorCommandEmpty,
+  EditorCommandList,
+  EditorBubble,
+  EditorBubbleItem,
+  type JSONContent,
+  createImageUpload,
+  handleImageDrop,
+  handleImagePaste,
+  UpdatedImage,
+  StarterKit,
+  Placeholder,
+  TiptapLink,
+  TiptapUnderline,
+  TextStyle,
+  Color,
+  HorizontalRule,
+  TaskList,
+  TaskItem,
+  ImageResizer,
+} from 'novel';
 import { Box } from '@radix-ui/themes';
+import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  Code,
+  Heading1,
+  Heading2,
+  Heading3,
+  List,
+  ListOrdered,
+  Quote,
+  Minus,
+  ImageIcon,
+  Link,
+} from 'lucide-react';
 
 interface NovelEditorProps {
   value: string;
@@ -9,43 +50,300 @@ interface NovelEditorProps {
   className?: string;
 }
 
-export function NovelEditor({ value, onChange, className }: NovelEditorProps) {
+// Custom upload function to use your existing S3 endpoint
+const handleImageUpload = async (file: File): Promise<string> => {
+  try {
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be less than 10MB');
+      throw new Error('File too large');
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('File must be an image');
+      throw new Error('Invalid file type');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Upload failed');
+    }
+
+    const data = await response.json();
+    toast.success('Image uploaded successfully!');
+
+    return data.url;
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'Failed to upload image');
+    throw error;
+  }
+};
+
+// Slash command suggestions
+const suggestionItems = [
+  {
+    title: 'Heading 1',
+    description: 'Big section heading',
+    icon: <Heading1 size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
+    },
+  },
+  {
+    title: 'Heading 2',
+    description: 'Medium section heading',
+    icon: <Heading2 size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
+    },
+  },
+  {
+    title: 'Heading 3',
+    description: 'Small section heading',
+    icon: <Heading3 size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
+    },
+  },
+  {
+    title: 'Bullet List',
+    description: 'Create a simple bullet list',
+    icon: <List size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).toggleBulletList().run();
+    },
+  },
+  {
+    title: 'Numbered List',
+    description: 'Create a numbered list',
+    icon: <ListOrdered size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).toggleOrderedList().run();
+    },
+  },
+  {
+    title: 'Quote',
+    description: 'Capture a quote',
+    icon: <Quote size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).toggleBlockquote().run();
+    },
+  },
+  {
+    title: 'Divider',
+    description: 'Visually divide blocks',
+    icon: <Minus size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).setHorizontalRule().run();
+    },
+  },
+  {
+    title: 'Image',
+    description: 'Upload an image',
+    icon: <ImageIcon size={18} />,
+    command: ({ editor, range }: any) => {
+      editor.chain().focus().deleteRange(range).run();
+      // Trigger file input
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          try {
+            const url = await handleImageUpload(file);
+            editor.chain().focus().setImage({ src: url }).run();
+          } catch (error) {
+            // Error already handled in handleImageUpload
+          }
+        }
+      };
+      input.click();
+    },
+  },
+];
+
+export function NovelEditor({ value, onChange, placeholder = "Press '/' for commands...", className }: NovelEditorProps) {
   const [initialContent, setInitialContent] = useState<JSONContent | undefined>();
 
-  // Convert markdown to JSON content on mount
+  // Convert value to JSON content on mount
   useEffect(() => {
     if (value) {
-      // For now, we'll use a simple text node structure
-      // In production, you might want to use a markdown parser
+      // Simple text conversion - in production you might want a markdown parser
       setInitialContent({
         type: 'doc',
         content: [
           {
             type: 'paragraph',
-            content: [{ type: 'text', text: value }],
+            content: value ? [{ type: 'text', text: value }] : [],
           },
         ],
       });
     }
   }, []);
 
+  const extensions = [
+    StarterKit.configure({
+      heading: {
+        levels: [1, 2, 3],
+      },
+      codeBlock: {
+        HTMLAttributes: {
+          class: 'rounded-md bg-gray-100 p-4 font-mono text-sm',
+        },
+      },
+    }),
+    Placeholder.configure({
+      placeholder,
+    }),
+    TiptapLink.configure({
+      HTMLAttributes: {
+        class: 'text-blue-600 underline hover:text-blue-800',
+      },
+    }),
+    TiptapUnderline,
+    TextStyle,
+    Color,
+    HorizontalRule,
+    TaskList.configure({
+      HTMLAttributes: {
+        class: 'not-prose',
+      },
+    }),
+    TaskItem.configure({
+      nested: true,
+    }),
+    UpdatedImage.configure({
+      HTMLAttributes: {
+        class: 'rounded-lg',
+      },
+    }),
+  ];
+
+  const uploadFn = createImageUpload({
+    validateFn: (file) => {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return false;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error('File must be an image');
+        return false;
+      }
+      return true;
+    },
+    onUpload: handleImageUpload,
+  });
+
   return (
     <Box className={className}>
       <EditorRoot>
         <EditorContent
           initialContent={initialContent}
-          extensions={[]}
+          extensions={extensions}
           editorProps={{
             attributes: {
-              class: 'novel-editor prose prose-lg focus:outline-none max-w-full',
+              class: 'prose prose-lg dark:prose-invert focus:outline-none max-w-full p-4 min-h-[500px]',
+            },
+            handleDrop: (view, event, _slice, moved) => {
+              return handleImageDrop(view, event, moved, uploadFn);
+            },
+            handlePaste: (view, event) => {
+              return handleImagePaste(view, event, uploadFn);
             },
           }}
           onUpdate={({ editor }) => {
             // Get the text content from the editor
+            // In production, you might want to use getJSON() or convert to markdown
             const text = editor.getText();
             onChange(text);
           }}
-        />
+        >
+          {/* Slash Command Menu */}
+          <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-gray-200 bg-white px-1 py-2 shadow-md transition-all">
+            <EditorCommandEmpty className="px-2 text-gray-500">No results</EditorCommandEmpty>
+            <EditorCommandList>
+              {suggestionItems.map((item) => (
+                <EditorCommandItem
+                  key={item.title}
+                  onCommand={(val) => item.command(val)}
+                  className="flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm hover:bg-gray-100 aria-selected:bg-gray-100"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-white">
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <p className="text-xs text-gray-500">{item.description}</p>
+                  </div>
+                </EditorCommandItem>
+              ))}
+            </EditorCommandList>
+          </EditorCommand>
+
+          {/* Bubble Menu for text formatting */}
+          <EditorBubble
+            tippyOptions={{
+              placement: 'top',
+            }}
+            className="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl"
+          >
+            <EditorBubbleItem
+              onSelect={(editor) => editor.chain().focus().toggleBold().run()}
+              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+            >
+              <Bold className={`h-4 w-4`} />
+            </EditorBubbleItem>
+            <EditorBubbleItem
+              onSelect={(editor) => editor.chain().focus().toggleItalic().run()}
+              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+            >
+              <Italic className={`h-4 w-4`} />
+            </EditorBubbleItem>
+            <EditorBubbleItem
+              onSelect={(editor) => editor.chain().focus().toggleUnderline().run()}
+              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+            >
+              <UnderlineIcon className={`h-4 w-4`} />
+            </EditorBubbleItem>
+            <EditorBubbleItem
+              onSelect={(editor) => editor.chain().focus().toggleStrike().run()}
+              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+            >
+              <Strikethrough className={`h-4 w-4`} />
+            </EditorBubbleItem>
+            <EditorBubbleItem
+              onSelect={(editor) => editor.chain().focus().toggleCode().run()}
+              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+            >
+              <Code className={`h-4 w-4`} />
+            </EditorBubbleItem>
+            <EditorBubbleItem
+              onSelect={(editor) => {
+                const url = window.prompt('Enter URL:');
+                if (url) {
+                  editor.chain().focus().setLink({ href: url }).run();
+                }
+              }}
+              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+            >
+              <Link className={`h-4 w-4`} />
+            </EditorBubbleItem>
+          </EditorBubble>
+
+          {/* Image Resizer */}
+          <ImageResizer />
+        </EditorContent>
       </EditorRoot>
     </Box>
   );
