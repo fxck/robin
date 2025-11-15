@@ -19,7 +19,11 @@ export function getS3Client(): S3Client {
       forcePathStyle: true, // Required for Minio
     });
 
-    log.info('S3 client initialized');
+    log.info('S3 client initialized', {
+      type: 's3_init',
+      region: process.env.S3_REGION || 'us-east-1',
+      bucket: process.env.S3_BUCKET || process.env.S3_BUCKET_ASSETS || 'assets'
+    });
   }
 
   return s3Client;
@@ -55,10 +59,21 @@ export async function uploadFile(options: UploadOptions): Promise<string> {
     const endpoint = process.env.S3_ENDPOINT || '';
     const publicUrl = `${endpoint}/${bucket}/${key}`;
 
-    log.info(`File uploaded to S3: ${key}`);
+    log.info('File uploaded to S3', {
+      type: 's3_upload',
+      key,
+      bucket,
+      contentType: options.contentType,
+      size: options.buffer.length
+    });
     return publicUrl;
   } catch (error) {
-    log.error('S3 upload error:', error);
+    log.error('S3 upload error', {
+      type: 's3_upload_error',
+      key,
+      bucket,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    });
     throw new Error('Failed to upload file to S3');
   }
 }
@@ -74,7 +89,10 @@ export async function deleteFile(url: string): Promise<void> {
     // Extract key from URL
     const key = extractKeyFromUrl(url);
     if (!key) {
-      log.warn(`Could not extract key from URL: ${url}`);
+      log.warn('Could not extract key from URL', {
+        type: 's3_delete_invalid_url',
+        url
+      });
       return;
     }
 
@@ -85,9 +103,17 @@ export async function deleteFile(url: string): Promise<void> {
       })
     );
 
-    log.info(`File deleted from S3: ${key}`);
+    log.info('File deleted from S3', {
+      type: 's3_delete',
+      key,
+      bucket
+    });
   } catch (error) {
-    log.error('S3 delete error:', error);
+    log.error('S3 delete error', {
+      type: 's3_delete_error',
+      url,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    });
     // Don't throw - deletion failures shouldn't break the app
   }
 }

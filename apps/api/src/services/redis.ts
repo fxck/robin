@@ -23,15 +23,19 @@ export function getRedis(): Redis {
     });
 
     redisClient.on('connect', () => {
-      log.info('Redis client connected');
+      log.info('Redis client connected', { type: 'redis_connect', client: 'main' });
     });
 
     redisClient.on('error', (err) => {
-      log.error('Redis client error:', err);
+      log.error('Redis client error', {
+        type: 'redis_error',
+        client: 'main',
+        error: err instanceof Error ? { message: err.message, stack: err.stack } : err
+      });
     });
 
     redisClient.on('ready', () => {
-      log.info('Redis client ready');
+      log.info('Redis client ready', { type: 'redis_ready', client: 'main' });
     });
   }
 
@@ -54,11 +58,11 @@ export function getRedisPubSub(): { pub: Redis; sub: Redis } {
     });
 
     redisPubClient.on('connect', () => {
-      log.info('Redis pub client connected');
+      log.info('Redis pub client connected', { type: 'redis_connect', client: 'pub' });
     });
 
     redisSubClient.on('connect', () => {
-      log.info('Redis sub client connected');
+      log.info('Redis sub client connected', { type: 'redis_connect', client: 'sub' });
     });
   }
 
@@ -79,7 +83,7 @@ export async function closeRedis(): Promise<void> {
   redisPubClient = null;
   redisSubClient = null;
 
-  log.info('Redis connections closed');
+  log.info('Redis connections closed', { type: 'redis_close', count: clients.length });
 }
 
 // ============================================================================
@@ -104,7 +108,11 @@ export async function getCache<T>(key: string, options?: CacheOptions): Promise<
 
     return JSON.parse(value) as T;
   } catch (error) {
-    log.error(`Cache get error for key ${fullKey}:`, error);
+    log.error('Cache get error', {
+      type: 'cache_get_error',
+      key: fullKey,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    });
     return null;
   }
 }
@@ -124,7 +132,12 @@ export async function setCache<T>(
   try {
     await redis.setex(fullKey, ttl, JSON.stringify(value));
   } catch (error) {
-    log.error(`Cache set error for key ${fullKey}:`, error);
+    log.error('Cache set error', {
+      type: 'cache_set_error',
+      key: fullKey,
+      ttl,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    });
   }
 }
 
@@ -146,7 +159,11 @@ export async function deleteCache(pattern: string, options?: CacheOptions): Prom
       await redis.del(fullPattern);
     }
   } catch (error) {
-    log.error(`Cache delete error for pattern ${fullPattern}:`, error);
+    log.error('Cache delete error', {
+      type: 'cache_delete_error',
+      pattern: fullPattern,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    });
   }
 }
 

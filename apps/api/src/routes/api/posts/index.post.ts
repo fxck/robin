@@ -71,7 +71,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  log.info(`Post created: ${postId} by user ${user.id}`);
+  log.info('Post created', {
+    type: 'post_created',
+    postId,
+    userId: user.id,
+    status: data.status,
+    slug,
+    requestId: event.context.requestId
+  });
 
   return {
     post: {

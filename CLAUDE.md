@@ -17,6 +17,7 @@
 - ✅ S3 file uploads
 - ✅ Full-text search
 - ✅ Infinite scroll UI
+- ✅ Production logging (structured JSON, request tracing, syslog-ng compatible)
 
 ---
 
@@ -37,6 +38,7 @@
 - **Cache:** ioredis 5.8
 - **Storage:** AWS S3 SDK
 - **Email:** nodemailer + Mailpit for development
+- **Logging:** Pino 9.x (JSON structured logging, syslog-ng compatible)
 
 ### Shared (`packages/*`)
 - `@robin/database` - Drizzle schema & client
@@ -55,8 +57,8 @@ robin/
 │   ├── api/          # Backend (13 endpoints)
 │   │   ├── routes/   # /health, /api/auth, /api/users, /api/posts, /api/upload
 │   │   ├── services/ # db, auth, redis (412 LOC), s3 (175 LOC)
-│   │   ├── middleware/ # cors, error-handler
-│   │   └── utils/    # logger, validation, auth-guard
+│   │   ├── middleware/ # cors, error-handler, request-id, http-logger
+│   │   └── utils/    # logger (pino), validation, auth-guard
 │   └── app/          # Frontend (11 routes)
 │       ├── routes/   # /, /auth, /forgot-password, /reset-password, /dashboard, /posts/*, /admin/posts/*
 │       ├── components/ # auth-form, error-boundary
@@ -224,6 +226,23 @@ VITE_API_URL=http://localhost:3000
 - **Test endpoint:** `POST /api/test-email` - Send test email
 - **Features:** Password reset emails, HTML templates
 - **No auth required:** SMTP on port 1025 (no username/password)
+
+### Logging (`apps/api/src/utils/logger.ts` + middleware)
+- **Library:** Pino 9.x (production-grade structured logging)
+- **Format:** JSON in production, pretty-print in development
+- **Features:**
+  - Request correlation (automatic request IDs via ULID)
+  - HTTP request/response logging with timing
+  - Structured fields for Logstash/Elasticsearch
+  - Automatic redaction of sensitive fields (passwords, tokens, etc.)
+  - Error tracking with stack traces
+- **Middleware:**
+  - `request-id.ts` - Generate/extract correlation IDs
+  - `http-logger.ts` - Log all HTTP requests/responses
+  - `error-handler.ts` - Structured error logging
+- **Syslog-ng compatible:** Logs to stdout in JSON format for log aggregation
+- **Documentation:** See [apps/api/LOGGING.md](apps/api/LOGGING.md)
+- **Test:** `node apps/api/test-logging.mjs`
 
 ---
 
