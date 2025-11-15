@@ -2,6 +2,19 @@ import { createAuthClient } from 'better-auth/react';
 
 export const authClient = createAuthClient({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  fetchOptions: {
+    onError: async (ctx) => {
+      if (ctx.response.status === 429) {
+        // Rate limited - the client will automatically retry
+        console.warn('[Auth] Rate limited, retrying...');
+      }
+    },
+    retry: {
+      attempts: 3,
+      delay: 1000,
+      statusCodes: [429, 500, 502, 503, 504],
+    },
+  },
 });
 
 export const {
