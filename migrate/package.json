@@ -6,6 +6,7 @@
   "description": "Standalone migration runtime for production deployments",
   "dependencies": {
     "drizzle-kit": "0.31.7",
+    "drizzle-orm": "^0.44.7",
     "postgres": "^3.4.7"
   }
 }
