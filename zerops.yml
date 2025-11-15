@@ -17,7 +17,6 @@ zerops:
       base: nodejs@22
       ports:
         - port: 3000
-          protocol: tcp
           httpSupport: true
       start: node apps/api/.output/server/index.mjs
       envVariables:
