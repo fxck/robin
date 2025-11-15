@@ -4,6 +4,7 @@ import { openAPI } from 'better-auth/plugins';
 import type { Database } from '@robin/database';
 import { users, sessions, accounts, verifications } from '@robin/database';
 import nodemailer from 'nodemailer';
+import type { Redis } from 'ioredis';
 
 // Email sending utility
 async function sendEmail(
@@ -32,6 +33,7 @@ export function createAuth(db: Database, config: {
   baseURL: string;
   secret: string;
   trustedOrigins?: string[];
+  redis?: Redis;
   emailConfig?: {
     host: string;
     port: number;
@@ -63,6 +65,25 @@ export function createAuth(db: Database, config: {
         partitioned: true, // Required by new browser standards for cross-site cookies
       },
     },
+
+    // Use Redis for session storage (faster than PostgreSQL)
+    secondaryStorage: config.redis ? {
+      get: async (key) => {
+        const value = await config.redis!.get(key);
+        return value;
+      },
+      set: async (key, value, ttl) => {
+        if (ttl) {
+          // Better Auth uses seconds, Redis SET EX also uses seconds
+          await config.redis!.set(key, value, 'EX', ttl);
+        } else {
+          await config.redis!.set(key, value);
+        }
+      },
+      delete: async (key) => {
+        await config.redis!.del(key);
+      },
+    } : undefined,
 
     emailAndPassword: {
       enabled: true,

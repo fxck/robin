@@ -34,7 +34,7 @@
 ### Backend (`apps/api`)
 - **Framework:** Nitropack 2.12 (H3)
 - **Database:** Drizzle ORM + PostgreSQL
-- **Auth:** Better Auth 1.4
+- **Auth:** Better Auth 1.4 (Redis secondary storage for sessions)
 - **Cache:** ioredis 5.8
 - **Storage:** AWS S3 SDK
 - **Email:** nodemailer + Mailpit for development
@@ -84,6 +84,11 @@ robin/
 - Soft deletes (`deletedAt`)
 - Optimistic locking (`version`)
 - Unique constraints (slugs, likes)
+
+**Session Storage:**
+- Primary: PostgreSQL (users, accounts, verifications)
+- Secondary: Redis (sessions, rate limiting) - Better Auth secondaryStorage
+- Multi-container safe: Shared PostgreSQL + Redis cluster
 
 ---
 
