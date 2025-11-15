@@ -1,272 +1,333 @@
-# Robin - AI Context
+# CLAUDE.md
 
-> **Updated:** 2025-11-15
-> **Status:** Production-Ready Full-Stack Blogging Platform
-> **Stack:** Nx Monorepo • React 19 • Nitro • PostgreSQL • Redis • S3
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
----
+## Project Overview
 
-## Quick Overview
+Robin is a modern full-stack blog platform built with React 19, Nitropack, and Better Auth. The project uses an Nx monorepo with pnpm workspaces.
 
-**Robin** is a modern full-stack blogging platform with authentication, posts management, file uploads, and caching.
+**Tech Stack:**
+- **Frontend:** React 19 + Vite + TanStack Router + Radix UI
+- **Backend:** Nitropack (v2) + H3 handlers
+- **Database:** PostgreSQL via Drizzle ORM
+- **Cache/Sessions:** Redis (via ioredis)
+- **Storage:** S3-compatible object storage
+- **Auth:** Better Auth (email/password + GitHub/Google OAuth)
+- **Monorepo:** Nx 22 + pnpm workspaces
 
-### Core Features
-- ✅ Authentication (email/password, OAuth ready, password reset)
-- ✅ Posts CRUD (drafts, publishing, images, likes, views, trending)
-- ✅ Redis caching & rate limiting
-- ✅ S3 file uploads
-- ✅ Full-text search
-- ✅ Infinite scroll UI
-- ✅ Production logging (structured JSON, request tracing, syslog-ng compatible)
+## Development Commands
 
----
+### Starting the development environment
 
-## Tech Stack
+```bash
+# Start both API and frontend in parallel
+nx run-many --target=dev --projects=api,app
 
-### Frontend (`apps/app`)
-- **Framework:** React 19 + Vite 7
-- **Routing:** TanStack Router (file-based)
-- **State:** TanStack Query
-- **Forms:** TanStack Form + Zod
-- **UI:** Radix UI Themes, TailwindCSS
-- **Icons:** Lucide React
+# Or individually:
+nx dev api    # API server at http://localhost:3000
+nx dev app    # Frontend at http://localhost:5173
+```
 
-### Backend (`apps/api`)
-- **Framework:** Nitropack 2.12 (H3)
-- **Database:** Drizzle ORM + PostgreSQL
-- **Auth:** Better Auth 1.4 (Redis secondary storage for sessions)
-- **Cache:** ioredis 5.8
-- **Storage:** AWS S3 SDK
-- **Email:** nodemailer + Mailpit for development
-- **Logging:** Pino 9.x (JSON structured logging, syslog-ng compatible)
+### Building
 
-### Shared (`packages/*`)
-- `@robin/database` - Drizzle schema & client
-- `@robin/auth` - Auth config (server + client)
-- `@robin/types` - Shared TypeScript types
-- `@robin/utils` - Utilities (placeholder)
-- `@robin/config` - Config (placeholder)
+```bash
+# Build everything
+nx run-many --target=build
 
----
+# Build individually
+nx build api  # Creates apps/api/.output/
+nx build app  # Creates dist/apps/app/
+```
 
-## Project Structure
+### Testing
+
+```bash
+# Run all tests
+nx run-many --target=test
+
+# Test specific project
+nx test api
+nx test app
+
+# Run tests in CI mode with coverage
+nx test api --configuration=ci
+```
+
+### Linting
+
+```bash
+# Lint everything
+nx run-many --target=lint
+
+# Lint specific project
+nx lint api
+nx lint app
+```
+
+### Database Migrations
+
+**IMPORTANT:** The migration system uses an isolated `migrate/` folder with its own locked dependencies.
+
+```bash
+# 1. Edit schema in packages/database/src/schema/*.ts
+# 2. Generate migration SQL
+pnpm db:generate
+
+# 3. Review the generated SQL
+cat migrate/migrations/XXXX_*.sql
+
+# 4. Commit migrations to git
+git add migrate/
+git commit -m "feat: add migration"
+
+# Migrations run automatically on deployment via zerops.yml
+```
+
+**How migrations work:**
+- `migrate/` has isolated dependencies (drizzle-kit + postgres) with locked versions in `migrate/pnpm-lock.yaml`
+- On deployment, Zerops runs `drizzle-kit migrate` from the standalone `migrate/` folder using `zsc execOnce` for idempotency
+- No workspace dependencies or TypeScript files are shipped to production
+
+## Architecture
+
+### Monorepo Structure
 
 ```
 robin/
 ├── apps/
-│   ├── api/          # Backend (13 endpoints)
-│   │   ├── routes/   # /health, /api/auth, /api/users, /api/posts, /api/upload
-│   │   ├── services/ # db, auth, redis (412 LOC), s3 (175 LOC)
-│   │   ├── middleware/ # cors, error-handler, request-id, http-logger
-│   │   └── utils/    # logger (pino), validation, auth-guard
-│   └── app/          # Frontend (11 routes)
-│       ├── routes/   # /, /auth, /forgot-password, /reset-password, /dashboard, /posts/*, /admin/posts/*
-│       ├── components/ # auth-form, error-boundary
-│       └── lib/      # api-client, auth
+│   ├── api/          # Backend Nitropack application
+│   └── app/          # Frontend React application
 ├── packages/
-│   ├── database/     # Drizzle schema (6 tables)
-│   ├── auth/         # Better Auth config
-│   ├── types/        # Shared types
-│   ├── utils/        # Utilities
-│   └── config/       # Config
-├── migrate/          # Standalone migration runtime
-│   ├── drizzle.config.ts  # Migration config
-│   ├── migrations/   # SQL migrations (tracked in git)
-│   └── node_modules/ # Isolated deps (installed in Zerops build)
-└── .vscode/          # Debug config
+│   ├── database/     # Shared database client and schema
+│   ├── auth/         # Shared auth configuration
+│   ├── types/        # Shared TypeScript types
+│   ├── utils/        # Shared utilities
+│   └── config/       # Shared configuration
+└── migrate/          # Standalone migration runtime (isolated deps)
 ```
 
----
+### Backend Architecture (`apps/api/`)
 
-## Database Schema
+**Framework:** Nitropack provides file-based routing with H3 handlers.
 
-**Auth Tables:** users, sessions, accounts, verifications
-**Content Tables:** posts (with full-text search), post_likes
+**Directory structure:**
+- `src/routes/` - File-based API routes (e.g., `api/posts/[id].get.ts` → GET /api/posts/:id)
+- `src/middleware/` - Global middleware (request-id, error-handler, http-logger, cors)
+- `src/services/` - Singleton services (auth, db, redis, s3)
+- `src/utils/` - Utilities (validation, auth-guard, logger)
+- `src/jobs/` - Background jobs
+- `src/plugins/` - Nitro plugins
 
-**Key Features:**
-- PostgreSQL tsvector for search
-- Soft deletes (`deletedAt`)
-- Optimistic locking (`version`)
-- Unique constraints (slugs, likes)
+**Key patterns:**
+- Nitro auto-imports utilities from `utils/**` and `services/**` (configured in `nitro.config.ts`)
+- `defineEventHandler` is auto-imported
+- Database accessed via `db` singleton from `services/db.ts`
+- Auth handled via Better Auth in `services/auth.ts`
+- Redis used for session storage (Better Auth `secondaryStorage`) and view count caching
+- S3 used for image uploads
 
-**Session Storage:**
-- Primary: PostgreSQL (users, accounts, verifications)
-- Secondary: Redis (sessions, rate limiting) - Better Auth secondaryStorage
-- Multi-container safe: Shared PostgreSQL + Redis cluster
+**Route handlers:**
+- Located in `src/routes/` with naming convention: `[path].[method].ts`
+- Example: `api/posts/index.get.ts` → GET /api/posts
+- Example: `api/posts/[id].patch.ts` → PATCH /api/posts/:id
+- Use `getRouterParam(event, 'id')` for route parameters
+- Use `readBody(event)` for request body
+- Use `validateBody(event, schema)` for validation (custom util)
 
----
+### Frontend Architecture (`apps/app/`)
 
-## API Endpoints (13)
+**Framework:** React 19 with Vite and TanStack Router v8.
 
-### Core
-- `GET /health` - Health check
+**Directory structure:**
+- `src/routes/` - File-based routes (TanStack Router convention)
+- `src/components/` - Reusable React components
+- `src/lib/` - Frontend utilities (api-client, auth)
+- `src/hooks/` - Custom React hooks
+- `src/app/` - App setup
 
-### Auth (Better Auth)
-- `POST /api/auth/*` - signup, signin, signout, session, password reset
+**Key patterns:**
+- TanStack Router uses file-based routing from `src/routes/`
+- Route files export `Route = createFileRoute('/path')` or `createRootRoute()`
+- Radix UI used for components with dark theme (purple accent)
+- TanStack Query for data fetching and caching
+- Authentication via Better Auth client (`@robin/auth/client`)
+- API calls use `api.get()`, `api.post()`, etc. from `lib/api-client.ts`
+- All API requests include `credentials: 'include'` for cross-domain cookies
 
-### Users
-- `GET /api/users` - List users (paginated, searchable)
-- `GET /api/users/me` - Current user (protected)
+**TanStack Router specifics:**
+- `__root.tsx` - Root layout with QueryClientProvider, Theme, Navigation
+- Route files in `src/routes/` with naming like `posts.$id.tsx` for `/posts/:id`
+- `routeTree.gen.ts` is auto-generated by TanStack Router plugin
 
-### Posts (7 endpoints)
-- `POST /api/posts` - Create (protected, rate limited)
-- `GET /api/posts` - List (cached 5min, search, filters)
-- `GET /api/posts/:id` - Get (cached 15min, view counter)
-- `PATCH /api/posts/:id` - Update (protected, version check)
-- `DELETE /api/posts/:id` - Delete (protected, S3 cleanup)
-- `POST /api/posts/:id/like` - Like/unlike (protected)
-- `GET /api/posts/trending` - Trending (Redis sorted sets)
+### Shared Packages
 
-### Files
-- `POST /api/upload` - Upload to S3 (protected, rate limited, 10MB max)
-- `POST /api/test-email` - Test email (dev only)
+**`@robin/database`:**
+- Drizzle ORM client factory (`getDb(connectionString)`)
+- Schema definitions in `src/schema/` (users, sessions, accounts, verifications, posts)
+- Export all tables and types
 
----
+**`@robin/auth`:**
+- Server-side: `createAuth(db, config)` factory (Better Auth instance)
+- Client-side: Import from `@robin/auth/client` in React components
+- Configured for cross-domain cookies (SameSite=none, Secure, Partitioned)
+- Redis-backed session storage for performance
+- Email verification enabled (auto-signin even if unverified)
 
-## Frontend Routes (11)
+**`@robin/types`:**
+- Shared TypeScript types
 
-### Public
-- `/` - Home
-- `/auth` - Login/signup
-- `/forgot-password` - Password reset request
-- `/reset-password` - Password reset confirmation
-- `/posts` - Posts feed (infinite scroll, trending toggle)
-- `/posts/:id` - Post viewer
+**`@robin/utils`:**
+- Shared utilities
 
-### Protected (Auth Required)
-- `/dashboard` - User dashboard
-- `/admin/posts` - Manage posts
-- `/admin/posts/new` - Create post
-- `/admin/posts/:id/edit` - Edit post
+**`@robin/config`:**
+- Shared configuration
 
----
+### Authentication Flow
 
-## Development
+1. Better Auth handles routes at `/api/auth/*` (catch-all handler in `api/routes/api/auth/[...all].ts`)
+2. Auth instance created in `api/services/auth.ts` with:
+   - Database adapter (Drizzle)
+   - Redis secondary storage for sessions
+   - Email/password + OAuth (GitHub, Google)
+   - Email verification with nodemailer
+3. Frontend auth via `@robin/auth/client` and TanStack Query
+4. Cross-domain cookies configured for SameSite=none (app and API on different domains)
 
-### Setup
-```bash
-pnpm install
-nx run-many --target=dev  # Start both apps
-```
+### Redis Usage
 
-### Commands
-```bash
-# Development
-nx dev api        # Backend (port 3000)
-nx dev app        # Frontend (port 5173)
+- **Session storage:** Better Auth uses Redis as `secondaryStorage` for faster session lookups
+- **View count caching:** Post views tracked in Redis, synced to PostgreSQL every 5 minutes via cron job
+- Connection managed by singleton in `api/services/redis.ts`
 
-# Build
-nx build api
-nx build app
+### S3 Storage
 
-# Testing
-nx test api       # Jest (0% coverage - needs tests)
-nx test app
+- Image uploads handled via `/api/upload` endpoint
+- Uses AWS SDK v3 with S3-compatible storage (Zerops)
+- Multipart upload support via `@aws-sdk/lib-storage`
+- Configured in `api/services/s3.ts`
 
-# Linting
-nx lint api
-nx lint app
+### Nitro Configuration
 
-# Database Migrations
-pnpm db:generate  # Generate migrations from schema changes
-```
+Key aspects in `apps/api/nitro.config.ts`:
+- **Alias resolution:** Workspace packages resolved via absolute paths
+- **Auto-imports:** `utils/**` and `services/**` directories globally imported
+- **Runtime config:** Environment variables mapped to `useRuntimeConfig()`
+- **Experimental features:** `asyncContext: true`, `typescriptBundlerResolution: true`
 
----
+### Environment Variables
 
-## Environment Variables
+All environment variables for the API use the `NITRO_` prefix in production (Zerops deployment).
 
-```bash
-# Database (NITRO_ prefix for runtime config)
-NITRO_DATABASE_URL=postgresql://...
+**Required:**
+- `NITRO_DATABASE_URL` - PostgreSQL connection string
+- `NITRO_REDIS_URL` - Redis connection string
+- `NITRO_S3_ENDPOINT` - S3 endpoint
+- `NITRO_S3_REGION` - S3 region
+- `NITRO_S3_BUCKET` - S3 bucket name
+- `NITRO_S3_ACCESS_KEY_ID` - S3 access key
+- `NITRO_S3_SECRET_ACCESS_KEY` - S3 secret key
+- `AUTH_SECRET` - Better Auth secret (32+ chars)
+- `NITRO_PUBLIC_API_BASE` - API base URL (e.g., https://api.robin.app)
+- `NITRO_PUBLIC_APP_URL` - Frontend URL (e.g., https://robin.app)
 
-# Redis
-NITRO_REDIS_URL=redis://...
+**Optional:**
+- `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` - GitHub OAuth
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - Google OAuth
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`, `SMTP_SECURE` - Email configuration
 
-# S3
-NITRO_S3_ENDPOINT=https://...
-NITRO_S3_REGION=us-east-1
-NITRO_S3_BUCKET=...
-NITRO_S3_ACCESS_KEY_ID=...
-NITRO_S3_SECRET_ACCESS_KEY=...
+**Frontend:**
+- `VITE_API_URL` - API base URL (defaults to `http://localhost:3000`)
 
-# Auth
-AUTH_SECRET=...        # Min 32 chars
-JWT_SECRET=...
+### Deployment (Zerops)
 
-# OAuth (optional)
-GITHUB_CLIENT_ID=...
-GITHUB_CLIENT_SECRET=...
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
+Configuration in `zerops.yml`:
 
-# Email (Mailpit for dev - catches all emails)
-SMTP_HOST=mailpit
-SMTP_PORT=1025
-SMTP_USER=
-SMTP_PASSWORD=
-EMAIL_FROM=noreply@robin.local
-SMTP_SECURE=false
+**API (`apiprod` setup):**
+- Build: Install deps, build API, install isolated migration deps
+- Deploy files: `apps/api/.output`, `migrate/`, `scripts/`
+- Init: Run migrations once per version with `zsc execOnce`
+- Start: `node apps/api/.output/server/index.mjs`
+- Cron: Sync view counts every 5 minutes via `scripts/sync-views.mjs`
+- Health check: GET `/health`
 
-# URLs
-API_BASE=http://localhost:3000
-APP_URL=http://localhost:5173
-VITE_API_URL=http://localhost:3000
-```
+**App (`appprod` setup):**
+- Build: Install deps, build static React app
+- Deploy files: `dist/apps/app/` contents
+- Run: Static file server
 
----
+### Path Aliases
 
-## Key Services
+**Backend (Nitro):**
+- `@robin/database` → `packages/database/src/index.ts`
+- `@robin/auth` → `packages/auth/src/index.ts`
+- `@robin/types` → `packages/types/src/index.ts`
+- `@robin/utils` → `packages/utils/src/index.ts`
+- `@robin/config` → `packages/config/src/index.ts`
 
-### Redis (`apps/api/src/services/redis.ts` - 412 LOC)
-- Caching (get/set/delete with TTL)
-- Rate limiting (sliding window)
-- Pub/Sub (real-time events)
-- Counters (views)
-- Sorted sets (trending algorithm)
+**Frontend (Vite):**
+- `@/` → `apps/app/src/`
+- Workspace packages via `@robin/*`
 
-### S3 (`apps/api/src/services/s3.ts` - 175 LOC)
-- File uploads (images only)
-- Validation (type, size)
-- URL generation
-- Cleanup on delete
+### Testing Strategy
 
-### Email (Mailpit)
-- **Development:** Mailpit catches all outgoing emails (Web UI: http://mailpit:8025)
-- **Test endpoint:** `POST /api/test-email` - Send test email
-- **Features:** Password reset emails, HTML templates
-- **No auth required:** SMTP on port 1025 (no username/password)
+- Jest configured for both backend and frontend
+- Backend tests: `apps/api/jest.config.ts`
+- Frontend tests: React Testing Library + jsdom environment
+- Run individual tests: `nx test api --testFile=path/to/test.spec.ts`
 
-### Logging (`apps/api/src/utils/logger.ts` + middleware)
-- **Library:** Pino 9.x (production-grade structured logging)
-- **Format:** JSON in production, pretty-print in development
-- **Features:**
-  - Request correlation (automatic request IDs via ULID)
-  - HTTP request/response logging with timing
-  - Structured fields for Logstash/Elasticsearch
-  - Automatic redaction of sensitive fields (passwords, tokens, etc.)
-  - Error tracking with stack traces
-- **Middleware:**
-  - `request-id.ts` - Generate/extract correlation IDs
-  - `http-logger.ts` - Log all HTTP requests/responses
-  - `error-handler.ts` - Structured error logging
-- **Syslog-ng compatible:** Logs to stdout in JSON format for log aggregation
-- **Documentation:** See [apps/api/LOGGING.md](apps/api/LOGGING.md)
-- **Test:** `node apps/api/test-logging.mjs`
+### Cron Jobs
 
----
+Defined in `zerops.yml` under `run.crontab`:
+- **Sync views:** `*/5 * * * *` (every 5 minutes) - Syncs Redis view counts to PostgreSQL
+- Runs on single container only (Zerops handles idempotency)
+- Script: `scripts/sync-views.mjs`
 
-## Useful Links
+## Common Patterns
 
-- [Nx Docs](https://nx.dev)
-- [Nitro Docs](https://nitro.unjs.io)
-- [TanStack Router](https://tanstack.com/router)
-- [Radix UI](https://www.radix-ui.com)
-- [Drizzle ORM](https://orm.drizzle.team)
+### Adding a new API endpoint
 
----
+1. Create file in `apps/api/src/routes/api/` following naming convention
+2. Export default `defineEventHandler(async (event) => { ... })`
+3. Use auto-imported utilities: `getRouterParam`, `readBody`, `getQuery`
+4. Access database via `db` from `services/db`
+5. Use `validateBody(event, schema)` for request validation
+6. Return JSON directly (Nitro handles serialization)
 
-**Size:** ~1.1GB (node_modules)
-**LOC:** ~6,000 TypeScript/TSX
-**Package Manager:** pnpm 9.11
-**Deployment Target:** Zerops (PostgreSQL, Redis, S3)
-**Dev Email:** Mailpit (http://localhost:8025)
+### Adding a new database table
+
+1. Create schema file in `packages/database/src/schema/`
+2. Export table definition using Drizzle syntax
+3. Export from `packages/database/src/schema/index.ts`
+4. Generate migration: `pnpm db:generate`
+5. Review SQL in `migrate/migrations/`
+6. Commit migration files
+
+### Adding a new frontend route
+
+1. Create file in `apps/app/src/routes/` following TanStack Router convention
+2. Export `Route = createFileRoute('/path')({ component: MyComponent })`
+3. Use TanStack Query hooks for data fetching
+4. Access auth state via `useSession()` from `@robin/auth/client`
+5. Make API calls via `api.get()`, `api.post()`, etc.
+
+### Working with Better Auth
+
+**Backend:**
+- Auth instance is singleton in `services/auth.ts`
+- Add auth handlers to routes via `auth.handler(toWebRequest(event))`
+- Check auth via `auth.api.getSession({ headers: event.headers })`
+
+**Frontend:**
+- Import hooks from `@robin/auth/client`
+- Use `useSession()` for current user
+- Use `signIn.email()`, `signUp.email()`, `signOut()`, etc.
+- Social auth via `signIn.social({ provider: 'github' })`
+
+## Important Notes
+
+- **Nitro auto-imports:** `defineEventHandler`, utilities from `utils/**`, services from `services/**` are globally available in API code
+- **Migration isolation:** The `migrate/` folder has its own `package.json` and `pnpm-lock.yaml` - never modify these manually
+- **Cross-domain cookies:** Auth cookies use `SameSite=none; Secure; Partitioned` for cross-domain support
+- **Redis as cache:** View counts are cached in Redis and synced to PostgreSQL periodically
+- **TanStack Router v8:** Uses file-based routing with auto-generated route tree
+- **Radix UI theming:** Dark mode with purple accent is configured in `__root.tsx`

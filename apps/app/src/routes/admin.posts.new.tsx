@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Container, Heading, Flex, Button, Card, TextField, Box, Select, Text } from '@radix-ui/themes';
-import { Upload, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
-import { NovelEditor } from '../components';
-import type { CreatePostInput, UploadResponse, PostResponse } from '@robin/types';
+import { NovelEditor, FileUpload } from '../components';
+import type { CreatePostInput, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/new')({
   component: NewPostPage,
@@ -21,14 +21,12 @@ export const Route = createFileRoute('/admin/posts/new')({
 
 function NewPostPage() {
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
-  const [uploading, setUploading] = useState(false);
 
   const createPostMutation = useMutation({
     mutationFn: async (data: CreatePostInput) => {
@@ -45,47 +43,6 @@ function NewPostPage() {
     },
   });
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size must be less than 10MB');
-      return;
-    }
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('File must be an image');
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const data: UploadResponse = await response.json();
-      setCoverImage(data.url);
-      toast.success('Image uploaded successfully!');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to upload image');
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,43 +92,10 @@ function NewPostPage() {
                   <Text size="2" weight="bold" mb="2" as="label">
                     Cover Image
                   </Text>
-                  <Flex gap="3" align="center">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      style={{ display: 'none' }}
-                    />
-                    <Button
-                      type="button"
-                      variant="soft"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
-                    >
-                      <Upload size={16} />
-                      {uploading ? 'Uploading...' : 'Upload Image'}
-                    </Button>
-                    {coverImage && (
-                      <Text size="2" color="green">
-                        ✓ Image uploaded
-                      </Text>
-                    )}
-                  </Flex>
-                  {coverImage && (
-                    <Box mt="3">
-                      <img
-                        src={coverImage}
-                        alt="Cover preview"
-                        style={{
-                          width: '100%',
-                          maxHeight: '300px',
-                          objectFit: 'cover',
-                          borderRadius: 'var(--radius-2)',
-                        }}
-                      />
-                    </Box>
-                  )}
+                  <FileUpload
+                    value={coverImage}
+                    onChange={setCoverImage}
+                  />
                 </Box>
 
                 {/* Title */}

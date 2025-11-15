@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Container, Flex, Button, Card, Text, Box, Grid } from '@radix-ui/themes';
 import { TrendingUp, Heart, Eye } from 'lucide-react';
 import { api } from '../lib/api-client';
+import { Image, Avatar } from '../components';
 import type { PostsListResponse, PostListItem } from '@robin/types';
 
 export const Route = createFileRoute('/')({
@@ -99,18 +100,18 @@ function Index() {
                   <Link key={post.id} to="/posts/$id" params={{ id: post.id }} style={{ textDecoration: 'none' }}>
                     <Card className="post-card">
                       <Flex direction="column" gap="0">
-                        {post.coverImage && (
-                          <Box
-                            style={{
-                              width: '100%',
-                              height: '200px',
-                              backgroundImage: `url(${post.coverImageThumb || post.coverImage})`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              borderRadius: 'var(--radius-3) var(--radius-3) 0 0',
-                            }}
-                          />
-                        )}
+                        <Image
+                          src={post.coverImageThumb || post.coverImage}
+                          alt={post.title}
+                          placeholder="gradient"
+                          placeholderText={post.title}
+                          aspectRatio={16 / 9}
+                          style={{
+                            width: '100%',
+                            height: '200px',
+                            borderRadius: 'var(--radius-3) var(--radius-3) 0 0',
+                          }}
+                        />
                         <Flex direction="column" gap="3" p="4">
                           <Text size="5" weight="bold">{post.title}</Text>
                           {post.excerpt && (
@@ -122,17 +123,12 @@ function Index() {
                           )}
                           <Flex justify="between" align="center" mt="2">
                             <Flex gap="2" align="center">
-                              {post.author?.image && (
-                                <Box
-                                  style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    borderRadius: '50%',
-                                    backgroundImage: `url(${post.author.image})`,
-                                    backgroundSize: 'cover',
-                                  }}
-                                />
-                              )}
+                              <Avatar
+                                src={post.author?.image}
+                                alt={post.author?.name || 'Author'}
+                                name={post.author?.name}
+                                size={28}
+                              />
                               <Text size="2" color="gray">
                                 {post.author?.name}
                               </Text>

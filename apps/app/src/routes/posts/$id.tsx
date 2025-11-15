@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { api } from '../../lib/api-client';
 import { useSession } from '../../lib/auth';
+import { Image, Avatar } from '../../components';
 import type { PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/posts/$id')({
@@ -86,15 +87,16 @@ function PostPage() {
             <Flex direction="column" gap="4">
               {/* Cover Image */}
               {post.coverImage && (
-                <Box
+                <Image
+                  src={post.coverImage}
+                  alt={post.title}
+                  placeholder="gradient"
+                  placeholderText={post.title}
+                  aspectRatio={16 / 9}
                   style={{
                     width: '100%',
                     maxHeight: '500px',
-                    backgroundImage: `url(${post.coverImage})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
                     borderRadius: 'var(--radius-3)',
-                    aspectRatio: '16/9',
                   }}
                 />
               )}
@@ -108,17 +110,12 @@ function PostPage() {
                 {/* Author and Stats */}
                 <Flex justify="between" align="center" wrap="wrap" gap="3">
                   <Flex gap="3" align="center">
-                    {post.author?.image && (
-                      <Box
-                        style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '50%',
-                          backgroundImage: `url(${post.author.image})`,
-                          backgroundSize: 'cover',
-                        }}
-                      />
-                    )}
+                    <Avatar
+                      src={post.author?.image}
+                      alt={post.author?.name || 'Author'}
+                      name={post.author?.name}
+                      size={40}
+                    />
                     <Flex direction="column" gap="1">
                       <Text size="3" weight="medium">
                         {post.author?.name}
