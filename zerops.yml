@@ -39,15 +39,15 @@ zerops:
         NITRO_S3_SECRET_ACCESS_KEY: ${storage_secretAccessKey}
         NITRO_PUBLIC_API_BASE: ${API_BASE}
         NITRO_PUBLIC_APP_URL: ${APP_URL}
-      healthCheck:
-        httpGet:
-          port: 3000
-          path: /health
-    deploy:
-      readinessCheck:
-        httpGet:
-          port: 3000
-          path: /health
+    #   healthCheck:
+    #     httpGet:
+    #       port: 3000
+    #       path: /health
+    # deploy:
+    #   readinessCheck:
+    #     httpGet:
+    #       port: 3000
+    #       path: /health
 
   - setup: appprod
     build:
