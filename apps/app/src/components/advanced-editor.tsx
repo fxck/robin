@@ -170,7 +170,6 @@ const suggestionItems = [
   },
 ];
 
-
 export function AdvancedEditor({
   value,
   onChange,

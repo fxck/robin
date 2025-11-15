@@ -66,7 +66,7 @@ function NewPostPage() {
   };
 
   return (
-    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
+    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
       <Container size="4" py="6">
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="6">

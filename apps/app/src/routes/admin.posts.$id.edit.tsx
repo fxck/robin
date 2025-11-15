@@ -143,7 +143,7 @@ function EditPostPage() {
 
   if (isLoading) {
     return (
-      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
+      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
         <Container size="3" py="6">
           <Card>
             <Flex align="center" justify="center" py="9">
@@ -157,7 +157,7 @@ function EditPostPage() {
 
   if (!data?.post) {
     return (
-      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
+      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
         <Container size="3" py="6">
           <Card>
             <Flex direction="column" align="center" gap="4" py="9">
@@ -176,7 +176,7 @@ function EditPostPage() {
   // Wait for initialization to complete before rendering form
   if (!initialized) {
     return (
-      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
+      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
         <Container size="3" py="6">
           <Card>
             <Flex align="center" justify="center" py="9">
