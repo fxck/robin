@@ -50,12 +50,12 @@ export function AppBar() {
         <Flex align="center" justify="between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 no-underline">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
-              <Text weight="bold" size="base" color="inverse" className="font-serif">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center shadow-lg shadow-accent-500/30">
+              <Text weight="bold" size="base" style={{ color: 'white' }} className="font-serif">
                 R
               </Text>
             </div>
-            <Text size="base" weight="semibold" color="primary">
+            <Text size="base" weight="bold" style={{ color: 'var(--color-text-primary)' }}>
               Robin
             </Text>
           </Link>

@@ -4,7 +4,8 @@
       "Bash(pnpm list:*)",
       "Bash(nx build:*)",
       "Bash(cat:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(nx run:*)"
     ],
     "deny": [],
     "ask": []

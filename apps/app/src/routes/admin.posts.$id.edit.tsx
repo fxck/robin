@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Container, Heading, Flex, Button, Card, TextField, Box, Select, Text } from '@radix-ui/themes';
 import { Save, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
-import { NovelEditor, FileUpload } from '../components';
+import { AdvancedEditor, FileUpload } from '../components';
 import type { UpdatePostInput, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/$id/edit')({
@@ -36,6 +36,9 @@ function EditPostPage() {
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
   const [version, setVersion] = useState(1);
   const [initialized, setInitialized] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Set form values when data loads (only once)
   useEffect(() => {
@@ -65,6 +68,56 @@ function EditPostPage() {
     },
   });
 
+  // Auto-save mutation (silent, doesn't navigate)
+  const autoSaveMutation = useMutation({
+    mutationFn: async (updateData: UpdatePostInput) => {
+      return api.patch<PostResponse>(`/api/posts/${id}`, updateData);
+    },
+    onSuccess: () => {
+      setLastSaved(new Date());
+      setIsSaving(false);
+      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['post', id] });
+    },
+    onError: (error: Error) => {
+      setIsSaving(false);
+      console.error('Auto-save failed:', error);
+    },
+  });
+
+  // Auto-save debounced function
+  const scheduleAutoSave = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      if (title.trim() && content.trim() && initialized) {
+        setIsSaving(true);
+        autoSaveMutation.mutate({
+          title,
+          content,
+          coverImage: coverImage || undefined,
+          status,
+          version,
+        });
+      }
+    }, 2000); // Auto-save after 2 seconds of inactivity
+  }, [title, content, coverImage, status, version, initialized]);
+
+  // Trigger auto-save when content changes
+  useEffect(() => {
+    if (initialized) {
+      scheduleAutoSave();
+    }
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [title, content, coverImage, status, scheduleAutoSave, initialized]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +190,7 @@ function EditPostPage() {
 
   return (
     <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
-      <Container size="3" py="6">
+      <Container size="4" py="6">
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="6">
             {/* Header */}
@@ -145,28 +198,42 @@ function EditPostPage() {
               <Heading size="8">Edit Post</Heading>
               <Flex gap="2">
                 <Button type="button" variant="soft" onClick={() => navigate({ to: '/admin/posts' })}>
-                  Cancel
+                  <ArrowLeft size={16} />
+                  Back
                 </Button>
                 <Button type="submit" disabled={updatePostMutation.isPending}>
-                  <Save size={20} />
-                  {updatePostMutation.isPending ? 'Saving...' : 'Save'}
+                  <Save size={16} />
+                  {updatePostMutation.isPending ? 'Publishing...' : 'Publish'}
                 </Button>
               </Flex>
             </Flex>
 
-            {/* Editor Card */}
-            <Card size="4">
-              <Flex direction="column" gap="4">
-                {/* Cover Image */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Cover Image
-                  </Text>
-                  <FileUpload
-                    value={coverImage}
-                    onChange={setCoverImage}
-                  />
-                </Box>
+            {/* Metadata Card */}
+            <Card>
+              <Flex direction="column" gap="4" p="4">
+                <Flex gap="4" wrap="wrap">
+                  {/* Cover Image */}
+                  <Box style={{ flex: '1', minWidth: '200px' }}>
+                    <Text size="2" weight="bold" mb="2" as="label">
+                      Cover Image
+                    </Text>
+                    <FileUpload value={coverImage} onChange={setCoverImage} />
+                  </Box>
+
+                  {/* Status */}
+                  <Box style={{ minWidth: '150px' }}>
+                    <Text size="2" weight="bold" mb="2" as="label">
+                      Status
+                    </Text>
+                    <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
+                      <Select.Trigger />
+                      <Select.Content>
+                        <Select.Item value="draft">Draft</Select.Item>
+                        <Select.Item value="published">Published</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                  </Box>
+                </Flex>
 
                 {/* Title */}
                 <Box>
@@ -179,39 +246,20 @@ function EditPostPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
+                    style={{ fontSize: '1.5rem', fontWeight: '600' }}
                   />
-                </Box>
-
-                {/* Content */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Content
-                  </Text>
-                  <NovelEditor
-                    value={content}
-                    onChange={setContent}
-                    placeholder="Write your post content here..."
-                  />
-                  <Text size="1" color="gray" mt="1">
-                    {content.length} characters
-                  </Text>
-                </Box>
-
-                {/* Status */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Status
-                  </Text>
-                  <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
-                    <Select.Trigger />
-                    <Select.Content>
-                      <Select.Item value="draft">Draft</Select.Item>
-                      <Select.Item value="published">Published</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
                 </Box>
               </Flex>
             </Card>
+
+            {/* Editor */}
+            <AdvancedEditor
+              value={content}
+              onChange={setContent}
+              isSaving={isSaving}
+              lastSaved={lastSaved}
+              placeholder="Write your post content here... Press '/' for commands"
+            />
           </Flex>
         </form>
       </Container>

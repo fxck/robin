@@ -2,11 +2,11 @@ import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Container, Heading, Flex, Button, Card, TextField, Box, Select, Text } from '@radix-ui/themes';
-import { Save } from 'lucide-react';
+import { Save, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
-import { NovelEditor, FileUpload } from '../components';
+import { AdvancedEditor, FileUpload } from '../components';
 import type { CreatePostInput, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/new')({
@@ -67,36 +67,50 @@ function NewPostPage() {
 
   return (
     <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
-      <Container size="3" py="6">
+      <Container size="4" py="6">
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="6">
             {/* Header */}
             <Flex justify="between" align="center">
               <Heading size="8">Create Post</Heading>
               <Flex gap="2">
-                <Button type="button" variant="soft" onClick={() => navigate({ to: '/posts' })}>
-                  Cancel
+                <Button type="button" variant="soft" onClick={() => navigate({ to: '/admin/posts' })}>
+                  <ArrowLeft size={16} />
+                  Back
                 </Button>
                 <Button type="submit" disabled={createPostMutation.isPending}>
-                  <Save size={20} />
-                  {createPostMutation.isPending ? 'Saving...' : 'Save'}
+                  <Save size={16} />
+                  {createPostMutation.isPending ? 'Creating...' : 'Create'}
                 </Button>
               </Flex>
             </Flex>
 
-            {/* Editor Card */}
-            <Card size="4">
-              <Flex direction="column" gap="4">
-                {/* Cover Image */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Cover Image
-                  </Text>
-                  <FileUpload
-                    value={coverImage}
-                    onChange={setCoverImage}
-                  />
-                </Box>
+            {/* Metadata Card */}
+            <Card>
+              <Flex direction="column" gap="4" p="4">
+                <Flex gap="4" wrap="wrap">
+                  {/* Cover Image */}
+                  <Box style={{ flex: '1', minWidth: '200px' }}>
+                    <Text size="2" weight="bold" mb="2" as="label">
+                      Cover Image
+                    </Text>
+                    <FileUpload value={coverImage} onChange={setCoverImage} />
+                  </Box>
+
+                  {/* Status */}
+                  <Box style={{ minWidth: '150px' }}>
+                    <Text size="2" weight="bold" mb="2" as="label">
+                      Status
+                    </Text>
+                    <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
+                      <Select.Trigger />
+                      <Select.Content>
+                        <Select.Item value="draft">Draft</Select.Item>
+                        <Select.Item value="published">Published</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                  </Box>
+                </Flex>
 
                 {/* Title */}
                 <Box>
@@ -109,39 +123,18 @@ function NewPostPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
+                    style={{ fontSize: '1.5rem', fontWeight: '600' }}
                   />
-                </Box>
-
-                {/* Content */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Content
-                  </Text>
-                  <NovelEditor
-                    value={content}
-                    onChange={setContent}
-                    placeholder="Write your post content here..."
-                  />
-                  <Text size="1" color="gray" mt="1">
-                    {content.length} characters
-                  </Text>
-                </Box>
-
-                {/* Status */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Status
-                  </Text>
-                  <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
-                    <Select.Trigger />
-                    <Select.Content>
-                      <Select.Item value="draft">Draft</Select.Item>
-                      <Select.Item value="published">Published</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
                 </Box>
               </Flex>
             </Card>
+
+            {/* Editor */}
+            <AdvancedEditor
+              value={content}
+              onChange={setContent}
+              placeholder="Write your post content here... Press '/' for commands"
+            />
           </Flex>
         </form>
       </Container>

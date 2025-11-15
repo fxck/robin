@@ -266,7 +266,7 @@ function PostPage() {
 
       {/* Article Content */}
       <Container size="reading" className="py-12">
-        <article className="prose">
+        <article className="prose prose-lg dark:prose-invert max-w-full">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </article>
 
