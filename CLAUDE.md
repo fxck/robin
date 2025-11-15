@@ -69,6 +69,10 @@ robin/
 │   ├── types/        # Shared types
 │   ├── utils/        # Utilities
 │   └── config/       # Config
+├── migrate/          # Standalone migration runtime
+│   ├── drizzle.config.ts  # Migration config
+│   ├── migrations/   # SQL migrations (tracked in git)
+│   └── node_modules/ # Isolated deps (installed in Zerops build)
 └── .vscode/          # Debug config
 ```
 
@@ -163,8 +167,8 @@ nx test app
 nx lint api
 nx lint app
 
-# Database
-pnpm --filter @robin/database db:push  # Run migrations
+# Database Migrations
+pnpm db:generate  # Generate migrations from schema changes
 ```
 
 ---
@@ -172,18 +176,18 @@ pnpm --filter @robin/database db:push  # Run migrations
 ## Environment Variables
 
 ```bash
-# Database
-DATABASE_URL=postgresql://...
+# Database (NITRO_ prefix for runtime config)
+NITRO_DATABASE_URL=postgresql://...
 
 # Redis
-REDIS_URL=redis://...
+NITRO_REDIS_URL=redis://...
 
 # S3
-S3_ENDPOINT=https://...
-S3_REGION=us-east-1
-S3_BUCKET=...
-S3_ACCESS_KEY_ID=...
-S3_SECRET_ACCESS_KEY=...
+NITRO_S3_ENDPOINT=https://...
+NITRO_S3_REGION=us-east-1
+NITRO_S3_BUCKET=...
+NITRO_S3_ACCESS_KEY_ID=...
+NITRO_S3_SECRET_ACCESS_KEY=...
 
 # Auth
 AUTH_SECRET=...        # Min 32 chars

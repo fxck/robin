@@ -5,8 +5,8 @@ zerops:
       buildCommands:
         - pnpm install --frozen-lockfile
         - pnpm exec nx build api
-        # Install isolated migration dependencies
-        - cd migrate && pnpm add drizzle-kit drizzle-orm postgres
+        # Install isolated migration dependencies (ignore workspace warning)
+        - cd migrate && pnpm add drizzle-kit drizzle-orm postgres --ignore-workspace-root-check
       deployFiles:
         - apps/api/.output
         - migrate  # Contains: drizzle.config.ts, migrations/, node_modules/, package.json
