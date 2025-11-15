@@ -10,6 +10,13 @@ export default defineEventHandler((event) => {
     ? localhostPattern.test(origin) || origin === config.public.appUrl
     : origin === config.public.appUrl;
 
+  // Debug logging for CORS issues
+  if (!isAllowed && origin) {
+    console.log('[CORS] Blocked origin:', origin);
+    console.log('[CORS] Expected APP_URL:', config.public.appUrl);
+    console.log('[CORS] NODE_ENV:', process.env.NODE_ENV);
+  }
+
   if (isAllowed) {
     event.node.res.setHeader('Access-Control-Allow-Origin', origin);
     event.node.res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
