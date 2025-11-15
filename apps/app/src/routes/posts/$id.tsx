@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { api } from '../../lib/api-client';
 import { useSession } from '../../lib/auth';
-import { Image } from '../../components';
+import { Image, TableOfContents, RelatedPosts } from '../../components';
 import type { PostResponse } from '@robin/types';
 import { Container } from '../../components/layout/Container';
 import { Flex } from '../../components/layout/Flex';
@@ -178,9 +178,12 @@ function PostPage() {
   const readTime = Math.max(1, Math.ceil(post.content.split(' ').length / 200));
 
   return (
-    <div className="post-detail">
+    <div className="post-detail relative">
       {/* Reading Progress Bar */}
       <ReadingProgress />
+
+      {/* Table of Contents (Desktop only - fixed position) */}
+      <TableOfContents content={post.content} />
 
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-end pb-16 md:pb-24">
@@ -339,6 +342,9 @@ function PostPage() {
             </Flex>
           </div>
         )}
+
+        {/* Related Posts */}
+        <RelatedPosts postId={post.id} />
       </Container>
     </div>
   );

@@ -57,7 +57,7 @@ function RootComponent() {
         <Theme appearance="dark" accentColor="purple" radius="medium">
           <Box style={{ minHeight: '100vh', background: 'var(--color-bg-base)' }}>
             <AppBar />
-            <div style={{ paddingTop: '64px' }}>
+            <div style={{ paddingTop: '80px' }}>
               <Outlet />
             </div>
           </Box>

@@ -6,4 +6,6 @@ export { FileUploadExample } from './file-upload-example';
 export { Image, Avatar } from './image';
 export { ImageShowcase } from './image-showcase';
 export { NovelEditor } from './novel-editor';
+export { TableOfContents } from './TableOfContents';
+export { RelatedPosts } from './RelatedPosts';
 export type { ImageProps, AvatarProps } from './image';
