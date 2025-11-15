@@ -56,6 +56,14 @@ export function createAuth(db: Database, config: {
     secret: config.secret,
     trustedOrigins: config.trustedOrigins || [],
 
+    advanced: {
+      defaultCookieAttributes: {
+        sameSite: 'none', // Required for cross-domain (app and api on different domains)
+        secure: true, // Required when using SameSite=none
+        partitioned: true, // Required by new browser standards for cross-site cookies
+      },
+    },
+
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false, // Set to true to enable email verification
@@ -106,7 +114,8 @@ export function createAuth(db: Database, config: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days
       updateAge: 60 * 60 * 24, // 1 day
       cookieCache: {
-        enabled: false, // Disabled to fix session update issues with TanStack Router (GitHub issue #4389)
+        enabled: true,
+        maxAge: 60 * 5, // 5 minutes
       },
     },
 

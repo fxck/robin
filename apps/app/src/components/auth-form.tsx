@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { Button, Card, Flex, Text, TextField } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { Link } from '@tanstack/react-router';
-import { signIn, signUp, authClient } from '../lib/auth';
+import { signIn, signUp } from '../lib/auth';
 
 // Individual field validators
 const nameValidator = z.string().min(2, { message: 'Name must be at least 2 characters' });
