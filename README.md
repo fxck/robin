@@ -70,18 +70,27 @@ nx lint app
 ### Database Migrations
 
 ```bash
-# Generate new migration (from schema changes)
+# 1. Edit schema
+vim packages/database/src/schema/posts.ts
+
+# 2. Generate migration SQL (from root - uses migrate/drizzle.config.ts)
 pnpm db:generate
 
-# Review generated SQL
+# 3. Review generated SQL
 cat migrate/migrations/0001_*.sql
 
-# Commit migrations to git
-git add migrate/migrations/
+# 4. Commit migrations to git
+git add migrate/
 git commit -m "feat: add migration"
 
-# Migrations run automatically on Zerops deployment via execOnce
+# 5. Deploy - migrations run automatically via Zerops execOnce
 ```
+
+**How it works:**
+- `pnpm db:generate` reads TypeScript schema and generates SQL files to `migrate/migrations/`
+- `migrate/` folder has isolated dependencies (drizzle-kit + postgres) with locked versions
+- On deployment, Zerops runs `drizzle-kit migrate` from the standalone `migrate/` folder
+- No workspace dependencies or schema files are shipped to production
 
 ## Project Structure
 
@@ -96,10 +105,12 @@ robin/
 │   ├── types/        # Shared TypeScript types
 │   ├── utils/        # Shared utilities
 │   └── config/       # Shared configuration
-├── migrate/          # Standalone migration runtime
-│   ├── drizzle.config.ts  # Migration config
-│   ├── migrations/   # Generated SQL migrations (tracked in git)
-│   └── node_modules/ # Isolated deps (ignored, installed in build)
+├── migrate/          # Standalone migration runtime (isolated deps)
+│   ├── drizzle.config.ts  # Migration config (references ../packages/database/src/schema/)
+│   ├── package.json       # Locked migration dependencies (drizzle-kit + postgres)
+│   ├── pnpm-lock.yaml     # Lockfile (tracked in git)
+│   ├── migrations/        # Generated SQL migrations (tracked in git)
+│   └── node_modules/      # Isolated deps (gitignored, installed during build)
 └── ...
 ```
 
