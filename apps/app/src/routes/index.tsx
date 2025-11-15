@@ -9,6 +9,33 @@ import type { PostsListResponse, PostListItem } from '@robin/types';
 
 export const Route = createFileRoute('/')({
   component: Index,
+  head: () => ({
+    meta: [
+      {
+        title: 'Robin - Discover Stories and Ideas',
+      },
+      {
+        name: 'description',
+        content: 'Explore trending stories, articles, and ideas from our community. Join Robin to share your thoughts and discover engaging content.',
+      },
+      {
+        property: 'og:title',
+        content: 'Robin - Discover Stories and Ideas',
+      },
+      {
+        property: 'og:description',
+        content: 'Explore trending stories, articles, and ideas from our community. Join Robin to share your thoughts and discover engaging content.',
+      },
+      {
+        name: 'twitter:title',
+        content: 'Robin - Discover Stories and Ideas',
+      },
+      {
+        name: 'twitter:description',
+        content: 'Explore trending stories, articles, and ideas from our community. Join Robin to share your thoughts and discover engaging content.',
+      },
+    ],
+  }),
 });
 
 function Index() {

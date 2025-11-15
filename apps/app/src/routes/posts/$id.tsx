@@ -11,6 +11,88 @@ import type { PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/posts/$id')({
   component: PostPage,
+  loader: async ({ params, context }) => {
+    try {
+      const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
+      return post;
+    } catch (error) {
+      return null;
+    }
+  },
+  head: ({ loaderData }) => {
+    if (!loaderData?.post) {
+      return {
+        meta: [
+          {
+            title: 'Post Not Found - Robin',
+          },
+        ],
+      };
+    }
+
+    const { post } = loaderData;
+    const description = post.excerpt || post.content.substring(0, 160).replace(/[#*`]/g, '');
+    const imageUrl = post.coverImage || '';
+    const publishedDate = new Date(post.publishedAt || post.createdAt).toISOString();
+
+    return {
+      meta: [
+        {
+          title: `${post.title} - Robin`,
+        },
+        {
+          name: 'description',
+          content: description,
+        },
+        {
+          name: 'author',
+          content: post.author?.name || 'Unknown',
+        },
+        {
+          property: 'article:published_time',
+          content: publishedDate,
+        },
+        {
+          property: 'article:author',
+          content: post.author?.name || '',
+        },
+        // Open Graph tags
+        {
+          property: 'og:type',
+          content: 'article',
+        },
+        {
+          property: 'og:title',
+          content: post.title,
+        },
+        {
+          property: 'og:description',
+          content: description,
+        },
+        ...(imageUrl ? [{
+          property: 'og:image',
+          content: imageUrl,
+        }] : []),
+        // Twitter Card tags
+        {
+          name: 'twitter:card',
+          content: imageUrl ? 'summary_large_image' : 'summary',
+        },
+        {
+          name: 'twitter:title',
+          content: post.title,
+        },
+        {
+          name: 'twitter:description',
+          content: description,
+        },
+        ...(imageUrl ? [{
+          name: 'twitter:image',
+          content: imageUrl,
+        }] : []),
+      ],
+    };
+  },
 });
 
 function PostPage() {
@@ -18,10 +100,12 @@ function PostPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: session } = useSession();
+  const loaderData = Route.useLoaderData();
 
   const { data, isLoading } = useQuery({
     queryKey: ['post', id],
     queryFn: () => api.get<PostResponse>(`/api/posts/${id}`),
+    initialData: loaderData || undefined,
   });
 
   const likeMutation = useMutation({

@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
-import { Flex, Button, Container, Box, Text } from '@radix-ui/themes';
-import { LayoutDashboard, LogOut } from 'lucide-react';
+import { Flex, Button, Container, Box, Text, Avatar, DropdownMenu } from '@radix-ui/themes';
+import { LayoutDashboard, LogOut, Settings, User } from 'lucide-react';
 import { useSession, signOut } from '../lib/auth';
 
 export function Navigation() {
@@ -38,9 +38,40 @@ export function Navigation() {
                     Dashboard
                   </Button>
                 </Link>
-                <Button variant="soft" size="2" onClick={handleSignOut}>
-                  <LogOut size={16} />
-                </Button>
+
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button variant="soft" size="2" style={{ cursor: 'pointer' }}>
+                      <Avatar
+                        size="1"
+                        src={session.user.image || undefined}
+                        fallback={<User size={12} />}
+                        radius="full"
+                      />
+                      {session.user.name}
+                    </Button>
+                  </DropdownMenu.Trigger>
+
+                  <DropdownMenu.Content>
+                    <DropdownMenu.Item asChild>
+                      <Link to="/settings" style={{ textDecoration: 'none' }}>
+                        <Flex align="center" gap="2">
+                          <Settings size={16} />
+                          Settings
+                        </Flex>
+                      </Link>
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Separator />
+
+                    <DropdownMenu.Item color="red" onClick={handleSignOut}>
+                      <Flex align="center" gap="2">
+                        <LogOut size={16} />
+                        Sign Out
+                      </Flex>
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
               </>
             ) : (
               <Link to="/auth">

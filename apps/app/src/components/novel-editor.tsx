@@ -23,6 +23,7 @@ import {
   TaskItem,
   ImageResizer,
 } from 'novel';
+import { Markdown } from 'tiptap-markdown';
 import { Box } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
@@ -174,23 +175,14 @@ const suggestionItems = [
 ];
 
 export function NovelEditor({ value, onChange, placeholder = "Press '/' for commands...", className }: NovelEditorProps) {
-  const [initialContent, setInitialContent] = useState<JSONContent | undefined>();
+  const [initialContent, setInitialContent] = useState<string | undefined>(value);
 
-  // Convert value to JSON content on mount
+  // Update content when value prop changes (e.g., when loading existing post)
   useEffect(() => {
-    if (value) {
-      // Simple text conversion - in production you might want a markdown parser
-      setInitialContent({
-        type: 'doc',
-        content: [
-          {
-            type: 'paragraph',
-            content: value ? [{ type: 'text', text: value }] : [],
-          },
-        ],
-      });
+    if (value && value !== initialContent) {
+      setInitialContent(value);
     }
-  }, []);
+  }, [value, initialContent]);
 
   const extensions = [
     StarterKit.configure({
@@ -203,6 +195,7 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
         },
       },
     }),
+    Markdown,
     Placeholder.configure({
       placeholder,
     }),
@@ -263,10 +256,9 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
             },
           }}
           onUpdate={({ editor }) => {
-            // Get the text content from the editor
-            // In production, you might want to use getJSON() or convert to markdown
-            const text = editor.getText();
-            onChange(text);
+            // Get markdown content from the editor
+            const markdown = editor.storage.markdown.getMarkdown();
+            onChange(markdown);
           }}
         >
           {/* Slash Command Menu */}
