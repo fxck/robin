@@ -120,6 +120,21 @@ function EditPostPage() {
     );
   }
 
+  // Wait for initialization to complete before rendering form
+  if (!initialized) {
+    return (
+      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
+        <Container size="3" py="6">
+          <Card>
+            <Flex align="center" justify="center" py="9">
+              <Text>Loading...</Text>
+            </Flex>
+          </Card>
+        </Container>
+      </Box>
+    );
+  }
+
   return (
     <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
       <Container size="3" py="6">

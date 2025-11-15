@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api-client';
 import { FileUpload } from '../components';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2, User } from 'lucide-react';
 
 export const Route = createFileRoute('/settings')({
@@ -30,6 +30,7 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [initialized, setInitialized] = useState(false);
 
   // Fetch current user data
   const { data: userData, isLoading } = useQuery<{ user: User }>({
@@ -37,11 +38,14 @@ function SettingsPage() {
     queryFn: () => api.get('/api/users/me'),
   });
 
-  // Set initial values when data loads
-  if (userData?.user) {
-    if (!name) setName(userData.user.name);
-    if (!avatarUrl && userData.user.image) setAvatarUrl(userData.user.image);
-  }
+  // Set initial values when data loads (only once)
+  useEffect(() => {
+    if (userData?.user && !initialized) {
+      setName(userData.user.name);
+      setAvatarUrl(userData.user.image || '');
+      setInitialized(true);
+    }
+  }, [userData, initialized]);
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
@@ -57,10 +61,28 @@ function SettingsPage() {
     },
   });
 
-  const handleAvatarChange = (url: string) => {
+  const handleAvatarChange = async (url: string) => {
+    if (!url) {
+      // Handle removal
+      setAvatarUrl('');
+      updateProfileMutation.mutate({ image: null });
+      return;
+    }
+
+    // Update local state immediately for better UX
     setAvatarUrl(url);
-    // Automatically update the avatar when a new image is uploaded
-    updateProfileMutation.mutate({ image: url || null });
+
+    // Update the database
+    try {
+      const updatedUser = await api.patch<User>('/api/users/me', { image: url });
+      queryClient.setQueryData(['currentUser'], { user: updatedUser });
+      queryClient.invalidateQueries({ queryKey: ['session'] });
+      toast.success('Avatar updated successfully');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update avatar');
+      // Revert on error
+      setAvatarUrl(userData?.user?.image || '');
+    }
   };
 
   const handleUpdateProfile = () => {
@@ -95,27 +117,18 @@ function SettingsPage() {
         <Flex direction="column" gap="4">
           <Heading size="5">Profile Picture</Heading>
 
-          <Flex align="center" gap="4">
-            <Avatar
-              size="8"
-              src={avatarUrl || undefined}
-              fallback={<User size={32} />}
-              radius="full"
+          <Box>
+            <Text size="2" color="gray" mb="3" style={{ display: 'block' }}>
+              Click or drag & drop to upload a new profile picture. Max size: 5 MB
+            </Text>
+
+            <FileUpload
+              value={avatarUrl}
+              onChange={handleAvatarChange}
+              maxSize={5 * 1024 * 1024}
+              accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
             />
-
-            <Box style={{ flex: 1 }}>
-              <Text size="2" color="gray" mb="3" style={{ display: 'block' }}>
-                Upload a new profile picture. Max size: 5 MB
-              </Text>
-
-              <FileUpload
-                value={avatarUrl}
-                onChange={handleAvatarChange}
-                maxSize={5 * 1024 * 1024}
-                accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
-              />
-            </Box>
-          </Flex>
+          </Box>
         </Flex>
       </Card>
 
