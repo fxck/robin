@@ -7,7 +7,6 @@ import {
   EditorCommandList,
   EditorBubble,
   EditorBubbleItem,
-  type JSONContent,
   createImageUpload,
   handleImageDrop,
   handleImagePaste,
@@ -26,7 +25,7 @@ import {
 import { Markdown } from 'tiptap-markdown';
 import { Box } from '@radix-ui/themes';
 import { toast } from 'sonner';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Bold,
   Italic,
@@ -175,16 +174,8 @@ const suggestionItems = [
 ];
 
 export function NovelEditor({ value, onChange, placeholder = "Press '/' for commands...", className }: NovelEditorProps) {
-  const [initialContent, setInitialContent] = useState<string | undefined>(value);
-  const [contentKey, setContentKey] = useState(0);
-
-  // Update content when value prop changes (e.g., when loading existing post)
-  useEffect(() => {
-    if (value && value !== initialContent) {
-      setInitialContent(value);
-      setContentKey(prev => prev + 1);
-    }
-  }, [value]);
+  // Only set initial content once when component mounts
+  const [initialContent] = useState<string | undefined>(value);
 
   const extensions = [
     StarterKit.configure({
@@ -242,7 +233,7 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
 
   return (
     <Box className={className}>
-      <EditorRoot key={contentKey}>
+      <EditorRoot>
         <EditorContent
           initialContent={initialContent}
           extensions={extensions}
