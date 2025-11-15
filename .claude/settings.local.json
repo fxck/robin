@@ -3,7 +3,8 @@
     "allow": [
       "Bash(pnpm list:*)",
       "Bash(nx build:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

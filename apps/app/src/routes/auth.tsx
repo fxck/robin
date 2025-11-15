@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { Box, Container, Flex, Heading, Text } from '@radix-ui/themes';
 import { AuthForm } from '../components/auth-form';
 
 export const Route = createFileRoute('/auth')({
@@ -12,25 +11,19 @@ function AuthPage() {
   const navigate = useNavigate();
 
   return (
-    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
-      <Container size="1">
-        <Flex
-          direction="column"
-          align="center"
-          justify="center"
-          gap="6"
-          style={{ minHeight: 'calc(100vh - 60px)', paddingTop: 'var(--space-9)', paddingBottom: 'var(--space-9)' }}
-        >
-          <Flex direction="column" align="center" gap="2" style={{ textAlign: 'center' }}>
-            <Heading size="7">
+    <div className="auth-layout mesh-gradient">
+      <div className="max-w-[540px] mx-auto px-5 md:px-8">
+        <div className="flex flex-col items-center justify-center gap-8" style={{ minHeight: 'calc(100vh - 60px)', paddingTop: 'var(--space-9)', paddingBottom: 'var(--space-9)' }}>
+          <div className="text-center space-y-2">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
               {mode === 'signin' ? 'Welcome back' : 'Create your account'}
-            </Heading>
-            <Text size="3" color="gray">
+            </h1>
+            <p className="text-lg text-gray-400">
               {mode === 'signin'
-                ? 'Sign in to access your dashboard'
-                : 'Get started with Robin today'}
-            </Text>
-          </Flex>
+                ? 'Sign in to continue to Robin'
+                : 'Start your writing journey'}
+            </p>
+          </div>
 
           <AuthForm
             mode={mode}
@@ -39,8 +32,8 @@ function AuthPage() {
               navigate({ to: '/dashboard' });
             }}
           />
-        </Flex>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
