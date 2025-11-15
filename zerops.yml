@@ -5,8 +5,8 @@ zerops:
       buildCommands:
         - pnpm install --frozen-lockfile
         - pnpm exec nx build api
-        # Install isolated migration dependencies with locked versions
-        - cd migrate && pnpm install --frozen-lockfile
+        # Install isolated migration dependencies (ignoring workspace)
+        - cd migrate && pnpm install --frozen-lockfile --ignore-workspace
       deployFiles:
         - apps/api/.output
         - migrate  # Contains: drizzle.config.ts, migrations/, node_modules/, package.json, pnpm-lock.yaml
