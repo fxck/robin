@@ -5,7 +5,7 @@ zerops:
       buildCommands:
         - pnpm install --frozen-lockfile
         - pnpm exec nx build api
-        # Install isolated migration dependencies (ignoring workspace)
+        # Install isolated migration dependencies
         - cd migrate && pnpm install --frozen-lockfile --ignore-workspace
       deployFiles:
         - apps/api/.output
@@ -37,8 +37,8 @@ zerops:
       envVariables:
         NODE_ENV: production
         PORT: 3000
-        NITRO_DATABASE_URL: postgresql://${db_user}:${db_password}@${db_hostname}:${db_port}/${db_dbName}
-        NITRO_REDIS_URL: redis://${redis_hostname}:${redis_port}
+        NITRO_DATABASE_URL: ${db_connectionString}/${db_dbName}
+        NITRO_REDIS_URL: ${redis_connectionString}
         NITRO_S3_ENDPOINT: ${storage_apiUrl}
         NITRO_S3_REGION: us-east-1
         NITRO_S3_BUCKET: ${storage_bucketName}
