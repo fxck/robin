@@ -13,22 +13,16 @@ export default defineNitroConfig({
     port: 3000,
   },
   runtimeConfig: {
-    database: {
-      url: process.env.DATABASE_URL || '',
-    },
-    redis: {
-      url: process.env.REDIS_URL || '',
-    },
-    s3: {
-      endpoint: process.env.S3_ENDPOINT || '',
-      region: process.env.S3_REGION || '',
-      bucket: process.env.S3_BUCKET || '',
-      accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-    },
+    databaseUrl: '',
+    redisUrl: '',
+    s3Endpoint: '',
+    s3Region: '',
+    s3Bucket: '',
+    s3AccessKeyId: '',
+    s3SecretAccessKey: '',
     public: {
-      apiBase: process.env.API_BASE || 'http://localhost:3000',
-      appUrl: process.env.APP_URL || 'http://localhost:5173',
+      apiBase: 'http://localhost:3000',
+      appUrl: 'http://localhost:5173',
     }
   },
   experimental: {

@@ -10,7 +10,8 @@ let redisSubClient: Redis | null = null;
  */
 export function getRedis(): Redis {
   if (!redisClient) {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const config = useRuntimeConfig();
+    const redisUrl = config.redisUrl || 'redis://localhost:6379';
 
     redisClient = new Redis(redisUrl, {
       maxRetriesPerRequest: 3,
@@ -47,7 +48,8 @@ export function getRedis(): Redis {
  */
 export function getRedisPubSub(): { pub: Redis; sub: Redis } {
   if (!redisPubClient || !redisSubClient) {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const config = useRuntimeConfig();
+    const redisUrl = config.redisUrl || 'redis://localhost:6379';
 
     redisPubClient = new Redis(redisUrl, {
       lazyConnect: false,

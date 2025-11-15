@@ -9,20 +9,21 @@ let s3Client: S3Client | null = null;
  */
 export function getS3Client(): S3Client {
   if (!s3Client) {
+    const config = useRuntimeConfig();
     s3Client = new S3Client({
-      endpoint: process.env.S3_ENDPOINT,
-      region: process.env.S3_REGION || 'us-east-1',
+      endpoint: config.s3Endpoint,
+      region: config.s3Region || 'us-east-1',
       credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+        accessKeyId: config.s3AccessKeyId || '',
+        secretAccessKey: config.s3SecretAccessKey || '',
       },
       forcePathStyle: true, // Required for Minio
     });
 
     log.info('S3 client initialized', {
       type: 's3_init',
-      region: process.env.S3_REGION || 'us-east-1',
-      bucket: process.env.S3_BUCKET || process.env.S3_BUCKET_ASSETS || 'assets'
+      region: config.s3Region || 'us-east-1',
+      bucket: config.s3Bucket || 'assets'
     });
   }
 
@@ -40,8 +41,9 @@ export interface UploadOptions {
 }
 
 export async function uploadFile(options: UploadOptions): Promise<string> {
+  const config = useRuntimeConfig();
   const client = getS3Client();
-  const bucket = process.env.S3_BUCKET || process.env.S3_BUCKET_ASSETS || 'assets';
+  const bucket = config.s3Bucket || 'assets';
   const filename = options.filename || `${ulid()}.${getExtensionFromMimeType(options.contentType)}`;
   const key = options.folder ? `${options.folder}/${filename}` : filename;
 
@@ -56,7 +58,7 @@ export async function uploadFile(options: UploadOptions): Promise<string> {
     );
 
     // Return public URL
-    const endpoint = process.env.S3_ENDPOINT || '';
+    const endpoint = config.s3Endpoint || '';
     const publicUrl = `${endpoint}/${bucket}/${key}`;
 
     log.info('File uploaded to S3', {
@@ -83,7 +85,8 @@ export async function uploadFile(options: UploadOptions): Promise<string> {
  */
 export async function deleteFile(url: string): Promise<void> {
   const client = getS3Client();
-  const bucket = process.env.S3_BUCKET || process.env.S3_BUCKET_ASSETS || 'assets';
+  const config = useRuntimeConfig();
+  const bucket = config.s3Bucket || 'assets';
 
   try {
     // Extract key from URL
@@ -130,7 +133,8 @@ export async function deleteFiles(urls: string[]): Promise<void> {
  */
 function extractKeyFromUrl(url: string): string | null {
   try {
-    const bucket = process.env.S3_BUCKET || process.env.S3_BUCKET_ASSETS || 'assets';
+    const config = useRuntimeConfig();
+  const bucket = config.s3Bucket || 'assets';
     const parts = url.split(`/${bucket}/`);
     return parts.length > 1 ? parts[1] : null;
   } catch {
@@ -179,7 +183,8 @@ export function validateFileSize(size: number, maxSizeMB = 10): boolean {
 export async function checkS3Health(): Promise<boolean> {
   try {
     const client = getS3Client();
-    const bucket = process.env.S3_BUCKET || process.env.S3_BUCKET_ASSETS || 'assets';
+    const config = useRuntimeConfig();
+  const bucket = config.s3Bucket || 'assets';
 
     // Try to list objects (limit 1 for efficiency)
     await client.send(
