@@ -27,7 +27,9 @@
       "mcp__ide__getDiagnostics",
       "Bash(ls:*)",
       "Bash(pnpm --filter @robin/api add pino pino-http pino-pretty)",
-      "Bash(node test-logging.mjs:*)"
+      "Bash(node test-logging.mjs:*)",
+      "Bash(pnpm exec drizzle-kit generate:*)",
+      "Bash(pnpm db:generate:*)"
     ],
     "deny": [],
     "ask": []

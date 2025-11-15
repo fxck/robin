@@ -67,6 +67,22 @@ nx lint api
 nx lint app
 ```
 
+### Database Migrations
+
+```bash
+# Generate new migration (from schema changes)
+pnpm db:generate
+
+# Review generated SQL
+cat migrate/migrations/0001_*.sql
+
+# Commit migrations to git
+git add migrate/migrations/
+git commit -m "feat: add migration"
+
+# Migrations run automatically on Zerops deployment via execOnce
+```
+
 ## Project Structure
 
 ```
@@ -80,6 +96,10 @@ robin/
 │   ├── types/        # Shared TypeScript types
 │   ├── utils/        # Shared utilities
 │   └── config/       # Shared configuration
+├── migrate/          # Standalone migration runtime
+│   ├── drizzle.config.ts  # Migration config
+│   ├── migrations/   # Generated SQL migrations (tracked in git)
+│   └── node_modules/ # Isolated deps (ignored, installed in build)
 └── ...
 ```
 
