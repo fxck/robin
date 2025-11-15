@@ -9,9 +9,7 @@ zerops:
         - cd migrate && pnpm install --frozen-lockfile --ignore-workspace
       deployFiles:
         - apps/api/.output
-        - migrate/drizzle.config.ts
-        - migrate/migrations
-        - migrate/node_modules
+        - migrate
       cache:
         - node_modules
         - apps/api/node_modules
@@ -24,9 +22,9 @@ zerops:
       ports:
         - port: 3000
           httpSupport: true
-      initCommands:
+      # initCommands:
         # Run migrations once per deployment version (execOnce provides idempotency)
-        - cd migrate && zsc execOnce apiprod-${appVersionId} -- ./node_modules/.bin/drizzle-kit migrate
+        # - cd migrate && zsc execOnce apiprod-${appVersionId} -- ./node_modules/.bin/drizzle-kit migrate
       start: node apps/api/.output/server/index.mjs
       envVariables:
         NODE_ENV: production

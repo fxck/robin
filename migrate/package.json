@@ -1,0 +1,11 @@
+{
+  "name": "robin-migrations",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Standalone migration runtime for production deployments",
+  "dependencies": {
+    "drizzle-kit": "0.31.7",
+    "postgres": "^3.4.7"
+  }
+}
