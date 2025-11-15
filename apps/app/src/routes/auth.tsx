@@ -36,9 +36,7 @@ function AuthPage() {
             mode={mode}
             onToggleMode={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
             onSuccess={() => {
-              console.log('[AuthPage] onSuccess called, navigating to dashboard...');
               navigate({ to: '/dashboard' });
-              console.log('[AuthPage] navigate() called');
             }}
           />
         </Flex>

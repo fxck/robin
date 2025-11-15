@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { Button, Card, Flex, Text, TextField } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { Link } from '@tanstack/react-router';
-import { signIn, signUp, useSession } from '../lib/auth';
+import { signIn, signUp, authClient } from '../lib/auth';
 
 // Individual field validators
 const nameValidator = z.string().min(2, { message: 'Name must be at least 2 characters' });
@@ -25,7 +25,6 @@ interface AuthFormProps {
 
 export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
   const isSignUp = mode === 'signup';
-  const session = useSession();
 
   const form = useForm({
     defaultValues: {
@@ -60,14 +59,6 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
           toast.success('Signed in successfully!');
         }
 
-        // Refetch session to ensure it's fresh before navigation
-        console.log('[AuthForm] Login successful, refetching session...');
-        session.refetch();
-
-        // Give the refetch a moment to complete and update the cache
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        console.log('[AuthForm] Calling onSuccess callback...');
         onSuccess?.();
       } catch (error) {
         // Handle specific error cases

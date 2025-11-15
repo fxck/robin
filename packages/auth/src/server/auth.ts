@@ -106,8 +106,7 @@ export function createAuth(db: Database, config: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days
       updateAge: 60 * 60 * 24, // 1 day
       cookieCache: {
-        enabled: true,
-        maxAge: 60 * 5, // 5 minutes
+        enabled: false, // Disabled to fix session update issues with TanStack Router (GitHub issue #4389)
       },
     },
 
