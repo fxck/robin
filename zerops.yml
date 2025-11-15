@@ -11,7 +11,9 @@ zerops:
         - node_modules
         - apps/api/node_modules
       envVariables:
-        CI: "true"
+        CI: true
+        API_BASE: ${RUNTIME_API_BASE}
+        APP_URL: ${RUNTIME_APP_URL}
     run:
       base: nodejs@22
       ports:
@@ -45,7 +47,7 @@ zerops:
         - pnpm install --frozen-lockfile
         - pnpm exec nx build app
       envVariables:
-        CI: "true"
+        CI: true
         VITE_API_URL: ${RUNTIME_VITE_API_URL}
       deployFiles:
         - dist/apps/app/~

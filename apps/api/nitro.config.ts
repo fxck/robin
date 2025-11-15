@@ -14,17 +14,17 @@ export default defineNitroConfig({
   },
   runtimeConfig: {
     database: {
-      url: process.env.DATABASE_URL,
+      url: process.env.DATABASE_URL || '',
     },
     redis: {
-      url: process.env.REDIS_URL,
+      url: process.env.REDIS_URL || '',
     },
     s3: {
-      endpoint: process.env.S3_ENDPOINT,
-      region: process.env.S3_REGION,
-      bucket: process.env.S3_BUCKET,
-      accessKeyId: process.env.S3_ACCESS_KEY_ID,
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      endpoint: process.env.S3_ENDPOINT || '',
+      region: process.env.S3_REGION || '',
+      bucket: process.env.S3_BUCKET || '',
+      accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
     },
     public: {
       apiBase: process.env.API_BASE || 'http://localhost:3000',
