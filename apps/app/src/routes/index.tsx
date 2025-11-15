@@ -90,21 +90,25 @@ function Index() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <Section spacing="xl" className="mesh-gradient">
+      <Section spacing="xl" className="mesh-gradient relative overflow-hidden">
+        {/* Decorative blur orbs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-600/5 rounded-full blur-3xl" />
+
         <Container size="standard">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 border border-accent-500/20 mb-8">
+          <div className="text-center max-w-4xl mx-auto relative">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 border border-accent-500/20 mb-12 backdrop-blur-sm">
               <Sparkles size={16} className="text-accent-400" />
               <Text size="sm" color="accent" weight="medium">
                 Discover stories that matter
               </Text>
             </div>
 
-            <Heading level={1} variant="display" className="mb-6">
+            <Heading level={1} variant="display" className="mb-8 tracking-tight">
               Welcome to Robin
             </Heading>
 
-            <Text size="lg" color="secondary" className="mb-8 max-w-2xl mx-auto">
+            <Text size="lg" color="secondary" className="mb-0 max-w-2xl mx-auto leading-relaxed">
               A modern platform for sharing ideas, stories, and insights.
               Join our community of writers and readers.
             </Text>
@@ -137,15 +141,11 @@ function Index() {
 
             {/* Posts Grid */}
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {[...Array(6)].map((_, i) => (
                   <div
                     key={i}
-                    className="h-96 rounded-2xl bg-bg-elevated animate-shimmer"
-                    style={{
-                      background: 'linear-gradient(90deg, var(--color-bg-elevated) 0%, var(--color-bg-hover) 50%, var(--color-bg-elevated) 100%)',
-                      backgroundSize: '1000px 100%',
-                    }}
+                    className="h-96 rounded-2xl shimmer overflow-hidden"
                   />
                 ))}
               </div>
@@ -157,7 +157,7 @@ function Index() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                   {posts.map((post: PostListItem) => (
                     <PostCard key={post.id} post={post} />
                   ))}
