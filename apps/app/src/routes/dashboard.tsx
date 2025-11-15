@@ -22,10 +22,14 @@ import type { PostsListResponse } from '@robin/types';
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: async () => {
+    console.log('[Dashboard] beforeLoad: checking session...');
     const session = await authClient.getSession();
+    console.log('[Dashboard] beforeLoad: session =', session);
     if (!session.data) {
+      console.log('[Dashboard] beforeLoad: No session, redirecting to /auth');
       throw redirect({ to: '/auth' });
     }
+    console.log('[Dashboard] beforeLoad: Session valid, user =', session.data.user?.email);
   },
   component: DashboardPage,
 });
