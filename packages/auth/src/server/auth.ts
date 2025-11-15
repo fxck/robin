@@ -113,7 +113,7 @@ export function createAuth(db: Database, config: {
 
     rateLimit: {
       window: 60,
-      max: 10,
+      max: 100,
     },
   });
 }
