@@ -189,7 +189,7 @@ function EditPostPage() {
   }
 
   return (
-    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
+    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
       <Container size="4" py="6">
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="6">
@@ -256,8 +256,6 @@ function EditPostPage() {
             <AdvancedEditor
               value={content}
               onChange={setContent}
-              isSaving={isSaving}
-              lastSaved={lastSaved}
               placeholder="Write your post content here... Press '/' for commands"
             />
           </Flex>
