@@ -87,9 +87,9 @@ export function createAuth(db: Database, config: {
 
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: false, // Set to true to enable email verification
-      autoSignIn: true,
-      sendResetPassword: async ({ user, url, token }) => {
+      requireEmailVerification: true, // Enable email verification (but users can still use the app)
+      autoSignIn: true, // Auto sign-in even if email is not verified
+      sendResetPassword: async ({ user, url }) => {
         // Password reset email
         if (config.emailConfig) {
           await sendEmail({
@@ -105,6 +105,61 @@ export function createAuth(db: Database, config: {
                 <p style="color: #6b7280; word-break: break-all;">${url}</p>
                 <p>This link will expire in 1 hour.</p>
                 <p>If you didn't request this, please ignore this email.</p>
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                <p style="color: #6b7280; font-size: 12px;">Sent from Robin App</p>
+              </div>
+            `,
+          }, config.emailConfig);
+        }
+      },
+    },
+
+    // Email verification configuration
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url }) => {
+        // Email verification
+        if (config.emailConfig) {
+          await sendEmail({
+            to: user.email,
+            subject: 'Verify your email - Robin',
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #8b5cf6;">Verify your email</h1>
+                <p>Hi ${user.name || 'there'},</p>
+                <p>Thanks for signing up! Please verify your email address by clicking the button below:</p>
+                <a href="${url}" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Verify Email</a>
+                <p>Or copy and paste this link into your browser:</p>
+                <p style="color: #6b7280; word-break: break-all;">${url}</p>
+                <p>This link will expire in 24 hours.</p>
+                <p>If you didn't create an account, please ignore this email.</p>
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                <p style="color: #6b7280; font-size: 12px;">Sent from Robin App</p>
+              </div>
+            `,
+          }, config.emailConfig);
+        }
+      },
+      sendOnSignUp: true, // Automatically send verification email on signup
+      autoSignInAfterVerification: false, // User is already signed in
+      // Send welcome email after verification
+      async afterEmailVerification(user) {
+        if (config.emailConfig) {
+          await sendEmail({
+            to: user.email,
+            subject: 'Welcome to Robin!',
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #8b5cf6;">Welcome to Robin!</h1>
+                <p>Hi ${user.name || 'there'},</p>
+                <p>Thanks for verifying your email and joining Robin! We're excited to have you on board.</p>
+                <p>You can now start creating and sharing your blog posts with the world.</p>
+                <h2 style="color: #6b7280; font-size: 18px;">Getting Started</h2>
+                <ul style="line-height: 1.8;">
+                  <li>Create your first post from the dashboard</li>
+                  <li>Explore trending posts from other writers</li>
+                  <li>Customize your profile</li>
+                </ul>
+                <p>If you have any questions or feedback, feel free to reach out!</p>
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
                 <p style="color: #6b7280; font-size: 12px;">Sent from Robin App</p>
               </div>

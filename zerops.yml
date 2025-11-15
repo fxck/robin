@@ -25,7 +25,15 @@ zerops:
       initCommands:
         # Run migrations once per deployment version (execOnce provides idempotency)
         - cd migrate && zsc execOnce $appVersionId -- ./node_modules/.bin/drizzle-kit migrate
+        # Sync Redis view counts to PostgreSQL on every container start
+        - node apps/api/.output/server/scripts/sync-views-cron.mjs
       start: node apps/api/.output/server/index.mjs
+      crontab:
+        # Sync Redis view counts to PostgreSQL every 5 minutes
+        - command: "node apps/api/.output/server/scripts/sync-views-cron.mjs"
+          timing: "*/5 * * * *"
+          allContainers: false
+          workingDir: /var/www
       envVariables:
         NODE_ENV: production
         PORT: 3000

@@ -2,7 +2,7 @@ import { defineEventHandler, getRouterParam, createError } from 'h3';
 import { eq, and, isNull } from 'drizzle-orm';
 import { db } from '../../../services/db';
 import { schema } from '@robin/database';
-import { getCache, setCache, incrementCounter } from '../../../services/redis';
+import { getCache, setCache, incrementCounter, getCounter } from '../../../services/redis';
 import { log } from '../../../utils/logger';
 
 export default defineEventHandler(async (event) => {
@@ -20,10 +20,19 @@ export default defineEventHandler(async (event) => {
   const cached = await getCache<any>(cacheKey);
 
   if (cached) {
-    // Still increment view count
+    // Still increment view count and get the updated value
     await incrementCounter(`post:${id}:views`);
+    const currentViews = await getCounter(`post:${id}:views`);
     log.debug(`Cache hit for post: ${id}`);
-    return cached;
+
+    // Return cached post with real-time view count from Redis
+    return {
+      ...cached,
+      post: {
+        ...cached.post,
+        views: currentViews
+      }
+    };
   }
 
   // Fetch post with author info
@@ -63,12 +72,18 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Increment view counter in Redis
-  await incrementCounter(`post:${id}:views`);
+  // Increment view counter in Redis and get the updated count
+  const currentViews = await incrementCounter(`post:${id}:views`);
 
-  const result = { post };
+  // Return post with real-time view count from Redis
+  const result = {
+    post: {
+      ...post,
+      views: currentViews
+    }
+  };
 
-  // Cache for 15 minutes
+  // Cache for 15 minutes (note: views will be updated from Redis on cache hits)
   await setCache(cacheKey, result, { ttl: 900 });
 
   log.debug(`Post fetched: ${id}`);
