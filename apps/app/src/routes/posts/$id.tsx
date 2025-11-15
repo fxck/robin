@@ -1,13 +1,19 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Container, Heading, Flex, Button, Card, Text, Box, Separator } from '@radix-ui/themes';
-import { Heart, Eye, ArrowLeft } from 'lucide-react';
+import { Button, Avatar as RadixAvatar } from '@radix-ui/themes';
+import { Heart, Eye, ArrowLeft, Share2, Bookmark } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { api } from '../../lib/api-client';
 import { useSession } from '../../lib/auth';
-import { Image, Avatar } from '../../components';
+import { Image } from '../../components';
 import type { PostResponse } from '@robin/types';
+import { Container } from '../../components/layout/Container';
+import { Flex } from '../../components/layout/Flex';
+import { Heading } from '../../components/typography/Heading';
+import { Text } from '../../components/typography/Text';
+import { ReadingProgress } from '../../components/shared/ReadingProgress';
+import { cn } from '../../lib/utils';
 
 export const Route = createFileRoute('/posts/$id')({
   component: PostPage,
@@ -56,7 +62,6 @@ export const Route = createFileRoute('/posts/$id')({
           property: 'article:author',
           content: post.author?.name || '',
         },
-        // Open Graph tags
         {
           property: 'og:type',
           content: 'article',
@@ -73,7 +78,6 @@ export const Route = createFileRoute('/posts/$id')({
           property: 'og:image',
           content: imageUrl,
         }] : []),
-        // Twitter Card tags
         {
           name: 'twitter:card',
           content: imageUrl ? 'summary_large_image' : 'summary',
@@ -113,155 +117,229 @@ function PostPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post', id] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast.success('Post liked!');
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to like post');
     },
   });
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: data?.post.title,
+          url: window.location.href,
+        });
+      } catch (err) {
+        // User cancelled or error
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copied to clipboard!');
+    }
+  };
+
   if (isLoading) {
     return (
-      <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
-        <Container size="3" py="8">
-          <Card style={{ height: '400px' }}>
-            <Box style={{ background: 'var(--gray-3)', height: '100%', borderRadius: 'var(--radius-2)' }} />
-          </Card>
+      <div className="min-h-screen">
+        <div className="h-[60vh] bg-bg-elevated animate-shimmer" />
+        <Container size="reading" className="py-12">
+          <div className="space-y-8">
+            <div className="h-12 bg-bg-elevated rounded animate-shimmer" />
+            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-3/4" />
+            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-5/6" />
+            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-2/3" />
+          </div>
         </Container>
-      </Box>
+      </div>
     );
   }
 
   if (!data?.post) {
     return (
-      <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
-        <Container size="3" py="8">
-          <Card>
-            <Flex direction="column" align="center" gap="4" py="9">
-              <Text size="5">Post not found</Text>
-              <Button onClick={() => navigate({ to: '/posts' })}>
-                <ArrowLeft size={16} />
-                Back to Posts
-              </Button>
-            </Flex>
-          </Card>
+      <div className="min-h-screen flex items-center justify-center">
+        <Container size="narrow">
+          <div className="glass-surface p-12 text-center rounded-2xl">
+            <Text size="lg" className="mb-6">
+              Post not found
+            </Text>
+            <Button onClick={() => navigate({ to: '/' })} size="3">
+              <ArrowLeft size={16} />
+              Back to Home
+            </Button>
+          </div>
         </Container>
-      </Box>
+      </div>
     );
   }
 
   const { post } = data;
+  const readTime = Math.max(1, Math.ceil(post.content.split(' ').length / 200));
 
   return (
-    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
-      <Container size="3" py="8">
-        <Flex direction="column" gap="6">
-          {/* Back Button */}
-          <Button
-            variant="ghost"
-            onClick={() => navigate({ to: '/posts' })}
-            style={{ width: 'fit-content' }}
-            size="2"
-          >
-            <ArrowLeft size={16} />
-            Back
-          </Button>
+    <div className="post-detail">
+      {/* Reading Progress Bar */}
+      <ReadingProgress />
 
-          {/* Post Card */}
-          <Card size="4">
-            <Flex direction="column" gap="4">
-              {/* Cover Image */}
-              {post.coverImage && (
-                <Image
-                  src={post.coverImage}
-                  alt={post.title}
-                  placeholder="gradient"
-                  placeholderText={post.title}
-                  aspectRatio={16 / 9}
-                  style={{
-                    width: '100%',
-                    maxHeight: '500px',
-                    borderRadius: 'var(--radius-3)',
-                  }}
-                />
+      {/* Hero Section */}
+      <section className="relative min-h-[60vh] flex items-end pb-16 md:pb-24">
+        {/* Hero Background Image */}
+        {post.coverImage && (
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Gradient Overlay */}
+            <div
+              className={cn(
+                'absolute inset-0',
+                'bg-gradient-to-t',
+                'from-bg-base via-bg-base/90 to-transparent'
               )}
+              style={{
+                backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.3) 40%, rgba(10, 10, 10, 0.9) 80%, var(--color-bg-base) 100%)',
+              }}
+            />
+          </div>
+        )}
 
-              {/* Header */}
-              <Flex direction="column" gap="4">
-                <Heading size="8" style={{ lineHeight: '1.2' }}>
-                  {post.title}
-                </Heading>
+        {/* Hero Content */}
+        <Container size="reading" className="relative z-10">
+          <div className="space-y-6">
+            <Heading
+              level={1}
+              variant="display"
+              className="text-shadow-lg"
+              style={{ textShadow: '0 2px 20px rgba(0, 0, 0, 0.8)' }}
+            >
+              {post.title}
+            </Heading>
 
-                {/* Author and Stats */}
-                <Flex justify="between" align="center" wrap="wrap" gap="3">
-                  <Flex gap="3" align="center">
-                    <Avatar
-                      src={post.author?.image}
-                      alt={post.author?.name || 'Author'}
-                      name={post.author?.name}
-                      size={40}
-                    />
-                    <Flex direction="column" gap="1">
-                      <Text size="3" weight="medium">
-                        {post.author?.name}
-                      </Text>
-                      <Text size="2" color="gray">
-                        {new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </Text>
-                    </Flex>
-                  </Flex>
-
-                  <Flex gap="4" align="center">
-                    <Flex align="center" gap="2">
-                      <Eye size={18} style={{ color: 'var(--gray-9)' }} />
-                      <Text size="2" color="gray">
-                        {post.views} views
-                      </Text>
-                    </Flex>
-                    <Flex align="center" gap="2">
-                      <Heart size={18} style={{ color: 'var(--gray-9)' }} />
-                      <Text size="2" color="gray">
-                        {post.likesCount} likes
-                      </Text>
-                    </Flex>
+            {/* Author Meta */}
+            <Flex align="center" gap="4">
+              <RadixAvatar
+                size="3"
+                src={post.author?.image}
+                fallback={post.author?.name?.[0] || 'A'}
+                radius="full"
+              />
+              <div>
+                <Link
+                  to="/"
+                  className="no-underline"
+                >
+                  <Text size="base" weight="medium" color="primary" className="hover:text-accent-400 transition-colors">
+                    {post.author?.name}
+                  </Text>
+                </Link>
+                <Flex align="center" gap="2" className="text-text-secondary">
+                  <Text size="sm" color="tertiary">
+                    {new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </Text>
+                  <Text size="sm" color="tertiary">·</Text>
+                  <Text size="sm" color="tertiary">
+                    {readTime} min read
+                  </Text>
+                  <Text size="sm" color="tertiary">·</Text>
+                  <Flex align="center" gap="1">
+                    <Eye size={14} />
+                    <Text size="sm" color="tertiary">
+                      {post.views}
+                    </Text>
                   </Flex>
                 </Flex>
-              </Flex>
-
-              <Separator size="4" />
-
-              {/* Content */}
-              <Box className="prose prose-lg max-w-none">
-                <ReactMarkdown>{post.content}</ReactMarkdown>
-              </Box>
-
-              <Separator size="4" />
-
-              {/* Like Button */}
-              <Flex justify="center">
-                {session ? (
-                  <Button
-                    size="3"
-                    variant="soft"
-                    onClick={() => likeMutation.mutate()}
-                    disabled={likeMutation.isPending}
-                  >
-                    <Heart size={20} />
-                    {post.likesCount > 0 ? `${post.likesCount} Likes` : 'Like this post'}
-                  </Button>
-                ) : (
-                  <Text size="2" color="gray">
-                    Sign in to like this post
-                  </Text>
-                )}
-              </Flex>
+              </div>
             </Flex>
-          </Card>
-        </Flex>
+          </div>
+        </Container>
+      </section>
+
+      {/* Article Content */}
+      <Container size="reading" className="py-12">
+        <article className="prose">
+          <ReactMarkdown>{post.content}</ReactMarkdown>
+        </article>
+
+        {/* Engagement Actions */}
+        <div className="mt-16 pt-8 border-t border-white/10">
+          <Flex align="center" justify="between" wrap="wrap" gap="4">
+            <Flex gap="3">
+              {session ? (
+                <Button
+                  size="3"
+                  variant="soft"
+                  onClick={() => likeMutation.mutate()}
+                  disabled={likeMutation.isPending}
+                  className={cn(
+                    'transition-all duration-200',
+                    likeMutation.isPending && 'animate-pulse'
+                  )}
+                >
+                  <Heart size={18} />
+                  {post.likesCount || 0}
+                </Button>
+              ) : (
+                <Button size="3" variant="soft" disabled>
+                  <Heart size={18} />
+                  {post.likesCount || 0}
+                </Button>
+              )}
+
+              <Button
+                size="3"
+                variant="ghost"
+                onClick={handleShare}
+              >
+                <Share2 size={18} />
+                Share
+              </Button>
+
+              {session && (
+                <Button size="3" variant="ghost">
+                  <Bookmark size={18} />
+                  Save
+                </Button>
+              )}
+            </Flex>
+
+            <Link to="/" className="no-underline">
+              <Button size="2" variant="ghost">
+                <ArrowLeft size={16} />
+                Back to Home
+              </Button>
+            </Link>
+          </Flex>
+        </div>
+
+        {/* Author Bio */}
+        {post.author && (
+          <div className="mt-16 glass-surface p-8 rounded-2xl">
+            <Flex gap="4">
+              <RadixAvatar
+                size="5"
+                src={post.author.image}
+                fallback={post.author.name?.[0] || 'A'}
+                radius="full"
+              />
+              <div className="flex-1">
+                <Text size="lg" weight="semibold" className="mb-2">
+                  {post.author.name}
+                </Text>
+                <Text size="base" color="secondary">
+                  Writer and creator sharing stories on Robin
+                </Text>
+              </div>
+            </Flex>
+          </div>
+        )}
       </Container>
-    </Box>
+    </div>
   );
 }

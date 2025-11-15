@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { inArray, isNull, and, eq } from 'drizzle-orm';
 import { db } from '../../../services/db';
 import { schema } from '@robin/database';
-import { getTopFromSortedSet } from '../../../services/redis';
+import { getTopFromSortedSet, getCounter, setCounter } from '../../../services/redis';
 import { log } from '../../../utils/logger';
 import { rewriteImageUrlsInObject } from '../../../utils/cdn';
 
@@ -54,9 +54,30 @@ export default defineEventHandler(async (event) => {
   const postsMap = new Map(posts.map((p) => [p.id, p]));
   const sortedPosts = trendingIds.map((id) => postsMap.get(id as string)).filter(Boolean);
 
-  log.debug(`Trending posts fetched: ${sortedPosts.length} posts`);
+  // Fetch real-time view counts from Redis
+  const postsWithRealTimeViews = await Promise.all(
+    sortedPosts.map(async (post) => {
+      if (!post) return post;
+
+      const redisKey = `post:${post.id}:views`;
+      let viewCount = await getCounter(redisKey);
+
+      // If Redis doesn't have the counter, initialize it from the database value
+      if (viewCount === 0 && post.views > 0) {
+        await setCounter(redisKey, post.views);
+        viewCount = post.views;
+      }
+
+      return {
+        ...post,
+        views: viewCount,
+      };
+    })
+  );
+
+  log.debug(`Trending posts fetched: ${postsWithRealTimeViews.length} posts with real-time views`);
 
   return rewriteImageUrlsInObject({
-    posts: sortedPosts,
+    posts: postsWithRealTimeViews,
   });
 });

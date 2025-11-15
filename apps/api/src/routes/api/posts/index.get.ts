@@ -29,7 +29,24 @@ export default defineEventHandler(async (event) => {
   const cached = await getCache<any>(cacheKey);
   if (cached) {
     log.debug(`Cache hit for posts list: ${cacheKey}`);
-    return rewriteImageUrlsInObject(cached);
+
+    // Update with real-time view counts from Redis even on cache hit
+    const postsWithRealTimeViews = await Promise.all(
+      cached.posts.map(async (post: any) => {
+        const redisKey = `post:${post.id}:views`;
+        const viewCount = await getCounter(redisKey);
+
+        return {
+          ...post,
+          views: viewCount || post.views, // Fallback to cached value if Redis has no counter
+        };
+      })
+    );
+
+    return rewriteImageUrlsInObject({
+      ...cached,
+      posts: postsWithRealTimeViews,
+    });
   }
 
   // Build query conditions
