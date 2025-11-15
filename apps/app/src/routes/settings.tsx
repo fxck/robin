@@ -2,9 +2,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Container, Heading, Card, Flex, Text, TextField, Button, Avatar, Box } from '@radix-ui/themes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api-client';
+import { FileUpload } from '../components';
 import { toast } from 'sonner';
-import { useState, useRef } from 'react';
-import { Upload, Loader2, User } from 'lucide-react';
+import { useState } from 'react';
+import { Loader2, User } from 'lucide-react';
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -27,9 +28,8 @@ interface UpdateProfileData {
 
 function SettingsPage() {
   const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   // Fetch current user data
   const { data: userData, isLoading } = useQuery<{ user: User }>({
@@ -37,9 +37,10 @@ function SettingsPage() {
     queryFn: () => api.get('/api/users/me'),
   });
 
-  // Set initial name when data loads
-  if (userData?.user && !name) {
-    setName(userData.user.name);
+  // Set initial values when data loads
+  if (userData?.user) {
+    if (!name) setName(userData.user.name);
+    if (!avatarUrl && userData.user.image) setAvatarUrl(userData.user.image);
   }
 
   // Update profile mutation
@@ -56,55 +57,10 @@ function SettingsPage() {
     },
   });
 
-  // Avatar upload mutation
-  const uploadAvatarMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/users/avatar`, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || 'Failed to upload avatar');
-      }
-
-      return response.json();
-    },
-    onSuccess: (data: { user: User; url: string }) => {
-      queryClient.setQueryData(['currentUser'], { user: data.user });
-      queryClient.invalidateQueries({ queryKey: ['session'] });
-      toast.success('Avatar updated successfully');
-      setIsUploading(false);
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to upload avatar');
-      setIsUploading(false);
-    },
-  });
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.match(/^image\/(jpeg|png|gif|webp)$/)) {
-      toast.error('Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.');
-      return;
-    }
-
-    // Validate file size (5 MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size exceeds 5 MB limit');
-      return;
-    }
-
-    setIsUploading(true);
-    uploadAvatarMutation.mutate(file);
+  const handleAvatarChange = (url: string) => {
+    setAvatarUrl(url);
+    // Automatically update the avatar when a new image is uploaded
+    updateProfileMutation.mutate({ image: url || null });
   };
 
   const handleUpdateProfile = () => {
@@ -114,10 +70,6 @@ function SettingsPage() {
     }
 
     updateProfileMutation.mutate({ name: name.trim() });
-  };
-
-  const handleRemoveAvatar = () => {
-    updateProfileMutation.mutate({ image: null });
   };
 
   if (isLoading) {
@@ -146,55 +98,23 @@ function SettingsPage() {
           <Flex align="center" gap="4">
             <Avatar
               size="8"
-              src={user?.image || undefined}
+              src={avatarUrl || undefined}
               fallback={<User size={32} />}
               radius="full"
             />
 
-            <Flex direction="column" gap="2" style={{ flex: 1 }}>
-              <Text size="2" color="gray">
+            <Box style={{ flex: 1 }}>
+              <Text size="2" color="gray" mb="3" style={{ display: 'block' }}>
                 Upload a new profile picture. Max size: 5 MB
               </Text>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
+              <FileUpload
+                value={avatarUrl}
+                onChange={handleAvatarChange}
+                maxSize={5 * 1024 * 1024}
+                accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
               />
-
-              <Flex gap="2">
-                <Button
-                  variant="soft"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading || uploadAvatarMutation.isPending}
-                >
-                  {isUploading || uploadAvatarMutation.isPending ? (
-                    <>
-                      <Loader2 className="animate-spin" size={16} />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Upload size={16} />
-                      Upload New
-                    </>
-                  )}
-                </Button>
-
-                {user?.image && (
-                  <Button
-                    variant="outline"
-                    color="red"
-                    onClick={handleRemoveAvatar}
-                    disabled={updateProfileMutation.isPending}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </Flex>
-            </Flex>
+            </Box>
           </Flex>
         </Flex>
       </Card>

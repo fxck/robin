@@ -176,13 +176,15 @@ const suggestionItems = [
 
 export function NovelEditor({ value, onChange, placeholder = "Press '/' for commands...", className }: NovelEditorProps) {
   const [initialContent, setInitialContent] = useState<string | undefined>(value);
+  const [contentKey, setContentKey] = useState(0);
 
   // Update content when value prop changes (e.g., when loading existing post)
   useEffect(() => {
     if (value && value !== initialContent) {
       setInitialContent(value);
+      setContentKey(prev => prev + 1);
     }
-  }, [value, initialContent]);
+  }, [value]);
 
   const extensions = [
     StarterKit.configure({
@@ -240,7 +242,7 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
 
   return (
     <Box className={className}>
-      <EditorRoot>
+      <EditorRoot key={contentKey}>
         <EditorContent
           initialContent={initialContent}
           extensions={extensions}
