@@ -24,28 +24,30 @@ function EditPostPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [coverImage, setCoverImage] = useState<string>('');
-  const [status, setStatus] = useState<'draft' | 'published'>('draft');
-  const [version, setVersion] = useState(1);
-
   // Fetch existing post
   const { data, isLoading } = useQuery({
     queryKey: ['post', id],
     queryFn: () => api.get<PostResponse>(`/api/posts/${id}`),
   });
 
-  // Set form values when data loads
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [coverImage, setCoverImage] = useState<string>('');
+  const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [version, setVersion] = useState(1);
+  const [initialized, setInitialized] = useState(false);
+
+  // Set form values when data loads (only once)
   useEffect(() => {
-    if (data?.post) {
+    if (data?.post && !initialized) {
       setTitle(data.post.title);
       setContent(data.post.content);
       setCoverImage(data.post.coverImage || '');
       setStatus(data.post.status);
       setVersion(data.post.version);
+      setInitialized(true);
     }
-  }, [data]);
+  }, [data, initialized]);
 
   const updatePostMutation = useMutation({
     mutationFn: async (updateData: UpdatePostInput) => {
