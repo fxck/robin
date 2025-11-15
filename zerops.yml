@@ -5,8 +5,12 @@ zerops:
       buildCommands:
         - pnpm install --frozen-lockfile
         - pnpm exec nx build api
+        # Install isolated migration dependencies
+        - cd migrate && pnpm add drizzle-kit drizzle-orm postgres
       deployFiles:
         - apps/api/.output
+        - migrate  # Contains: drizzle.config.ts, migrations/, node_modules/, package.json
+        - packages/database/src  # Schema files referenced by migrate/drizzle.config.ts
       cache:
         - node_modules
         - apps/api/node_modules
@@ -19,6 +23,9 @@ zerops:
       ports:
         - port: 3000
           httpSupport: true
+      initCommands:
+        # Run migrations once per deployment version (execOnce provides idempotency)
+        - cd migrate && zsc execOnce apiprod-${appVersionId} -- pnpm exec drizzle-kit migrate
       start: node apps/api/.output/server/index.mjs
       envVariables:
         NODE_ENV: production

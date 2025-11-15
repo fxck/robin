@@ -56,3 +56,11 @@ vitest.config.*.timestamp*
 .env.development
 .env.production
 .env.test
+
+# Migration runtime folder (tracked files via negation)
+migrate/node_modules/
+migrate/package.json
+migrate/pnpm-lock.yaml
+migrate/.npmrc
+!migrate/drizzle.config.ts
+!migrate/migrations/
