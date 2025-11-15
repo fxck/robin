@@ -1,6 +1,9 @@
 {
   "permissions": {
-    "allow": [],
+    "allow": [
+      "Bash(pnpm list:*)",
+      "Bash(nx build:*)"
+    ],
     "deny": [],
     "ask": []
   }

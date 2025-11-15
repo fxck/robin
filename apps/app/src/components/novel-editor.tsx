@@ -1,6 +1,6 @@
-import { Editor } from 'novel';
+import { EditorRoot, EditorContent, type JSONContent } from 'novel';
 import { Box } from '@radix-ui/themes';
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 interface NovelEditorProps {
   value: string;
@@ -9,60 +9,44 @@ interface NovelEditorProps {
   className?: string;
 }
 
-// Custom upload function to use your existing S3 endpoint
-const handleImageUpload = async (file: File): Promise<string> => {
-  try {
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size must be less than 10MB');
-      throw new Error('File too large');
+export function NovelEditor({ value, onChange, className }: NovelEditorProps) {
+  const [initialContent, setInitialContent] = useState<JSONContent | undefined>();
+
+  // Convert markdown to JSON content on mount
+  useEffect(() => {
+    if (value) {
+      // For now, we'll use a simple text node structure
+      // In production, you might want to use a markdown parser
+      setInitialContent({
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: value }],
+          },
+        ],
+      });
     }
+  }, []);
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('File must be an image');
-      throw new Error('Invalid file type');
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error('Upload failed');
-    }
-
-    const data = await response.json();
-    toast.success('Image uploaded successfully!');
-
-    return data.url;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : 'Failed to upload image');
-    throw error;
-  }
-};
-
-export function NovelEditor({ value, onChange, placeholder, className }: NovelEditorProps) {
   return (
     <Box className={className}>
-      <Editor
-        defaultValue={value}
-        onDebouncedUpdate={(editor) => {
-          // Get the markdown content from the editor
-          if (editor) {
-            const markdown = editor.storage.markdown.getMarkdown();
-            onChange(markdown);
-          }
-        }}
-        onUpload={handleImageUpload}
-        disableLocalStorage
-        className="novel-editor"
-      />
+      <EditorRoot>
+        <EditorContent
+          initialContent={initialContent}
+          extensions={[]}
+          editorProps={{
+            attributes: {
+              class: 'novel-editor prose prose-lg focus:outline-none max-w-full',
+            },
+          }}
+          onUpdate={({ editor }) => {
+            // Get the text content from the editor
+            const text = editor.getText();
+            onChange(text);
+          }}
+        />
+      </EditorRoot>
     </Box>
   );
 }

@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
+import { TanStackRouterVite as TanStackRouterPlugin } from '@tanstack/router-vite-plugin';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import path from 'path';
 
@@ -21,9 +21,9 @@ export default defineConfig({
   
   plugins: [
     react(),
-    TanStackRouterVite({
-      routesDirectory: './src/routes',
-      generatedRouteTree: './src/routeTree.gen.ts',
+    TanStackRouterPlugin({
+      routesDirectory: path.resolve(__dirname, './src/routes'),
+      generatedRouteTree: path.resolve(__dirname, './src/routeTree.gen.ts'),
     }),
     nxViteTsPaths(),
   ],
