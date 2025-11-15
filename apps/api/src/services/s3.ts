@@ -57,18 +57,19 @@ export async function uploadFile(options: UploadOptions): Promise<string> {
       })
     );
 
-    // Return public URL
+    // Return storage URL (will be rewritten to CDN on read)
     const endpoint = config.s3Endpoint || '';
-    const publicUrl = `${endpoint}/${bucket}/${key}`;
+    const storageUrl = `${endpoint}/${bucket}/${key}`;
 
     log.info('File uploaded to S3', {
       type: 's3_upload',
       key,
       bucket,
       contentType: options.contentType,
-      size: options.buffer.length
+      size: options.buffer.length,
+      url: storageUrl
     });
-    return publicUrl;
+    return storageUrl;
   } catch (error) {
     log.error('S3 upload error', {
       type: 's3_upload_error',

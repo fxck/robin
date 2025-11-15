@@ -1,4 +1,5 @@
 import { log } from '~/utils/logger';
+import { rewriteImageUrlsInObject } from '~/utils/cdn';
 
 // Note: defineEventHandler, requireAuth, getHeaders are auto-imported by Nitro
 export default defineEventHandler(async (event) => {
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
   });
 
   // Return user information (requireAuth already validates session)
-  return {
+  return rewriteImageUrlsInObject({
     user,
-  };
+  });
 });

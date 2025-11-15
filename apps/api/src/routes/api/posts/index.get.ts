@@ -3,8 +3,9 @@ import { z } from 'zod';
 import { eq, desc, and, isNull, sql } from 'drizzle-orm';
 import { db } from '../../../services/db';
 import { schema } from '@robin/database';
-import { getCache, setCache } from '../../../services/redis';
+import { getCache, setCache, getCounter, setCounter } from '../../../services/redis';
 import { log } from '../../../utils/logger';
+import { rewriteImageUrlsInObject } from '../../../utils/cdn';
 
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -28,7 +29,7 @@ export default defineEventHandler(async (event) => {
   const cached = await getCache<any>(cacheKey);
   if (cached) {
     log.debug(`Cache hit for posts list: ${cacheKey}`);
-    return cached;
+    return rewriteImageUrlsInObject(cached);
   }
 
   // Build query conditions
@@ -83,8 +84,27 @@ export default defineEventHandler(async (event) => {
     .from(schema.posts)
     .where(and(...conditions));
 
+  // Fetch real-time view counts from Redis
+  const postsWithRealTimeViews = await Promise.all(
+    posts.map(async (post) => {
+      const redisKey = `post:${post.id}:views`;
+      let viewCount = await getCounter(redisKey);
+
+      // If Redis doesn't have the counter, initialize it from the database value
+      if (viewCount === 0 && post.views > 0) {
+        await setCounter(redisKey, post.views);
+        viewCount = post.views;
+      }
+
+      return {
+        ...post,
+        views: viewCount,
+      };
+    })
+  );
+
   const result = {
-    posts,
+    posts: postsWithRealTimeViews,
     pagination: {
       page: params.page,
       limit: params.limit,
@@ -93,10 +113,10 @@ export default defineEventHandler(async (event) => {
     },
   };
 
-  // Cache for 5 minutes
-  await setCache(cacheKey, result, { ttl: 300 });
+  // Cache for 1 minute (shorter TTL since we have real-time views)
+  await setCache(cacheKey, result, { ttl: 60 });
 
-  log.debug(`Posts list fetched: ${posts.length} posts`);
+  log.debug(`Posts list fetched: ${posts.length} posts with real-time views`);
 
-  return result;
+  return rewriteImageUrlsInObject(result);
 });

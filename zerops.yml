@@ -44,6 +44,7 @@ zerops:
         NITRO_S3_BUCKET: ${storage_bucketName}
         NITRO_S3_ACCESS_KEY_ID: ${storage_accessKeyId}
         NITRO_S3_SECRET_ACCESS_KEY: ${storage_secretAccessKey}
+        NITRO_CDN_HOST: ${staticCdnUrl}
         NITRO_PUBLIC_API_BASE: ${API_BASE}
         NITRO_PUBLIC_APP_URL: ${APP_URL}
       healthCheck:

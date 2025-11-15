@@ -5,6 +5,7 @@ import { db } from '~/services/db';
 import { schema } from '@robin/database';
 import { eq } from 'drizzle-orm';
 import { log } from '~/utils/logger';
+import { rewriteImageUrlsInObject } from '~/utils/cdn';
 
 export default defineEventHandler(async (event) => {
   // Require authentication
@@ -85,10 +86,10 @@ export default defineEventHandler(async (event) => {
 
     log.info(`Avatar uploaded by user ${user.id}: ${url}`);
 
-    return {
+    return rewriteImageUrlsInObject({
       url,
       user: updatedUser,
-    };
+    });
   } catch (error) {
     log.error('Avatar upload error:', error);
     throw createError({

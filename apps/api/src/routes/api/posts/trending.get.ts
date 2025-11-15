@@ -5,6 +5,7 @@ import { db } from '../../../services/db';
 import { schema } from '@robin/database';
 import { getTopFromSortedSet } from '../../../services/redis';
 import { log } from '../../../utils/logger';
+import { rewriteImageUrlsInObject } from '../../../utils/cdn';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
@@ -55,7 +56,7 @@ export default defineEventHandler(async (event) => {
 
   log.debug(`Trending posts fetched: ${sortedPosts.length} posts`);
 
-  return {
+  return rewriteImageUrlsInObject({
     posts: sortedPosts,
-  };
+  });
 });

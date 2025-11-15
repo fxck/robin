@@ -4,6 +4,7 @@ import { db } from '../../../services/db';
 import { schema } from '@robin/database';
 import { getCache, setCache, incrementCounter, getCounter } from '../../../services/redis';
 import { log } from '../../../utils/logger';
+import { rewriteImageUrlsInObject } from '../../../utils/cdn';
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
@@ -25,14 +26,14 @@ export default defineEventHandler(async (event) => {
     const currentViews = await getCounter(`post:${id}:views`);
     log.debug(`Cache hit for post: ${id}`);
 
-    // Return cached post with real-time view count from Redis
-    return {
+    // Return cached post with real-time view count from Redis and CDN URLs
+    return rewriteImageUrlsInObject({
       ...cached,
       post: {
         ...cached.post,
         views: currentViews
       }
-    };
+    });
   }
 
   // Fetch post with author info
@@ -88,5 +89,5 @@ export default defineEventHandler(async (event) => {
 
   log.debug(`Post fetched: ${id}`);
 
-  return result;
+  return rewriteImageUrlsInObject(result);
 });

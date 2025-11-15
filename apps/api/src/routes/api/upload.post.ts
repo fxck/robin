@@ -3,6 +3,7 @@ import { requireAuth } from '../../utils/auth-guard';
 import { uploadFile, validateImageFile, validateFileSize } from '../../services/s3';
 import { checkRateLimit } from '../../services/redis';
 import { log } from '../../utils/logger';
+import { rewriteUrlToCdn } from '../../utils/cdn';
 
 export default defineEventHandler(async (event) => {
   // Require authentication
@@ -66,7 +67,7 @@ export default defineEventHandler(async (event) => {
     log.info(`File uploaded by user ${user.id}: ${url}`);
 
     return {
-      url,
+      url: rewriteUrlToCdn(url) || url,
       contentType,
       size: file.data.length,
     };

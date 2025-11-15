@@ -20,6 +20,7 @@ export default defineNitroConfig({
     s3Bucket: '',
     s3AccessKeyId: '',
     s3SecretAccessKey: '',
+    cdnHost: '',
     public: {
       apiBase: 'http://localhost:3000',
       appUrl: 'http://localhost:5173',
