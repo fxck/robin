@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { Card, TextField, Button, Text, Box, Flex } from '@radix-ui/themes';
+import { Card, TextField, Button, Text, Box, Flex, Container, Heading } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { forgetPassword } from '../lib/auth';
@@ -48,116 +48,117 @@ function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Card style={{ maxWidth: 450, width: '100%' }}>
-          <Flex direction="column" gap="4">
-            <Flex align="center" gap="3">
-              <Box
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '50%',
-                  backgroundColor: 'var(--accent-3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Mail size={24} />
-              </Box>
-              <Box>
-                <Text size="5" weight="bold">
-                  Check your email
+      <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+        <Container size="1">
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            style={{ minHeight: 'calc(100vh - 60px)' }}
+          >
+            <Card style={{ maxWidth: 450, width: '100%' }}>
+              <Flex direction="column" gap="5" p="5">
+                <Flex direction="column" align="center" gap="3" style={{ textAlign: 'center' }}>
+                  <Box
+                    style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--accent-a3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--accent-9)',
+                    }}
+                  >
+                    <Mail size={32} />
+                  </Box>
+                  <Heading size="6">Check your email</Heading>
+                  <Text size="2" color="gray">
+                    We've sent a password reset link to <strong>{email}</strong>
+                  </Text>
+                </Flex>
+
+                <Text size="2" color="gray" style={{ textAlign: 'center' }}>
+                  Click the link in the email to reset your password. The link will expire in 1 hour.
                 </Text>
-                <Text size="2" color="gray">
-                  Password reset link sent
-                </Text>
-              </Box>
-            </Flex>
 
-            <Text size="3" color="gray">
-              We've sent a password reset link to:
-            </Text>
-            <Text size="3" weight="medium">
-              {email}
-            </Text>
+                <Flex direction="column" gap="2">
+                  <Button size="3" onClick={() => navigate({ to: '/auth' })}>
+                    <ArrowLeft size={16} />
+                    Back to Sign In
+                  </Button>
 
-            <Text size="2" color="gray">
-              Click the link in the email to reset your password. The link will expire in 1 hour.
-            </Text>
-
-            <Flex direction="column" gap="2" mt="2">
-              <Button
-                size="3"
-                onClick={() => navigate({ to: '/auth' })}
-                variant="soft"
-              >
-                <ArrowLeft size={16} />
-                Back to Sign In
-              </Button>
-
-              <Button
-                size="2"
-                variant="ghost"
-                onClick={() => {
-                  setSent(false);
-                  setEmail('');
-                }}
-              >
-                Resend email
-              </Button>
-            </Flex>
+                  <Button
+                    size="2"
+                    variant="ghost"
+                    onClick={() => {
+                      setSent(false);
+                      setEmail('');
+                    }}
+                  >
+                    Resend email
+                  </Button>
+                </Flex>
+              </Flex>
+            </Card>
           </Flex>
-        </Card>
-      </div>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card style={{ maxWidth: 450, width: '100%' }}>
-        <form onSubmit={handleSubmit}>
-          <Flex direction="column" gap="4">
-            <Box>
-              <Text size="6" weight="bold">
-                Forgot your password?
-              </Text>
-              <Text size="2" color="gray" mt="2">
-                Enter your email address and we'll send you a link to reset your password.
-              </Text>
-            </Box>
-
-            <Box>
-              <TextField.Root
-                size="3"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-                disabled={loading}
-              >
-                <TextField.Slot>
-                  <Mail size={16} />
-                </TextField.Slot>
-              </TextField.Root>
-            </Box>
-
-            <Flex direction="column" gap="2">
-              <Button size="3" type="submit" disabled={loading}>
-                {loading ? 'Sending...' : 'Send Reset Link'}
-              </Button>
-
-              <Link to="/auth">
-                <Button size="3" variant="ghost" style={{ width: '100%' }}>
-                  <ArrowLeft size={16} />
-                  Back to Sign In
-                </Button>
-              </Link>
-            </Flex>
+    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+      <Container size="1">
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
+          gap="6"
+          style={{ minHeight: 'calc(100vh - 60px)', paddingTop: 'var(--space-9)', paddingBottom: 'var(--space-9)' }}
+        >
+          <Flex direction="column" align="center" gap="2" style={{ textAlign: 'center' }}>
+            <Heading size="7">Forgot your password?</Heading>
+            <Text size="3" color="gray">
+              Enter your email and we'll send you a reset link
+            </Text>
           </Flex>
-        </form>
-      </Card>
-    </div>
+
+          <Card style={{ maxWidth: 450, width: '100%' }}>
+            <form onSubmit={handleSubmit}>
+              <Flex direction="column" gap="4" p="5">
+                <TextField.Root
+                  size="3"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  disabled={loading}
+                >
+                  <TextField.Slot>
+                    <Mail size={16} />
+                  </TextField.Slot>
+                </TextField.Root>
+
+                <Flex direction="column" gap="2">
+                  <Button size="3" type="submit" disabled={loading}>
+                    {loading ? 'Sending...' : 'Send Reset Link'}
+                  </Button>
+
+                  <Link to="/auth" style={{ textDecoration: 'none' }}>
+                    <Button size="3" variant="ghost" style={{ width: '100%' }}>
+                      <ArrowLeft size={16} />
+                      Back to Sign In
+                    </Button>
+                  </Link>
+                </Flex>
+              </Flex>
+            </form>
+          </Card>
+        </Flex>
+      </Container>
+    </Box>
   );
 }

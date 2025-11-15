@@ -1,8 +1,18 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { Card, TextField, Button, Text, Box, Flex, Callout } from '@radix-ui/themes';
+import {
+  Card,
+  TextField,
+  Button,
+  Text,
+  Box,
+  Flex,
+  Callout,
+  Container,
+  Heading,
+} from '@radix-ui/themes';
 import { toast } from 'sonner';
-import { Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Lock, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { resetPassword } from '../lib/auth';
 
 export const Route = createFileRoute('/reset-password')({
@@ -71,46 +81,60 @@ function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Card style={{ maxWidth: 450, width: '100%' }}>
-          <Flex direction="column" gap="4">
-            <Callout.Root color="red">
-              <Callout.Icon>
-                <AlertCircle size={20} />
-              </Callout.Icon>
-              <Callout.Text>
-                <Text weight="bold">Invalid Reset Link</Text>
-                <Text size="2">
-                  This password reset link is invalid or has expired. Please request a new one.
-                </Text>
-              </Callout.Text>
-            </Callout.Root>
+      <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+        <Container size="1">
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            style={{ minHeight: 'calc(100vh - 60px)' }}
+          >
+            <Card style={{ maxWidth: 450, width: '100%' }}>
+              <Flex direction="column" gap="4" p="5">
+                <Callout.Root color="red">
+                  <Callout.Icon>
+                    <AlertCircle size={20} />
+                  </Callout.Icon>
+                  <Callout.Text>
+                    <Text weight="bold">Invalid Reset Link</Text>
+                    <br />
+                    <Text size="2">
+                      This password reset link is invalid or has expired. Please request a new one.
+                    </Text>
+                  </Callout.Text>
+                </Callout.Root>
 
-            <Button
-              size="3"
-              onClick={() => navigate({ to: '/forgot-password' })}
-            >
-              Request New Link
-            </Button>
+                <Button size="3" onClick={() => navigate({ to: '/forgot-password' })}>
+                  Request New Link
+                </Button>
+              </Flex>
+            </Card>
           </Flex>
-        </Card>
-      </div>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card style={{ maxWidth: 450, width: '100%' }}>
-        <form onSubmit={handleSubmit}>
-          <Flex direction="column" gap="4">
-            <Box>
-              <Text size="6" weight="bold">
-                Reset your password
-              </Text>
-              <Text size="2" color="gray" mt="2">
-                Enter a new password for your account.
-              </Text>
-            </Box>
+    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+      <Container size="1">
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
+          gap="6"
+          style={{ minHeight: 'calc(100vh - 60px)', paddingTop: 'var(--space-9)', paddingBottom: 'var(--space-9)' }}
+        >
+          <Flex direction="column" align="center" gap="2" style={{ textAlign: 'center' }}>
+            <Heading size="7">Reset your password</Heading>
+            <Text size="3" color="gray">
+              Choose a strong password for your account
+            </Text>
+          </Flex>
+
+          <Card style={{ maxWidth: 450, width: '100%' }}>
+            <form onSubmit={handleSubmit}>
+              <Flex direction="column" gap="4" p="5">
 
             <Box>
               <Text size="2" weight="medium" mb="1">
@@ -222,13 +246,15 @@ function ResetPasswordPage() {
               </Callout.Text>
             </Callout.Root>
 
-            <Button size="3" type="submit" disabled={loading}>
-              {loading ? 'Resetting...' : 'Reset Password'}
-            </Button>
-          </Flex>
-        </form>
-      </Card>
-    </div>
+                <Button size="3" type="submit" disabled={loading}>
+                  {loading ? 'Resetting...' : 'Reset Password'}
+                </Button>
+              </Flex>
+            </form>
+          </Card>
+        </Flex>
+      </Container>
+    </Box>
   );
 }
 

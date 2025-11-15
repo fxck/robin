@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { Container, Heading, Flex, Button, Card, Text, Box, Grid } from '@radix-ui/themes';
-import { TrendingUp, Home } from 'lucide-react';
+import { TrendingUp, Heart, Eye } from 'lucide-react';
 import { api } from '../../lib/api-client';
 import type { PostsListResponse } from '@robin/types';
 
@@ -56,31 +56,21 @@ function PublicPostsPage() {
   const posts = data?.pages.flatMap((page) => page.posts) || [];
 
   return (
-    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
-      <Container size="4" py="6">
+    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+      <Container size="4" py="8">
         <Flex direction="column" gap="6">
-          {/* Header */}
-          <Flex justify="between" align="center">
-            <Heading size="8">Blog</Heading>
-            <Link to="/">
-              <Button variant="soft" size="3">
-                <Home size={16} />
-                Home
-              </Button>
-            </Link>
-          </Flex>
-
-          {/* View Toggle */}
           <Flex gap="2">
             <Button
               variant={view === 'all' ? 'solid' : 'soft'}
               onClick={() => setView('all')}
+              size="2"
             >
               Latest
             </Button>
             <Button
               variant={view === 'trending' ? 'solid' : 'soft'}
               onClick={() => setView('trending')}
+              size="2"
             >
               <TrendingUp size={16} />
               Trending
@@ -109,53 +99,64 @@ function PublicPostsPage() {
             </Card>
           ) : (
             <>
-              <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="4">
+              <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="5">
                 {posts.map((post: PostListItem) => (
                   <Link key={post.id} to={`/posts/${post.id}`} style={{ textDecoration: 'none' }}>
-                    <Card style={{ height: '100%', cursor: 'pointer' }} className="post-card">
-                      {post.coverImage && (
-                        <Box
-                          style={{
-                            width: '100%',
-                            height: '200px',
-                            backgroundImage: `url(${post.coverImageThumb || post.coverImage})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            borderRadius: 'var(--radius-2) var(--radius-2) 0 0',
-                            marginBottom: 'var(--space-3)',
-                          }}
-                        />
-                      )}
-                      <Flex direction="column" gap="3" p="3">
-                        <Flex justify="end" gap="3">
-                          <Text size="1" color="gray">
-                            <span role="img" aria-label="likes">❤️</span> {post.likesCount}
-                          </Text>
-                          <Text size="1" color="gray">
-                            <span role="img" aria-label="views">👁️</span> {post.views}
-                          </Text>
-                        </Flex>
-                        <Heading size="4">{post.title}</Heading>
-                        {post.excerpt && (
-                          <Text size="2" color="gray">
-                            {post.excerpt}
-                          </Text>
+                    <Card className="post-card">
+                      <Flex direction="column" gap="0">
+                        {post.coverImage && (
+                          <Box
+                            style={{
+                              width: '100%',
+                              height: '200px',
+                              backgroundImage: `url(${post.coverImageThumb || post.coverImage})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              borderRadius: 'var(--radius-3) var(--radius-3) 0 0',
+                            }}
+                          />
                         )}
-                        <Flex gap="2" align="center">
-                          {post.author?.image && (
-                            <Box
-                              style={{
-                                width: '24px',
-                                height: '24px',
-                                borderRadius: '50%',
-                                backgroundImage: `url(${post.author.image})`,
-                                backgroundSize: 'cover',
-                              }}
-                            />
+                        <Flex direction="column" gap="3" p="4">
+                          <Heading size="5">{post.title}</Heading>
+                          {post.excerpt && (
+                            <Text size="2" color="gray" style={{ lineHeight: '1.5' }}>
+                              {post.excerpt.length > 120
+                                ? `${post.excerpt.substring(0, 120)}...`
+                                : post.excerpt}
+                            </Text>
                           )}
-                          <Text size="2" color="gray">
-                            {post.author?.name}
-                          </Text>
+                          <Flex justify="between" align="center" mt="2">
+                            <Flex gap="2" align="center">
+                              {post.author?.image && (
+                                <Box
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    borderRadius: '50%',
+                                    backgroundImage: `url(${post.author.image})`,
+                                    backgroundSize: 'cover',
+                                  }}
+                                />
+                              )}
+                              <Text size="2" color="gray">
+                                {post.author?.name}
+                              </Text>
+                            </Flex>
+                            <Flex gap="3" align="center">
+                              <Flex gap="1" align="center">
+                                <Heart size={14} style={{ color: 'var(--gray-9)' }} />
+                                <Text size="1" color="gray">
+                                  {post.likesCount}
+                                </Text>
+                              </Flex>
+                              <Flex gap="1" align="center">
+                                <Eye size={14} style={{ color: 'var(--gray-9)' }} />
+                                <Text size="1" color="gray">
+                                  {post.views}
+                                </Text>
+                              </Flex>
+                            </Flex>
+                          </Flex>
                         </Flex>
                       </Flex>
                     </Card>
@@ -183,11 +184,14 @@ function PublicPostsPage() {
 
       <style>{`
         .post-card {
-          transition: transform 0.2s, box-shadow 0.2s;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 1px solid var(--gray-a5);
         }
         .post-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+          border-color: var(--accent-a7);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
       `}</style>
     </Box>

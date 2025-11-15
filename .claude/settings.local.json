@@ -20,7 +20,11 @@
       "Bash(pnpm remove:*)",
       "Bash(pnpm --filter @robin/api remove:*)",
       "Bash(pnpm install:*)",
-      "Bash(.npmrc)"
+      "Bash(.npmrc)",
+      "Bash(tree:*)",
+      "Bash(done)",
+      "Bash(find:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

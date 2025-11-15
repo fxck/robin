@@ -1,6 +1,18 @@
 import { createFileRoute, Link, useNavigate, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Container, Heading, Flex, Button, Card, Text, Badge, Box, Table, AlertDialog } from '@radix-ui/themes';
+import {
+  Container,
+  Heading,
+  Flex,
+  Button,
+  Card,
+  Text,
+  Badge,
+  Box,
+  Table,
+  AlertDialog,
+  Grid,
+} from '@radix-ui/themes';
 import { PlusCircle, Edit, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -49,41 +61,47 @@ function AdminPostsPage() {
   const posts = data?.posts || [];
 
   return (
-    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
-      <Container size="4" py="6">
+    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+      <Container size="4" py="8">
         <Flex direction="column" gap="6">
           {/* Header */}
           <Flex justify="between" align="center">
-            <Heading size="8">Manage Posts</Heading>
-            <Link to="/admin/posts/new">
+            <Heading size="8">Posts</Heading>
+            <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
               <Button size="3">
-                <PlusCircle size={20} />
-                Create Post
+                <PlusCircle size={18} />
+                New Post
               </Button>
             </Link>
           </Flex>
 
           {/* Stats */}
-          <Flex gap="4">
+          <Grid columns={{ initial: '1', sm: '3' }} gap="4">
             <Card>
-              <Flex direction="column" gap="1">
-                <Text size="2" color="gray">Total Posts</Text>
-                <Heading size="6">{posts.length}</Heading>
+              <Flex direction="column" gap="2" p="3">
+                <Text size="2" color="gray">
+                  Total Posts
+                </Text>
+                <Heading size="7">{posts.length}</Heading>
               </Flex>
             </Card>
             <Card>
-              <Flex direction="column" gap="1">
-                <Text size="2" color="gray">Published</Text>
-                <Heading size="6">{posts.filter(p => p.status === 'published').length}</Heading>
+              <Flex direction="column" gap="2" p="3">
+                <Text size="2" color="gray">
+                  Published
+                </Text>
+                <Heading size="7">{posts.filter((p) => p.status === 'published').length}</Heading>
               </Flex>
             </Card>
             <Card>
-              <Flex direction="column" gap="1">
-                <Text size="2" color="gray">Drafts</Text>
-                <Heading size="6">{posts.filter(p => p.status === 'draft').length}</Heading>
+              <Flex direction="column" gap="2" p="3">
+                <Text size="2" color="gray">
+                  Drafts
+                </Text>
+                <Heading size="7">{posts.filter((p) => p.status === 'draft').length}</Heading>
               </Flex>
             </Card>
-          </Flex>
+          </Grid>
 
           {/* Posts Table */}
           <Card>
@@ -93,9 +111,14 @@ function AdminPostsPage() {
               </Box>
             ) : posts.length === 0 ? (
               <Flex direction="column" align="center" gap="4" py="9">
-                <Text size="5" color="gray">No posts yet</Text>
-                <Link to="/admin/posts/new">
-                  <Button size="3">Create your first post</Button>
+                <Text size="5" color="gray">
+                  No posts yet
+                </Text>
+                <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
+                  <Button size="3">
+                    <PlusCircle size={18} />
+                    Create your first post
+                  </Button>
                 </Link>
               </Flex>
             ) : (

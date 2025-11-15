@@ -2,10 +2,11 @@ import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Theme } from '@radix-ui/themes';
+import { Theme, Box } from '@radix-ui/themes';
 import { Toaster } from 'sonner';
 import { queryClient } from '../lib/api-client';
 import { ErrorBoundary } from '../components/error-boundary';
+import { Navigation } from '../components/navigation';
 import '@radix-ui/themes/styles.css';
 
 export const Route = createRootRoute({
@@ -16,10 +17,11 @@ function RootComponent() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <Theme appearance="dark" accentColor="purple" radius="medium" style={{ minHeight: '100vh' }}>
-          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Theme appearance="dark" accentColor="purple" radius="medium">
+          <Box style={{ minHeight: '100vh', background: 'var(--gray-1)' }}>
+            <Navigation />
             <Outlet />
-          </div>
+          </Box>
           <Toaster position="top-right" richColors />
           <TanStackRouterDevtools position="bottom-right" />
           <ReactQueryDevtools initialIsOpen={false} />

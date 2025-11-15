@@ -1,110 +1,193 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Box, Button, Container, Flex, Heading, Text } from '@radix-ui/themes';
-import { ArrowRight, Zap, Shield, Rocket } from 'lucide-react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { Container, Flex, Button, Card, Text, Box, Grid } from '@radix-ui/themes';
+import { TrendingUp, Heart, Eye } from 'lucide-react';
+import { api } from '../lib/api-client';
+import type { PostsListResponse, PostListItem } from '@robin/types';
 
 export const Route = createFileRoute('/')({
   component: Index,
 });
 
 function Index() {
+  const [view, setView] = useState<'all' | 'trending'>('all');
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery({
+    queryKey: ['posts', view],
+    queryFn: async ({ pageParam = 1 }) => {
+      if (view === 'trending') {
+        return api.get<{ posts: PostListItem[] }>('/api/posts/trending?limit=20');
+      }
+      return api.get<PostsListResponse>(`/api/posts?page=${pageParam}&limit=20`);
+    },
+    getNextPageParam: (lastPage: PostsListResponse | { posts: PostListItem[] }) => {
+      if ('pagination' in lastPage) {
+        const { page, totalPages } = lastPage.pagination;
+        return page < totalPages ? page + 1 : undefined;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+  });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 500 &&
+        hasNextPage &&
+        !isFetchingNextPage
+      ) {
+        fetchNextPage();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const posts = data?.pages.flatMap((page) => page.posts) || [];
+
   return (
-    <Container size="4">
-      <Flex direction="column" gap="9" py="9">
-        {/* Hero Section */}
-        <Flex direction="column" align="center" gap="4" style={{ textAlign: 'center' }}>
-          <Heading size="9" weight="bold">
-            Welcome to Robin
-          </Heading>
-          <Text size="5" color="gray">
-            A modern full-stack platform built with React, Nitro, and Better Auth
-          </Text>
-          <Flex gap="3" mt="4">
-            <Link to="/posts">
-              <Button size="3" variant="solid">
-                Read Blog <ArrowRight size={16} />
-              </Button>
-            </Link>
-            <Link to="/dashboard">
-              <Button size="3" variant="outline">
-                Admin Dashboard
-              </Button>
-            </Link>
+    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+      <Container size="4" py="8">
+        <Flex direction="column" gap="6">
+          <Flex gap="2">
+            <Button
+              variant={view === 'all' ? 'solid' : 'soft'}
+              onClick={() => setView('all')}
+              size="2"
+            >
+              Latest
+            </Button>
+            <Button
+              variant={view === 'trending' ? 'solid' : 'soft'}
+              onClick={() => setView('trending')}
+              size="2"
+            >
+              <TrendingUp size={16} />
+              Trending
+            </Button>
           </Flex>
+
+          {isLoading ? (
+            <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="4">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} style={{ height: '300px' }}>
+                  <Box style={{ background: 'var(--gray-3)', height: '100%', borderRadius: 'var(--radius-2)' }} />
+                </Card>
+              ))}
+            </Grid>
+          ) : posts.length === 0 ? (
+            <Card>
+              <Flex direction="column" align="center" gap="4" py="9">
+                <Text size="5" color="gray">
+                  No posts published yet
+                </Text>
+              </Flex>
+            </Card>
+          ) : (
+            <>
+              <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="5">
+                {posts.map((post: PostListItem) => (
+                  <Link key={post.id} to="/posts/$id" params={{ id: post.id }} style={{ textDecoration: 'none' }}>
+                    <Card className="post-card">
+                      <Flex direction="column" gap="0">
+                        {post.coverImage && (
+                          <Box
+                            style={{
+                              width: '100%',
+                              height: '200px',
+                              backgroundImage: `url(${post.coverImageThumb || post.coverImage})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              borderRadius: 'var(--radius-3) var(--radius-3) 0 0',
+                            }}
+                          />
+                        )}
+                        <Flex direction="column" gap="3" p="4">
+                          <Text size="5" weight="bold">{post.title}</Text>
+                          {post.excerpt && (
+                            <Text size="2" color="gray" style={{ lineHeight: '1.5' }}>
+                              {post.excerpt.length > 120
+                                ? `${post.excerpt.substring(0, 120)}...`
+                                : post.excerpt}
+                            </Text>
+                          )}
+                          <Flex justify="between" align="center" mt="2">
+                            <Flex gap="2" align="center">
+                              {post.author?.image && (
+                                <Box
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    borderRadius: '50%',
+                                    backgroundImage: `url(${post.author.image})`,
+                                    backgroundSize: 'cover',
+                                  }}
+                                />
+                              )}
+                              <Text size="2" color="gray">
+                                {post.author?.name}
+                              </Text>
+                            </Flex>
+                            <Flex gap="3" align="center">
+                              <Flex gap="1" align="center">
+                                <Heart size={14} style={{ color: 'var(--gray-9)' }} />
+                                <Text size="1" color="gray">
+                                  {post.likesCount}
+                                </Text>
+                              </Flex>
+                              <Flex gap="1" align="center">
+                                <Eye size={14} style={{ color: 'var(--gray-9)' }} />
+                                <Text size="1" color="gray">
+                                  {post.views}
+                                </Text>
+                              </Flex>
+                            </Flex>
+                          </Flex>
+                        </Flex>
+                      </Flex>
+                    </Card>
+                  </Link>
+                ))}
+              </Grid>
+
+              {hasNextPage && (
+                <Flex justify="center" py="4">
+                  <Button
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    variant="soft"
+                    size="3"
+                  >
+                    {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                  </Button>
+                </Flex>
+              )}
+            </>
+          )}
         </Flex>
+      </Container>
 
-        {/* Features Grid */}
-        <Flex gap="4" wrap="wrap" justify="center">
-          <Card
-            icon={<Zap />}
-            title="Lightning Fast"
-            description="Built with Vite and Nitro for blazing fast development and production performance"
-          />
-          <Card
-            icon={<Shield />}
-            title="Secure by Default"
-            description="Better Auth integration with OAuth, magic links, and session management"
-          />
-          <Card
-            icon={<Rocket />}
-            title="Production Ready"
-            description="TypeScript, Zod validation, and comprehensive error handling out of the box"
-          />
-        </Flex>
-
-        {/* Tech Stack */}
-        <Box style={{ textAlign: 'center' }}>
-          <Heading size="6" mb="4">
-            Modern Tech Stack
-          </Heading>
-          <Flex gap="2" wrap="wrap" justify="center">
-            {['React 19', 'TanStack Router', 'Radix UI', 'Nitro', 'Better Auth', 'Drizzle ORM'].map(
-              (tech) => (
-                <Box
-                  key={tech}
-                  px="3"
-                  py="1"
-                  style={{
-                    background: 'var(--gray-a3)',
-                    borderRadius: 'var(--radius-2)',
-                  }}
-                >
-                  <Text size="2" weight="medium">
-                    {tech}
-                  </Text>
-                </Box>
-              )
-            )}
-          </Flex>
-        </Box>
-      </Flex>
-    </Container>
-  );
-}
-
-interface CardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-function Card({ icon, title, description }: CardProps) {
-  return (
-    <Box
-      p="5"
-      style={{
-        background: 'var(--gray-a2)',
-        borderRadius: 'var(--radius-3)',
-        border: '1px solid var(--gray-a5)',
-        maxWidth: '300px',
-      }}
-    >
-      <Flex direction="column" gap="2">
-        <Box style={{ color: 'var(--accent-9)' }}>{icon}</Box>
-        <Heading size="4">{title}</Heading>
-        <Text size="2" color="gray">
-          {description}
-        </Text>
-      </Flex>
+      <style>{`
+        .post-card {
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 1px solid var(--gray-a5);
+        }
+        .post-card:hover {
+          transform: translateY(-2px);
+          border-color: var(--accent-a7);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+      `}</style>
     </Box>
   );
 }

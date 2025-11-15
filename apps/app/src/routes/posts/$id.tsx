@@ -35,8 +35,8 @@ function PostPage() {
 
   if (isLoading) {
     return (
-      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
-        <Container size="3" py="6">
+      <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+        <Container size="3" py="8">
           <Card style={{ height: '400px' }}>
             <Box style={{ background: 'var(--gray-3)', height: '100%', borderRadius: 'var(--radius-2)' }} />
           </Card>
@@ -47,8 +47,8 @@ function PostPage() {
 
   if (!data?.post) {
     return (
-      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
-        <Container size="3" py="6">
+      <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+        <Container size="3" py="8">
           <Card>
             <Flex direction="column" align="center" gap="4" py="9">
               <Text size="5">Post not found</Text>
@@ -66,13 +66,18 @@ function PostPage() {
   const { post } = data;
 
   return (
-    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)' }}>
-      <Container size="3" py="6">
+    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+      <Container size="3" py="8">
         <Flex direction="column" gap="6">
           {/* Back Button */}
-          <Button variant="ghost" onClick={() => navigate({ to: '/posts' })} style={{ width: 'fit-content' }}>
+          <Button
+            variant="ghost"
+            onClick={() => navigate({ to: '/posts' })}
+            style={{ width: 'fit-content' }}
+            size="2"
+          >
             <ArrowLeft size={16} />
-            Back to Posts
+            Back
           </Button>
 
           {/* Post Card */}
@@ -94,44 +99,50 @@ function PostPage() {
               )}
 
               {/* Header */}
-              <Flex direction="column" gap="3">
-                <Heading size="8">{post.title}</Heading>
+              <Flex direction="column" gap="4">
+                <Heading size="8" style={{ lineHeight: '1.2' }}>
+                  {post.title}
+                </Heading>
 
                 {/* Author and Stats */}
-                <Flex justify="between" align="center">
-                  <Flex gap="2" align="center">
+                <Flex justify="between" align="center" wrap="wrap" gap="3">
+                  <Flex gap="3" align="center">
                     {post.author?.image && (
                       <Box
                         style={{
-                          width: '32px',
-                          height: '32px',
+                          width: '40px',
+                          height: '40px',
                           borderRadius: '50%',
                           backgroundImage: `url(${post.author.image})`,
                           backgroundSize: 'cover',
                         }}
                       />
                     )}
-                    <Flex direction="column">
-                      <Text size="2" weight="bold">
+                    <Flex direction="column" gap="1">
+                      <Text size="3" weight="medium">
                         {post.author?.name}
                       </Text>
-                      <Text size="1" color="gray">
-                        {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                      <Text size="2" color="gray">
+                        {new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
                       </Text>
                     </Flex>
                   </Flex>
 
-                  <Flex gap="3" align="center">
-                    <Flex align="center" gap="1">
-                      <Eye size={16} color="var(--gray-9)" />
+                  <Flex gap="4" align="center">
+                    <Flex align="center" gap="2">
+                      <Eye size={18} style={{ color: 'var(--gray-9)' }} />
                       <Text size="2" color="gray">
-                        {post.views}
+                        {post.views} views
                       </Text>
                     </Flex>
-                    <Flex align="center" gap="1">
-                      <Heart size={16} color="var(--gray-9)" />
+                    <Flex align="center" gap="2">
+                      <Heart size={18} style={{ color: 'var(--gray-9)' }} />
                       <Text size="2" color="gray">
-                        {post.likesCount}
+                        {post.likesCount} likes
                       </Text>
                     </Flex>
                   </Flex>

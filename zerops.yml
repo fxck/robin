@@ -1,0 +1,64 @@
+zerops:
+  # Backend API (Nitro)
+  - setup: api
+    build:
+      base: nodejs@22
+      buildCommands:
+        - pnpm install --frozen-lockfile
+        - nx build api
+      deployFiles:
+        - apps/api/.output
+      cache:
+        - node_modules
+        - apps/api/node_modules
+        - .nx/cache
+
+    run:
+      base: nodejs@22
+      ports:
+        - port: 3000
+          protocol: tcp
+          httpSupport: true
+      start: node apps/api/.output/server/index.mjs
+      envVariables:
+        NODE_ENV: production
+        PORT: 3000
+
+      healthCheck:
+        httpGet:
+          port: 3000
+          path: /health
+
+    deploy:
+      readinessCheck:
+        httpGet:
+          port: 3000
+          path: /health
+
+  # Frontend App (React + Vite)
+  - setup: app
+    build:
+      base: nodejs@22
+      buildCommands:
+        - pnpm install --frozen-lockfile
+        - nx build app
+      deployFiles:
+        - dist/apps/app
+      cache:
+        - node_modules
+        - apps/app/node_modules
+        - .nx/cache
+
+    run:
+      base: static
+      ports:
+        - port: 80
+          protocol: tcp
+          httpSupport: true
+      documentRoot: dist/apps/app
+
+    deploy:
+      readinessCheck:
+        httpGet:
+          port: 80
+          path: /

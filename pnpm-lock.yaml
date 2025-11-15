@@ -186,30 +186,27 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.931.0
         version: 3.931.0
-      '@robin/auth':
-        specifier: workspace:*
-        version: link:../../packages/auth
-      '@robin/config':
-        specifier: workspace:*
-        version: link:../../packages/config
-      '@robin/database':
-        specifier: workspace:*
-        version: link:../../packages/database
-      '@robin/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@robin/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
       '@scalar/api-reference':
         specifier: ^1.39.3
         version: 1.39.3(axios@1.13.2)(tailwindcss@4.1.17)(typescript@5.9.3)
       '@t3-oss/env-core':
         specifier: ^0.13.8
         version: 0.13.8(typescript@5.9.3)(zod@4.1.12)
+      better-auth:
+        specifier: 1.4.0-beta.20
+        version: 1.4.0-beta.20(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vue@3.5.24(typescript@5.9.3))
+      drizzle-orm:
+        specifier: ^0.44.7
+        version: 0.44.7(@neondatabase/serverless@1.0.2)(@prisma/client@5.22.0(prisma@5.22.0))(@types/better-sqlite3@7.6.13)(@types/pg@8.15.6)(better-sqlite3@12.4.1)(kysely@0.28.8)(postgres@3.4.7)(prisma@5.22.0)
+      ioredis:
+        specifier: ^5.8.2
+        version: 5.8.2
       nodemailer:
         specifier: ^7.0.10
         version: 7.0.10
+      postgres:
+        specifier: ^3.4.7
+        version: 3.4.7
       ulidx:
         specifier: ^2.4.1
         version: 2.4.1
@@ -229,12 +226,6 @@ importers:
       '@radix-ui/themes':
         specifier: ^3.2.1
         version: 3.2.1(@types/react-dom@19.2.3(@types/react@19.2.4))(@types/react@19.2.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      '@robin/auth':
-        specifier: workspace:*
-        version: link:../../packages/auth
-      '@robin/types':
-        specifier: workspace:*
-        version: link:../../packages/types
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@3.4.18(tsx@4.20.6)(yaml@2.8.1))
@@ -17944,6 +17935,26 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
       solid-js: 1.9.10
+
+  better-auth@1.4.0-beta.20(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vue@3.5.24(typescript@5.9.3)):
+    dependencies:
+      '@better-auth/core': 1.4.0-beta.20(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.0.26)(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1)
+      '@better-auth/telemetry': 1.4.0-beta.20(@better-auth/core@1.4.0-beta.20(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.0.26)(jose@6.1.1)(kysely@0.28.8)(nanostores@1.0.1))
+      '@better-auth/utils': 0.3.0
+      '@better-fetch/fetch': 1.1.18
+      '@noble/ciphers': 2.0.1
+      '@noble/hashes': 2.0.1
+      '@standard-schema/spec': 1.0.0
+      better-call: 1.0.26
+      defu: 6.1.4
+      jose: 6.1.1
+      kysely: 0.28.8
+      nanostores: 1.0.1
+      zod: 4.1.12
+    optionalDependencies:
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+      vue: 3.5.24(typescript@5.9.3)
 
   better-call@1.0.19:
     dependencies:

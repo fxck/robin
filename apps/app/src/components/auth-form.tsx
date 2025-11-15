@@ -1,25 +1,19 @@
 import { useForm } from '@tanstack/react-form';
-import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
 import { Button, Card, Flex, Text, TextField } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { Link } from '@tanstack/react-router';
 import { signIn, signUp } from '../lib/auth';
 
-const signUpSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Must contain uppercase letter')
-    .regex(/[0-9]/, 'Must contain a number'),
-});
-
-const signInSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
+// Individual field validators
+const nameValidator = z.string().min(2, { message: 'Name must be at least 2 characters' });
+const emailValidator = z.string().email({ message: 'Invalid email address' });
+const passwordSignUpValidator = z
+  .string()
+  .min(8, { message: 'Password must be at least 8 characters' })
+  .regex(/[A-Z]/, { message: 'Must contain uppercase letter' })
+  .regex(/[0-9]/, { message: 'Must contain a number' });
+const passwordSignInValidator = z.string().min(1, { message: 'Password is required' });
 
 type AuthMode = 'signin' | 'signup';
 
@@ -37,10 +31,6 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
       name: '',
       email: '',
       password: '',
-    },
-    validatorAdapter: zodValidator(),
-    validators: {
-      onChange: isSignUp ? signUpSchema : signInSchema,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -102,10 +92,17 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
         >
           <Flex direction="column" gap="3">
             {isSignUp && (
-              <form.Field name="name">
+              <form.Field
+                name="name"
+                validators={{
+                  onChange: ({ value }) => {
+                    const result = nameValidator.safeParse(value);
+                    return result.success ? undefined : result.error.issues[0]?.message;
+                  },
+                }}
+              >
                 {(field) => {
-                  const error = field.state.meta.errors[0];
-                  const errorMessage = typeof error === 'string' ? error : error?.message || 'Invalid value';
+                  const errorMessage = field.state.meta.errors[0];
                   return (
                     <div>
                       <TextField.Root
@@ -114,7 +111,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
                       />
-                      {field.state.meta.errors.length > 0 && (
+                      {errorMessage && (
                         <Text size="1" color="red" mt="1">
                           {errorMessage}
                         </Text>
@@ -125,10 +122,17 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
               </form.Field>
             )}
 
-            <form.Field name="email">
+            <form.Field
+              name="email"
+              validators={{
+                onChange: ({ value }) => {
+                  const result = emailValidator.safeParse(value);
+                  return result.success ? undefined : 'Invalid email address';
+                },
+              }}
+            >
               {(field) => {
-                const error = field.state.meta.errors[0];
-                const errorMessage = typeof error === 'string' ? error : error?.message || 'Invalid value';
+                const errorMessage = field.state.meta.errors[0];
                 return (
                   <div>
                     <TextField.Root
@@ -138,7 +142,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                     />
-                    {field.state.meta.errors.length > 0 && (
+                    {errorMessage && (
                       <Text size="1" color="red" mt="1">
                         {errorMessage}
                       </Text>
@@ -148,10 +152,18 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
               }}
             </form.Field>
 
-            <form.Field name="password">
+            <form.Field
+              name="password"
+              validators={{
+                onChange: ({ value }) => {
+                  const validator = isSignUp ? passwordSignUpValidator : passwordSignInValidator;
+                  const result = validator.safeParse(value);
+                  return result.success ? undefined : result.error.issues[0]?.message;
+                },
+              }}
+            >
               {(field) => {
-                const error = field.state.meta.errors[0];
-                const errorMessage = typeof error === 'string' ? error : error?.message || 'Invalid value';
+                const errorMessage = field.state.meta.errors[0];
                 return (
                   <div>
                     <TextField.Root
@@ -161,7 +173,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                     />
-                    {field.state.meta.errors.length > 0 && (
+                    {errorMessage && (
                       <Text size="1" color="red" mt="1">
                         {errorMessage}
                       </Text>

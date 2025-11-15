@@ -1,19 +1,7 @@
 {
   "name": "auth",
-  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/database/packages/auth/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/auth/src",
   "projectType": "library",
-  "tags": [],
-  "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/packages/database/packages/auth",
-        "main": "packages/database/packages/auth/src/index.ts",
-        "tsConfig": "packages/database/packages/auth/tsconfig.lib.json",
-        "assets": ["packages/database/packages/auth/*.md"]
-      }
-    }
-  }
+  "tags": []
 }

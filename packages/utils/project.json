@@ -1,19 +1,7 @@
 {
   "name": "utils",
-  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/auth/packages/utils/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/utils/src",
   "projectType": "library",
-  "tags": [],
-  "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/packages/auth/packages/utils",
-        "main": "packages/auth/packages/utils/src/index.ts",
-        "tsConfig": "packages/auth/packages/utils/tsconfig.lib.json",
-        "assets": ["packages/auth/packages/utils/*.md"]
-      }
-    }
-  }
+  "tags": []
 }

@@ -5,6 +5,10 @@ dist
 tmp
 out-tsc
 
+# Nitro build output
+.output
+.nitro
+
 # dependencies
 node_modules
 
