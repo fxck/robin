@@ -162,7 +162,7 @@ function AdminPostsPage() {
   };
 
   return (
-    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+    <Box style={{ minHeight: 'calc(100vh - 60px)', paddingTop: '100px' }}>
       <Container size="4" py="8">
         <Flex direction="column" gap="6">
           {/* Header */}
