@@ -46,7 +46,7 @@ zerops:
       envVariables:
         VITE_API_URL: ${RUNTIME_VITE_API_URL}
       deployFiles:
-        - dist/apps/app
+        - dist/apps/app/~
       cache:
         - node_modules
         - apps/app/node_modules
