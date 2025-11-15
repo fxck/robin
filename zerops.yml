@@ -9,7 +9,7 @@ zerops:
         - cd migrate && pnpm install --frozen-lockfile --ignore-workspace
       deployFiles:
         - apps/api/.output
-        - migrate  # Contains: drizzle.config.ts, migrations/, node_modules/, package.json, pnpm-lock.yaml
+        - migrate
       cache:
         - node_modules
         - apps/api/node_modules
@@ -24,6 +24,7 @@ zerops:
           httpSupport: true
       initCommands:
         # Run migrations once per deployment version (execOnce provides idempotency)
+        - cd migrate && ls -la
         - cd migrate && zsc execOnce apiprod-${appVersionId} -- ./node_modules/.bin/drizzle-kit migrate
       start: node apps/api/.output/server/index.mjs
       envVariables:
