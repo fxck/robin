@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
 import { useState, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Container, Heading, Flex, Button, Card, TextField, TextArea, Box, Select, Text } from '@radix-ui/themes';
-import { Upload, Save, Eye } from 'lucide-react';
+import { Container, Heading, Flex, Button, Card, TextField, Box, Select, Text } from '@radix-ui/themes';
+import { Upload, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
+import { NovelEditor } from '../components';
 import type { CreatePostInput, UploadResponse, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/new')({
@@ -192,13 +193,10 @@ function NewPostPage() {
                   <Text size="2" weight="bold" mb="2" as="label">
                     Content
                   </Text>
-                  <TextArea
-                    size="3"
-                    placeholder="Write your post content here... (Markdown supported)"
+                  <NovelEditor
                     value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    required
-                    style={{ minHeight: '400px', fontFamily: 'monospace' }}
+                    onChange={setContent}
+                    placeholder="Write your post content here..."
                   />
                   <Text size="1" color="gray" mt="1">
                     {content.length} characters
@@ -220,39 +218,6 @@ function NewPostPage() {
                 </Box>
               </Flex>
             </Card>
-
-            {/* Preview Card */}
-            {content && (
-              <Card size="4">
-                <Flex direction="column" gap="3">
-                  <Flex align="center" gap="2">
-                    <Eye size={16} />
-                    <Heading size="4">Preview</Heading>
-                  </Flex>
-                  {coverImage && (
-                    <img
-                      src={coverImage}
-                      alt="Cover"
-                      style={{
-                        width: '100%',
-                        maxHeight: '300px',
-                        objectFit: 'cover',
-                        borderRadius: 'var(--radius-2)',
-                      }}
-                    />
-                  )}
-                  <Heading size="6">{title || 'Untitled'}</Heading>
-                  <Text
-                    style={{
-                      whiteSpace: 'pre-wrap',
-                      lineHeight: '1.6',
-                    }}
-                  >
-                    {content}
-                  </Text>
-                </Flex>
-              </Card>
-            )}
           </Flex>
         </form>
       </Container>

@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Container, Heading, Flex, Button, Card, TextField, TextArea, Box, Select, Text } from '@radix-ui/themes';
+import { Container, Heading, Flex, Button, Card, TextField, Box, Select, Text } from '@radix-ui/themes';
 import { Upload, Save, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
+import { NovelEditor } from '../components';
 import type { UpdatePostInput, UploadResponse, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/$id/edit')({
@@ -243,13 +244,10 @@ function EditPostPage() {
                   <Text size="2" weight="bold" mb="2" as="label">
                     Content
                   </Text>
-                  <TextArea
-                    size="3"
-                    placeholder="Write your post content here..."
+                  <NovelEditor
                     value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    required
-                    style={{ minHeight: '400px', fontFamily: 'monospace' }}
+                    onChange={setContent}
+                    placeholder="Write your post content here..."
                   />
                   <Text size="1" color="gray" mt="1">
                     {content.length} characters

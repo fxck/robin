@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Container, Heading, Flex, Button, Card, Text, Box, Separator } from '@radix-ui/themes';
 import { Heart, Eye, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import ReactMarkdown from 'react-markdown';
 import { api } from '../../lib/api-client';
 import { useSession } from '../../lib/auth';
 import type { PostResponse } from '@robin/types';
@@ -152,15 +153,9 @@ function PostPage() {
               <Separator size="4" />
 
               {/* Content */}
-              <Text
-                size="4"
-                style={{
-                  whiteSpace: 'pre-wrap',
-                  lineHeight: '1.8',
-                }}
-              >
-                {post.content}
-              </Text>
+              <Box className="prose prose-lg max-w-none">
+                <ReactMarkdown>{post.content}</ReactMarkdown>
+              </Box>
 
               <Separator size="4" />
 
