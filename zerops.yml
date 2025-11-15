@@ -4,7 +4,7 @@ zerops:
       base: nodejs@22
       buildCommands:
         - pnpm install --frozen-lockfile
-        - nx build api
+        - pnpm exec nx build api
       deployFiles:
         - apps/api/.output
       cache:
@@ -42,7 +42,7 @@ zerops:
       base: nodejs@22
       buildCommands:
         - pnpm install --frozen-lockfile
-        - nx build app
+        - pnpm exec nx build app
       envVariables:
         VITE_API_URL: ${RUNTIME_VITE_API_URL}
       deployFiles:
