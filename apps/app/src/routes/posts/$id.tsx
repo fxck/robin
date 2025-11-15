@@ -12,7 +12,6 @@ import { Container } from '../../components/layout/Container';
 import { Flex } from '../../components/layout/Flex';
 import { Heading } from '../../components/typography/Heading';
 import { Text } from '../../components/typography/Text';
-import { ReadingProgress } from '../../components/shared/ReadingProgress';
 import { cn } from '../../lib/utils';
 
 export const Route = createFileRoute('/posts/$id')({
@@ -179,9 +178,6 @@ function PostPage() {
 
   return (
     <div className="post-detail relative">
-      {/* Reading Progress Bar */}
-      <ReadingProgress />
-
       {/* Table of Contents (Desktop only - fixed position) */}
       <TableOfContents content={post.content} />
 

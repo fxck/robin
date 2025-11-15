@@ -255,21 +255,39 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
           }}
         >
           {/* Slash Command Menu */}
-          <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-gray-200 bg-white px-1 py-2 shadow-md transition-all">
-            <EditorCommandEmpty className="px-2 text-gray-500">No results</EditorCommandEmpty>
+          <EditorCommand
+            className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md px-1 py-2 shadow-md transition-all"
+            style={{
+              border: '1px solid var(--gray-6)',
+              background: 'var(--color-panel)',
+            }}
+          >
+            <EditorCommandEmpty className="px-2" style={{ color: 'var(--gray-9)' }}>
+              No results
+            </EditorCommandEmpty>
             <EditorCommandList>
               {suggestionItems.map((item) => (
                 <EditorCommandItem
                   key={item.title}
                   onCommand={(val) => item.command(val)}
-                  className="flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm hover:bg-gray-100 aria-selected:bg-gray-100"
+                  className="flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm aria-selected:bg-[var(--gray-4)] hover:bg-[var(--gray-3)]"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-white">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-md"
+                    style={{
+                      border: '1px solid var(--gray-6)',
+                      background: 'var(--color-panel)',
+                    }}
+                  >
                     {item.icon}
                   </div>
                   <div>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-xs text-gray-500">{item.description}</p>
+                    <p className="font-medium" style={{ color: 'var(--gray-12)' }}>
+                      {item.title}
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--gray-9)' }}>
+                      {item.description}
+                    </p>
                   </div>
                 </EditorCommandItem>
               ))}
@@ -281,35 +299,40 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
             tippyOptions={{
               placement: 'top',
             }}
-            className="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl"
+            className="flex w-fit max-w-[90vw] overflow-hidden rounded-md shadow-xl border-[var(--gray-6)] bg-[var(--color-panel)]"
           >
             <EditorBubbleItem
               onSelect={(editor) => editor.chain().focus().toggleBold().run()}
-              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+              className="p-2 hover:bg-[var(--gray-3)] active:bg-[var(--gray-4)]"
+              style={{ color: 'var(--gray-11)' }}
             >
               <Bold className={`h-4 w-4`} />
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) => editor.chain().focus().toggleItalic().run()}
-              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+              className="p-2 hover:bg-[var(--gray-3)] active:bg-[var(--gray-4)]"
+              style={{ color: 'var(--gray-11)' }}
             >
               <Italic className={`h-4 w-4`} />
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) => editor.chain().focus().toggleUnderline().run()}
-              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+              className="p-2 hover:bg-[var(--gray-3)] active:bg-[var(--gray-4)]"
+              style={{ color: 'var(--gray-11)' }}
             >
               <UnderlineIcon className={`h-4 w-4`} />
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) => editor.chain().focus().toggleStrike().run()}
-              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+              className="p-2 hover:bg-[var(--gray-3)] active:bg-[var(--gray-4)]"
+              style={{ color: 'var(--gray-11)' }}
             >
               <Strikethrough className={`h-4 w-4`} />
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) => editor.chain().focus().toggleCode().run()}
-              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+              className="p-2 hover:bg-[var(--gray-3)] active:bg-[var(--gray-4)]"
+              style={{ color: 'var(--gray-11)' }}
             >
               <Code className={`h-4 w-4`} />
             </EditorBubbleItem>
@@ -320,7 +343,8 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
                   editor.chain().focus().setLink({ href: url }).run();
                 }
               }}
-              className="p-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+              className="p-2 hover:bg-[var(--gray-3)] active:bg-[var(--gray-4)]"
+              style={{ color: 'var(--gray-11)' }}
             >
               <Link className={`h-4 w-4`} />
             </EditorBubbleItem>
