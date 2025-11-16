@@ -61,9 +61,8 @@ export function createAuth(db: Database, config: {
 
     advanced: {
       defaultCookieAttributes: {
-        sameSite: 'none', // Required for cross-domain (app and api on different domains)
+        sameSite: 'none', // Required for cross-domain API calls (app and api on different domains)
         secure: true, // Required when using SameSite=none
-        partitioned: true, // Required by new browser standards for cross-site cookies
       },
     },
 
