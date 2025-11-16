@@ -72,6 +72,15 @@ const parseAndInsertMarkdown = (editor: any, text: string, from: number, to: num
       continue;
     }
 
+    // Check for standalone images (must be alone on a line)
+    const imageMatch = line.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imageMatch) {
+      const alt = imageMatch[1];
+      const src = imageMatch[2];
+      html += `<img src="${src}" alt="${alt}" />`;
+      continue;
+    }
+
     // Check for headings first (must be at start of line)
     const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
     if (headingMatch) {
@@ -90,12 +99,15 @@ const parseAndInsertMarkdown = (editor: any, text: string, from: number, to: num
   editor.chain().focus().deleteRange({ from, to }).insertContent(html).run();
 };
 
-// Helper to parse inline markdown (bold, italic, links, code)
+// Helper to parse inline markdown (bold, italic, links, code, inline images)
 const parseInlineMarkdown = (text: string): string => {
   let result = text;
 
   // Inline code: `code` - do this first to protect code content from other replacements
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Inline images: ![alt](url) - must come before links
+  result = result.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
 
   // Links: [text](url)
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
