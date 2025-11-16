@@ -117,8 +117,12 @@ export function createAuth(db: Database, config: {
 
     // Email verification configuration
     emailVerification: {
-      sendVerificationEmail: async ({ user, url }) => {
-        // Email verification
+      sendVerificationEmail: async ({ user, url, token }) => {
+        // Email verification - Replace API URL with frontend app URL
+        // Better Auth generates url pointing to API (e.g., https://api.robin.app/api/auth/verify-email?token=...)
+        // We want users to visit the frontend app instead
+        const verificationUrl = `${config.appURL}/verify-email?token=${token}`;
+
         if (config.emailConfig) {
           await sendEmail({
             to: user.email,
@@ -128,9 +132,9 @@ export function createAuth(db: Database, config: {
                 <h1 style="color: #8b5cf6;">Verify your email</h1>
                 <p>Hi ${user.name || 'there'},</p>
                 <p>Thanks for signing up! Please verify your email address by clicking the button below:</p>
-                <a href="${url}" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Verify Email</a>
+                <a href="${verificationUrl}" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Verify Email</a>
                 <p>Or copy and paste this link into your browser:</p>
-                <p style="color: #6b7280; word-break: break-all;">${url}</p>
+                <p style="color: #6b7280; word-break: break-all;">${verificationUrl}</p>
                 <p>This link will expire in 24 hours.</p>
                 <p>If you didn't create an account, please ignore this email.</p>
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
