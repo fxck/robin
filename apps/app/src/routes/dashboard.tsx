@@ -106,7 +106,7 @@ function DashboardPage() {
       if (!session?.user?.id) {
         throw new Error('User not authenticated');
       }
-      return api.get<PostsListResponse>(`/api/posts?status=all&limit=100&userId=${session.user.id}`);
+      return api.get<PostsListResponse>(`/posts?status=all&limit=100&userId=${session.user.id}`);
     },
     enabled: !!session?.user?.id,
   });
