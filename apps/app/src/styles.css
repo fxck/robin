@@ -206,7 +206,8 @@
   .logo-link {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem;
+    /* 10px safe zone to prevent rotation clipping */
+    padding: 0.625rem;
     border-radius: 10px;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
@@ -216,6 +217,8 @@
     height: 2rem;
     perspective: 1000px;
     perspective-origin: 50% 50%;
+    /* Additional safe zone padding */
+    padding: 0.25rem;
   }
 
   .cube-inner {
@@ -228,9 +231,17 @@
     transform: rotateX(-20deg) rotateY(30deg);
   }
 
+  /* Smooth hover: preserve rotation state with gentle speed transition */
   .logo-link:hover .cube-inner {
     animation-duration: 4s;
-    animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Smooth transition between speeds - no jarring jumps */
+    transition: animation-duration 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .logo-cube:hover {
+    /* Subtle scale on hover within safe zone */
+    transform: scale(1.05);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .cube-face {
