@@ -12,7 +12,7 @@ import {
   Select,
   Checkbox,
 } from '@radix-ui/themes';
-import { PlusCircle, Edit, Trash2, Eye, Search, Filter, X, Heart, FileText, CheckCircle, Clock } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Eye, Search, X, Heart, FileText, TrendingUp, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { api } from '../lib/api-client';
