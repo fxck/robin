@@ -1,3 +1,5 @@
+import { getRedis } from '../../../../../services/redis';
+
 // Custom Google OAuth initiation that redirects back to FRONTEND
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -17,9 +19,7 @@ export default defineEventHandler(async (event) => {
 
   // Store state in Redis with short TTL (10 minutes)
   const redis = getRedis();
-  if (redis) {
-    await redis.set(`oauth:state:${state}`, frontendCallbackUrl, 'EX', 600);
-  }
+  await redis.set(`oauth:state:${state}`, frontendCallbackUrl, 'EX', 600);
 
   // Build Google OAuth URL that redirects to FRONTEND
   const scope = 'openid email profile';

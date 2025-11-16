@@ -1,3 +1,4 @@
+import { getRedis } from '../../../../../services/redis';
 import { db } from '../../../../../services/db';
 import { users, accounts, sessions } from '@robin/database';
 import { eq } from 'drizzle-orm';
@@ -16,17 +17,15 @@ export default defineEventHandler(async (event) => {
 
   // Validate state from Redis
   const redis = getRedis();
-  if (redis) {
-    const storedCallbackUrl = await redis.get(`oauth:state:${state}`);
-    if (!storedCallbackUrl) {
-      throw createError({
-        statusCode: 400,
-        message: 'Invalid or expired state',
-      });
-    }
-    // Delete used state
-    await redis.del(`oauth:state:${state}`);
+  const storedCallbackUrl = await redis.get(`oauth:state:${state}`);
+  if (!storedCallbackUrl) {
+    throw createError({
+      statusCode: 400,
+      message: 'Invalid or expired state',
+    });
   }
+  // Delete used state
+  await redis.del(`oauth:state:${state}`);
 
   // Exchange code for tokens
   const googleClientId = process.env['GOOGLE_CLIENT_ID'];
