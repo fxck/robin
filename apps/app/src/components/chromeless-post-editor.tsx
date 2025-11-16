@@ -361,164 +361,8 @@ export function ChromelessPostEditor({
 
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
-      {/* Top Control Bar - Floating, minimal */}
-      <div className="absolute top-0 left-0 right-0 z-50">
-        <div className="flex items-center justify-between px-6 py-6">
-          {/* Left: Exit */}
-          <button
-            onClick={onExit}
-            className={cn(
-              'group flex items-center gap-2 px-4 py-2 rounded-full',
-              'bg-white/5 hover:bg-white/10',
-              'border border-white/10 hover:border-white/20',
-              'text-gray-400 hover:text-gray-200',
-              'transition-all duration-200',
-              'backdrop-blur-xl'
-            )}
-          >
-            <X size={16} />
-            <span className="text-sm font-medium">Close</span>
-          </button>
-
-          {/* Center: Auto-save status */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10">
-            {isSaving ? (
-              <>
-                <Loader2 size={14} className="text-purple-400 animate-spin" />
-                <span className="text-xs text-gray-400">Saving...</span>
-              </>
-            ) : lastSaved ? (
-              <>
-                <Check size={14} className="text-green-400" />
-                <span className="text-xs text-gray-400">Saved {formatLastSaved()}</span>
-              </>
-            ) : (
-              <>
-                <Clock size={14} className="text-gray-500" />
-                <span className="text-xs text-gray-500">Not saved</span>
-              </>
-            )}
-          </div>
-
-          {/* Right: Actions */}
-          <div className="flex items-center gap-3">
-            {/* Status Toggle */}
-            <div className="relative">
-              <button
-                onClick={() => setShowStatusMenu(!showStatusMenu)}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-full',
-                  'border transition-all duration-200',
-                  'backdrop-blur-xl',
-                  status === 'published'
-                    ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
-                )}
-              >
-                {status === 'published' ? <Eye size={16} /> : <EyeOff size={16} />}
-                <span className="text-sm font-medium capitalize">{status}</span>
-                <ChevronDown size={14} />
-              </button>
-
-              {showStatusMenu && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setShowStatusMenu(false)}
-                  />
-                  <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-gray-900 border border-white/10 shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
-                    <button
-                      onClick={() => {
-                        onStatusChange('draft');
-                        setShowStatusMenu(false);
-                      }}
-                      className={cn(
-                        'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
-                        status === 'draft'
-                          ? 'bg-white/10 text-white'
-                          : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
-                      )}
-                    >
-                      <EyeOff size={16} />
-                      <div>
-                        <div className="text-sm font-medium">Draft</div>
-                        <div className="text-xs text-gray-500">Only you can see</div>
-                      </div>
-                    </button>
-                    <button
-                      onClick={() => {
-                        onStatusChange('published');
-                        setShowStatusMenu(false);
-                      }}
-                      className={cn(
-                        'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
-                        status === 'published'
-                          ? 'bg-green-500/10 text-green-400'
-                          : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
-                      )}
-                    >
-                      <Eye size={16} />
-                      <div>
-                        <div className="text-sm font-medium">Published</div>
-                        <div className="text-xs text-gray-500">Visible to everyone</div>
-                      </div>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Save Draft */}
-            <button
-              onClick={onSaveDraft}
-              disabled={isSaving}
-              className={cn(
-                'px-4 py-2 rounded-full text-sm font-medium',
-                'bg-white/5 hover:bg-white/10',
-                'border border-white/10 hover:border-white/20',
-                'text-gray-300 hover:text-white',
-                'transition-all duration-200',
-                'backdrop-blur-xl',
-                'disabled:opacity-50 disabled:cursor-not-allowed'
-              )}
-            >
-              Save Draft
-            </button>
-
-            {/* Publish */}
-            <button
-              onClick={onPublish}
-              disabled={isPublishing}
-              className={cn(
-                'group relative px-6 py-2 rounded-full text-sm font-medium',
-                'bg-gradient-to-r from-purple-500 to-pink-500',
-                'hover:from-purple-600 hover:to-pink-600',
-                'text-white',
-                'transition-all duration-200',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
-                'shadow-lg shadow-purple-500/25',
-                'overflow-hidden'
-              )}
-            >
-              {isPublishing ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 size={16} className="animate-spin" />
-                  Publishing...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Sparkles size={16} />
-                  Publish
-                </span>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -translate-x-full group-hover:translate-x-full" />
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Editor Container */}
-      <div className="h-full overflow-y-auto pt-32 pb-20">
+      <div className="h-full overflow-y-auto pt-24 pb-32">
         <div className="max-w-4xl mx-auto px-8">
           {/* Cover Image Section */}
           <div className="mb-12">
@@ -788,10 +632,156 @@ export function ChromelessPostEditor({
         </div>
       </div>
 
-      {/* Keyboard Shortcuts Hint - Bottom Right */}
-      <div className="fixed bottom-6 right-6 z-40">
-        <div className="px-4 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-xs text-gray-500">
-          <span className="text-gray-600">⌘S</span> Save • <span className="text-gray-600">⌘⇧P</span> Publish • <span className="text-gray-600">ESC</span> Close
+      {/* Bottom Control Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 pb-6 px-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10">
+          {/* Left: Exit */}
+          <button
+            onClick={onExit}
+            className={cn(
+              'group flex items-center gap-2 px-4 py-2 rounded-full',
+              'bg-white/5 hover:bg-white/10',
+              'border border-white/10 hover:border-white/20',
+              'text-gray-400 hover:text-gray-200',
+              'transition-all duration-200'
+            )}
+          >
+            <X size={16} />
+            <span className="text-sm font-medium">Close</span>
+          </button>
+
+          {/* Center: Auto-save status */}
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+            {isSaving ? (
+              <>
+                <Loader2 size={14} className="text-purple-400 animate-spin" />
+                <span className="text-xs text-gray-400">Saving...</span>
+              </>
+            ) : lastSaved ? (
+              <>
+                <Check size={14} className="text-green-400" />
+                <span className="text-xs text-gray-400">Saved {formatLastSaved()}</span>
+              </>
+            ) : (
+              <>
+                <Clock size={14} className="text-gray-500" />
+                <span className="text-xs text-gray-500">Not saved</span>
+              </>
+            )}
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-3">
+            {/* Status Toggle */}
+            <div className="relative">
+              <button
+                onClick={() => setShowStatusMenu(!showStatusMenu)}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-full',
+                  'border transition-all duration-200',
+                  status === 'published'
+                    ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
+                )}
+              >
+                {status === 'published' ? <Eye size={16} /> : <EyeOff size={16} />}
+                <span className="text-sm font-medium capitalize">{status}</span>
+                <ChevronDown size={14} />
+              </button>
+
+              {showStatusMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowStatusMenu(false)}
+                  />
+                  <div className="absolute right-0 bottom-full mb-2 w-48 rounded-xl bg-gray-900 border border-white/10 shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
+                    <button
+                      onClick={() => {
+                        onStatusChange('draft');
+                        setShowStatusMenu(false);
+                      }}
+                      className={cn(
+                        'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
+                        status === 'draft'
+                          ? 'bg-white/10 text-white'
+                          : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
+                      )}
+                    >
+                      <EyeOff size={16} />
+                      <div>
+                        <div className="text-sm font-medium">Draft</div>
+                        <div className="text-xs text-gray-500">Only you can see</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onStatusChange('published');
+                        setShowStatusMenu(false);
+                      }}
+                      className={cn(
+                        'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
+                        status === 'published'
+                          ? 'bg-green-500/10 text-green-400'
+                          : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
+                      )}
+                    >
+                      <Eye size={16} />
+                      <div>
+                        <div className="text-sm font-medium">Published</div>
+                        <div className="text-xs text-gray-500">Visible to everyone</div>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Save Draft */}
+            <button
+              onClick={onSaveDraft}
+              disabled={isSaving}
+              className={cn(
+                'px-4 py-2 rounded-full text-sm font-medium',
+                'bg-white/5 hover:bg-white/10',
+                'border border-white/10 hover:border-white/20',
+                'text-gray-300 hover:text-white',
+                'transition-all duration-200',
+                'disabled:opacity-50 disabled:cursor-not-allowed'
+              )}
+            >
+              Save Draft
+            </button>
+
+            {/* Publish */}
+            <button
+              onClick={onPublish}
+              disabled={isPublishing}
+              className={cn(
+                'group relative px-6 py-2 rounded-full text-sm font-medium',
+                'bg-gradient-to-r from-purple-500 to-pink-500',
+                'hover:from-purple-600 hover:to-pink-600',
+                'text-white',
+                'transition-all duration-200',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
+                'shadow-lg shadow-purple-500/25',
+                'overflow-hidden'
+              )}
+            >
+              {isPublishing ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin" />
+                  Publishing...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Sparkles size={16} />
+                  Publish
+                </span>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -translate-x-full group-hover:translate-x-full" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
