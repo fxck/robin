@@ -94,7 +94,7 @@ function Index() {
         <div className="absolute inset-0 -z-10" style={{ minHeight: '100%' }}>
           <div className="relative w-full h-full">
             <FloatingLines
-              linesGradient={['#3a3a3a', '#2a2a2a', '#404040']}
+              linesGradient={['#1a1a1a', '#151515', '#1f1f1f']}
               enabledWaves={['middle', 'bottom']}
               lineCount={[6, 4]}
               lineDistance={[4, 5]}
@@ -108,12 +108,12 @@ function Index() {
               parallaxStrength={0.2}
               mixBlendMode="lighten"
             />
-            {/* Gradient fade to black at bottom */}
+            {/* Gradient fade to background color at bottom */}
             <div
               className="absolute bottom-0 left-0 right-0 pointer-events-none"
               style={{
                 height: '100px',
-                background: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 100%)'
+                background: 'linear-gradient(to bottom, transparent 0%, var(--color-bg-base) 100%)'
               }}
             />
           </div>

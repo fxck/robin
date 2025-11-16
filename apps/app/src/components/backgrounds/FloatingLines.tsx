@@ -96,7 +96,7 @@ vec3 getLineColor(float t, vec3 baseColor) {
     gradientColor = mix(c1, c2, f);
   }
 
-  return gradientColor * 2.0;
+  return gradientColor * 1.0;
 }
 
   float wave(vec2 uv, float offset, vec2 screenUv, vec2 mouseUv, bool shouldBend) {
@@ -150,7 +150,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         baseUv,
         mouseUv,
         interactive
-      ) * 1.5;
+      ) * 0.3;
     }
   }
 
@@ -168,7 +168,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         baseUv,
         mouseUv,
         interactive
-      ) * 2.0;
+      ) * 0.5;
     }
   }
 
