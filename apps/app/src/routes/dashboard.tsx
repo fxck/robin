@@ -158,7 +158,7 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg-base)' }}>
-      <div className="max-w-[1800px] mx-auto px-8 py-16 pt-32 md:pt-40">
+      <div className="max-w-[1800px] mx-auto px-8 py-16 pt-42 md:pt-55">
         {/* Header */}
         <div className="mb-20">
           <Flex justify="between" align="start" className="flex-col md:flex-row gap-8">
