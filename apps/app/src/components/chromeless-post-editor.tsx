@@ -615,7 +615,7 @@ export function ChromelessPostEditor({
                 ref={titleInputRef}
                 value={title}
                 onChange={(e) => onTitleChange(e.target.value)}
-                placeholder="Give your story a title..."
+                placeholder="Name your story..."
                 rows={1}
                 className={cn(
                   'w-full resize-none overflow-hidden',

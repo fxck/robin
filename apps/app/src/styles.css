@@ -109,35 +109,12 @@
 @layer components {
   /* Glass Morphism */
   .glass-surface {
-    background: linear-gradient(
-      135deg,
-      rgba(20, 20, 22, 0.7) 0%,
-      rgba(15, 15, 17, 0.65) 100%
-    );
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-      0 20px 40px -10px rgba(0, 0, 0, 0.5),
-      0 0 80px -20px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(60px) saturate(180%);
-    -webkit-backdrop-filter: blur(60px) saturate(180%);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .glass-surface::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.02) 40%,
-      transparent 70%
-    );
-    pointer-events: none;
+    background: rgba(15, 15, 15, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(40px) saturate(120%);
+    -webkit-backdrop-filter: blur(40px) saturate(120%);
   }
 
   /* Premium Fluid Glass AppBar - Apple Vision Pro Inspired */
@@ -1128,6 +1105,11 @@
   overflow: hidden;
 }
 
+/* Tabular numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Improved table hover */
 .rt-TableRow:hover {
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1142,16 +1124,17 @@
 
 /* Custom text sizing for admin dashboard - beyond Radix constraints */
 .text-admin-page-title {
-  font-size: 32px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-size: 36px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
   font-weight: 700;
 }
 
 .text-admin-page-subtitle {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.5;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
+  font-weight: 400;
 }
 
 .text-admin-section-title {
@@ -1162,23 +1145,24 @@
 }
 
 .text-admin-stat-value {
-  font-size: 28px;
-  line-height: 1.2;
-  letter-spacing: -0.015em;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .text-admin-stat-label {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
   letter-spacing: 0;
   font-weight: 500;
 }
 
 .text-admin-table-header {
-  font-size: 13px;
+  font-size: 11px;
   line-height: 1.4;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -1186,31 +1170,39 @@
 .text-admin-table-cell {
   font-size: 14px;
   line-height: 1.5;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
 }
 
 .text-admin-table-cell-title {
   font-size: 15px;
   line-height: 1.4;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
   font-weight: 500;
 }
 
 .text-admin-meta {
   font-size: 13px;
-  line-height: 1.4;
-  letter-spacing: 0;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
 }
 
 /* Admin table row spacing */
 .admin-table-row {
-  height: 72px !important;
+  height: auto !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.admin-table-row:last-child {
+  border-bottom: none !important;
 }
 
 .admin-table-header-cell {
-  padding: 20px 24px !important;
+  padding: 16px 20px !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .admin-table-cell {
-  padding: 24px !important;
+  padding: 20px !important;
+  background: transparent !important;
 }

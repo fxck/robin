@@ -186,12 +186,12 @@ function AdminPostsPage() {
         </div>
 
         {/* Stats Row */}
-        <div className="glass-surface rounded-2xl p-8 mb-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="glass-surface p-6 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {/* Total Posts */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4" style={{ color: 'var(--color-text-tertiary)' }} />
+                <FileText className="h-3.5 w-3.5" style={{ color: 'var(--color-text-tertiary)' }} />
                 <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
                   Total Posts
                 </div>
@@ -202,9 +202,9 @@ function AdminPostsPage() {
             </div>
 
             {/* Published */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-green-400" />
+                <Eye className="h-3.5 w-3.5 text-green-400" />
                 <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
                   Published
                 </div>
@@ -215,9 +215,9 @@ function AdminPostsPage() {
             </div>
 
             {/* Total Views */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-blue-400" />
+                <TrendingUp className="h-3.5 w-3.5 text-blue-400" />
                 <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
                   Total Views
                 </div>
@@ -228,9 +228,9 @@ function AdminPostsPage() {
             </div>
 
             {/* Total Likes */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Heart className="h-4 w-4 text-pink-400" />
+                <Heart className="h-3.5 w-3.5 text-pink-400" />
                 <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
                   Total Likes
                 </div>
@@ -243,7 +243,7 @@ function AdminPostsPage() {
         </div>
 
         {/* Search and Filters */}
-        <div className="glass-surface rounded-2xl p-6 mb-8">
+        <div className="glass-surface p-5 mb-6">
           <Flex gap="3" wrap="wrap" align="center">
             {/* Search */}
             <Box style={{ flex: '1', minWidth: '280px' }}>
@@ -336,7 +336,7 @@ function AdminPostsPage() {
         </div>
 
         {/* Posts Table */}
-        <div className="glass-surface rounded-2xl overflow-hidden">
+        <div className="glass-surface overflow-hidden">
           {isLoading ? (
             <Box py="9">
               <Text align="center" color="gray">Loading...</Text>
@@ -360,38 +360,38 @@ function AdminPostsPage() {
               )}
             </Flex>
           ) : (
-            <Table.Root variant="surface">
+            <Table.Root variant="surface" style={{ background: 'transparent' }}>
               <Table.Header>
                 <Table.Row>
-                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '50px' }}>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '40px' }}>
                     <Checkbox
                       checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
                       onCheckedChange={() => toggleSelectAll(filteredPosts)}
                     />
                   </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '42%' }}>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '45%' }}>
                     <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Title</div>
                   </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '12%' }}>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '10%' }}>
                     <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Status</div>
                   </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '10%' }}>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '8%' }}>
                     <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Views</div>
                   </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '10%' }}>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '8%' }}>
                     <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Likes</div>
                   </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '13%' }}>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '12%' }}>
                     <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Date</div>
                   </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '13%' }}>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '12%' }}>
                     <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Actions</div>
                   </Table.ColumnHeaderCell>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
                 {filteredPosts.map((post) => (
-                  <Table.Row key={post.id} className="admin-table-row hover:bg-white/[0.08] transition-colors duration-150">
+                  <Table.Row key={post.id} className="admin-table-row hover:bg-white/[0.03] transition-colors duration-200">
                     <Table.Cell className="admin-table-cell">
                       <Checkbox
                         checked={selectedPosts.has(post.id)}
@@ -399,7 +399,7 @@ function AdminPostsPage() {
                       />
                     </Table.Cell>
                     <Table.Cell className="admin-table-cell">
-                      <Flex direction="column" gap="3">
+                      <Flex direction="column" gap="2">
                         <div className="text-admin-table-cell-title text-white">
                           {post.title}
                         </div>
@@ -411,52 +411,52 @@ function AdminPostsPage() {
                       </Flex>
                     </Table.Cell>
                     <Table.Cell className="admin-table-cell">
-                      <Badge color={post.status === 'published' ? 'green' : 'gray'} size="2">
+                      <Badge color={post.status === 'published' ? 'green' : 'gray'} size="1" radius="full">
                         {post.status}
                       </Badge>
                     </Table.Cell>
                     <Table.Cell className="admin-table-cell">
-                      <Flex gap="2" align="center">
-                        <Eye size={16} style={{ color: 'var(--color-text-tertiary)' }} />
-                        <div className="text-admin-table-cell font-medium text-white">{post.views}</div>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell className="admin-table-cell">
-                      <Flex gap="2" align="center">
-                        <Heart size={16} style={{ color: 'var(--color-text-tertiary)' }} />
-                        <div className="text-admin-table-cell font-medium text-white">{post.likesCount}</div>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell className="admin-table-cell">
-                      <div className="text-admin-meta" style={{ color: 'var(--color-text-tertiary)' }}>
-                        {new Date(post.createdAt).toLocaleDateString()}
+                      <div className="text-admin-table-cell font-medium tabular-nums" style={{ color: 'var(--color-text-secondary)' }}>
+                        {post.views.toLocaleString()}
                       </div>
                     </Table.Cell>
                     <Table.Cell className="admin-table-cell">
-                      <Flex gap="2">
+                      <div className="text-admin-table-cell font-medium tabular-nums" style={{ color: 'var(--color-text-secondary)' }}>
+                        {post.likesCount.toLocaleString()}
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <div className="text-admin-meta" style={{ color: 'var(--color-text-tertiary)' }}>
+                        {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <Flex gap="1.5">
                         <Button
-                          size="2"
-                          variant="soft"
+                          size="1"
+                          variant="ghost"
                           onClick={() => navigate({ to: `/posts/${post.id}` })}
+                          className="hover:bg-white/5"
                         >
-                          <Eye size={16} />
+                          <Eye size={14} />
                         </Button>
                         <Button
-                          size="2"
-                          variant="soft"
-                          color="blue"
+                          size="1"
+                          variant="ghost"
                           onClick={() => navigate({ to: `/admin/posts/${post.id}/edit` })}
+                          className="hover:bg-white/5"
                         >
-                          <Edit size={16} />
+                          <Edit size={14} />
                         </Button>
                         <Button
-                          size="2"
-                          variant="soft"
+                          size="1"
+                          variant="ghost"
                           color="red"
                           onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
                           disabled={deleteMutation.isPending}
+                          className="hover:bg-red-500/10"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
                         </Button>
                       </Flex>
                     </Table.Cell>
