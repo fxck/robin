@@ -77,7 +77,11 @@ export function rewriteImageUrlsInObject<T>(obj: T): T {
       if (IMAGE_URL_FIELDS.includes(key) && typeof value === 'string') {
         result[key] = rewriteUrlToCdn(value);
       }
-      // Otherwise, recursively process nested objects/arrays
+      // Date objects should pass through unchanged
+      else if (value instanceof Date) {
+        result[key] = value;
+      }
+      // Recursively process nested objects/arrays (but not Dates)
       else if (typeof value === 'object' && value !== null) {
         result[key] = rewriteImageUrlsInObject(value);
       }
