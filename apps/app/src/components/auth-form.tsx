@@ -132,15 +132,11 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                   variant="outline"
                   size="3"
                   className="w-full hover:bg-white/5 transition-colors"
-                  onClick={async () => {
-                    try {
-                      await signIn.social({
-                        provider: 'google',
-                        callbackURL: '/dashboard',
-                      });
-                    } catch (error) {
-                      toast.error('Google sign in failed');
-                    }
+                  onClick={() => {
+                    // Redirect directly to API OAuth endpoint to avoid cross-domain cookie issues
+                    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                    const callbackURL = encodeURIComponent(`${window.location.origin}/dashboard`);
+                    window.location.href = `${apiUrl}/api/auth/sign-in/social/google?callbackURL=${callbackURL}`;
                   }}
                 >
                   <Flex align="center" gap="2">

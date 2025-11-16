@@ -180,11 +180,15 @@ export function createAuth(db: Database, config: {
         clientId: process.env['GITHUB_CLIENT_ID'] || '',
         clientSecret: process.env['GITHUB_CLIENT_SECRET'] || '',
         enabled: !!process.env['GITHUB_CLIENT_ID'],
+        // Redirect to frontend after OAuth callback
+        callbackURL: `${config.appURL}/dashboard`,
       },
       google: {
         clientId: process.env['GOOGLE_CLIENT_ID'] || '',
         clientSecret: process.env['GOOGLE_CLIENT_SECRET'] || '',
         enabled: !!process.env['GOOGLE_CLIENT_ID'],
+        // Redirect to frontend after OAuth callback
+        callbackURL: `${config.appURL}/dashboard`,
       },
     },
 
