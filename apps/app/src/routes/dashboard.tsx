@@ -112,7 +112,7 @@ function DashboardPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/api/posts/${id}`),
+    mutationFn: (id: string) => api.delete(`/posts/${id}`),
     onSuccess: () => {
       toast.success('Post deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });

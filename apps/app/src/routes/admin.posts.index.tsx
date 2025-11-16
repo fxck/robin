@@ -53,7 +53,7 @@ function AdminPostsPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/api/posts/${id}`),
+    mutationFn: (id: string) => api.delete(`/posts/${id}`),
     onSuccess: () => {
       toast.success('Post deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
@@ -66,7 +66,7 @@ function AdminPostsPage() {
 
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => api.delete(`/api/posts/${id}`)));
+      await Promise.all(ids.map(id => api.delete(`/posts/${id}`)));
     },
     onSuccess: () => {
       toast.success(`${selectedPosts.size} posts deleted successfully`);

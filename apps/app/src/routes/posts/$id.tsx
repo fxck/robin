@@ -20,7 +20,7 @@ import { cn } from '../../lib/utils';
 export const Route = createFileRoute('/posts/$id')({
   component: PostPage,
   loader: async ({ params }) => {
-    const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
+    const post = await api.get<PostResponse>(`/posts/${params.id}`);
     return post;
   },
   errorComponent: ({ error }) => {
@@ -119,7 +119,7 @@ function PostPage() {
   const data = Route.useLoaderData();
 
   const likeMutation = useMutation({
-    mutationFn: () => api.post(`/api/posts/${id}/like`, {}),
+    mutationFn: () => api.post(`/posts/${id}/like`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post', id] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });

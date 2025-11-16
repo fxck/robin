@@ -29,7 +29,7 @@ interface RelatedPostsProps {
 export function RelatedPosts({ postId }: RelatedPostsProps) {
   const { data, isLoading } = useQuery<{ posts: Post[] }>({
     queryKey: ['related-posts', postId],
-    queryFn: () => api.get(`/api/posts/${postId}/related`),
+    queryFn: () => api.get(`/posts/${postId}/related`),
   });
 
   if (isLoading) {

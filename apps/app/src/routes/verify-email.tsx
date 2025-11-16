@@ -29,7 +29,7 @@ function VerifyEmailPage() {
         // Call Better Auth verify endpoint via fetch
         // We use fetch directly because Better Auth client might not expose verifyEmail method
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/verify-email`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/verify-email`,
           {
             method: 'POST',
             headers: {

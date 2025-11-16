@@ -26,7 +26,7 @@ function EditPostPage() {
   // Fetch existing post
   const { data, isLoading } = useQuery({
     queryKey: ['post', id],
-    queryFn: () => api.get<PostResponse>(`/api/posts/${id}`),
+    queryFn: () => api.get<PostResponse>(`/posts/${id}`),
   });
 
   const [title, setTitle] = useState('');
@@ -54,7 +54,7 @@ function EditPostPage() {
 
   const updatePostMutation = useMutation({
     mutationFn: async (updateData: UpdatePostInput) => {
-      return api.patch<PostResponse>(`/api/posts/${id}`, updateData);
+      return api.patch<PostResponse>(`/posts/${id}`, updateData);
     },
     onSuccess: () => {
       hasUnsavedChanges.current = false;
@@ -72,7 +72,7 @@ function EditPostPage() {
   // Auto-save mutation (silent, doesn't navigate)
   const autoSaveMutation = useMutation({
     mutationFn: async (updateData: UpdatePostInput) => {
-      return api.patch<PostResponse>(`/api/posts/${id}`, updateData);
+      return api.patch<PostResponse>(`/posts/${id}`, updateData);
     },
     onSuccess: () => {
       setLastSaved(new Date());
