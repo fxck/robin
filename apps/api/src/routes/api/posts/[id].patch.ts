@@ -6,6 +6,7 @@ import { schema } from '@robin/database';
 import { requireAuth } from '../../../utils/auth-guard';
 import { deleteCache, publish } from '../../../services/redis';
 import { log } from '../../../utils/logger';
+import { generateExcerpt } from '../../../utils/markdown';
 
 const updatePostSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -76,7 +77,7 @@ export default defineEventHandler(async (event) => {
 
   if (data.content !== undefined) {
     updateData.content = data.content;
-    updateData.excerpt = data.content.substring(0, 200).trim() + (data.content.length > 200 ? '...' : '');
+    updateData.excerpt = generateExcerpt(data.content, 200);
   }
 
   if (data.coverImage !== undefined) {

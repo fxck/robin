@@ -20,25 +20,35 @@ import { cn } from '../../lib/utils';
 export const Route = createFileRoute('/posts/$id')({
   component: PostPage,
   loader: async ({ params }) => {
-    const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
-    return post;
+    console.log('[Loader] Loading post:', params.id);
+    try {
+      const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
+      console.log('[Loader] Post loaded successfully:', post);
+      return post;
+    } catch (error) {
+      console.error('[Loader] Failed to load post:', error);
+      throw error;
+    }
   },
-  pendingComponent: () => (
-    <div className="min-h-screen pt-20 md:pt-24">
-      <div className="h-[60vh] bg-bg-elevated animate-shimmer" />
-      <Container size="reading" className="py-12">
-        <div className="space-y-8">
-          <div className="h-12 bg-bg-elevated rounded animate-shimmer" />
-          <div className="h-4 bg-bg-elevated rounded animate-shimmer w-3/4" />
-          <div className="h-4 bg-bg-elevated rounded animate-shimmer w-5/6" />
-          <div className="h-4 bg-bg-elevated rounded animate-shimmer w-2/3" />
-        </div>
-      </Container>
-    </div>
-  ),
+  pendingComponent: () => {
+    console.log('[Route] Showing pending component');
+    return (
+      <div className="min-h-screen">
+        <div className="h-[60vh] bg-bg-elevated animate-shimmer" />
+        <Container size="reading" className="py-12">
+          <div className="space-y-8">
+            <div className="h-12 bg-bg-elevated rounded animate-shimmer" />
+            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-3/4" />
+            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-5/6" />
+            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-2/3" />
+          </div>
+        </Container>
+      </div>
+    );
+  },
   errorComponent: ({ error }) => {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-24">
+      <div className="min-h-screen flex items-center justify-center">
         <Container size="narrow">
           <div className="glass-surface p-12 text-center rounded-2xl">
             <Text size="lg" className="mb-6">
@@ -136,6 +146,8 @@ function PostPage() {
   const { data: session } = useSession();
   const data = Route.useLoaderData();
 
+  console.log('[PostPage] Rendering with data:', data);
+
   const likeMutation = useMutation({
     mutationFn: () => api.post(`/api/posts/${id}/like`, {}),
     onSuccess: () => {
@@ -166,7 +178,7 @@ function PostPage() {
 
   if (!data?.post) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-24">
+      <div className="min-h-screen flex items-center justify-center">
         <Container size="narrow">
           <div className="glass-surface p-12 text-center rounded-2xl">
             <Text size="lg" className="mb-6">
@@ -186,7 +198,7 @@ function PostPage() {
   const readTime = Math.max(1, Math.ceil(post.content.split(' ').length / 200));
 
   return (
-    <div className="post-detail relative pt-20 md:pt-24">
+    <div className="post-detail relative">
       {/* Table of Contents (Desktop only - fixed position) */}
       <TableOfContents content={post.content} />
 

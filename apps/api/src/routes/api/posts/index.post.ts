@@ -6,6 +6,7 @@ import { schema } from '@robin/database';
 import { requireAuth } from '../../../utils/auth-guard';
 import { checkRateLimit, deleteCache, publish } from '../../../services/redis';
 import { log } from '../../../utils/logger';
+import { generateExcerpt } from '../../../utils/markdown';
 
 const createPostSchema = z.object({
   title: z.string().min(1).max(200),
@@ -39,7 +40,7 @@ export default defineEventHandler(async (event) => {
   // Create post
   const postId = ulid();
 
-  const excerpt = data.content.substring(0, 200).trim() + (data.content.length > 200 ? '...' : '');
+  const excerpt = generateExcerpt(data.content, 200);
 
   const [post] = await db
     .insert(schema.posts)

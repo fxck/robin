@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Heart, Eye, Clock } from 'lucide-react';
+import { Heart, Eye } from 'lucide-react';
 import type { PostListItem } from '@robin/types';
 import { Image } from '../image';
 import { Heading } from '../typography/Heading';
@@ -12,18 +12,8 @@ interface PostCardProps {
   post: PostListItem;
 }
 
-function extractExcerpt(content: string, maxLength: number = 120): string {
-  const plainText = content
-    .replace(/<[^>]*>/g, '')
-    .replace(/[#*_`]/g, '')
-    .trim();
-  return plainText.length > maxLength
-    ? `${plainText.substring(0, maxLength)}...`
-    : plainText;
-}
-
 export function PostCard({ post }: PostCardProps) {
-  const excerpt = post.excerpt || extractExcerpt(post.content || '');
+  const excerpt = post.excerpt || '';
 
   return (
     <Link
@@ -89,7 +79,7 @@ export function PostCard({ post }: PostCardProps) {
               <Flex align="center" gap="2">
                 <Avatar
                   size="1"
-                  src={post.author?.image}
+                  src={post.author?.image || undefined}
                   fallback={post.author?.name?.[0] || 'A'}
                   radius="full"
                 />
@@ -112,14 +102,6 @@ export function PostCard({ post }: PostCardProps) {
                     {post.views || 0}
                   </Text>
                 </Flex>
-                {post.readTime && (
-                  <Flex align="center" gap="1">
-                    <Clock size={14} className="text-text-tertiary" />
-                    <Text size="xs" color="tertiary">
-                      {post.readTime}m
-                    </Text>
-                  </Flex>
-                )}
               </Flex>
             </Flex>
           </div>

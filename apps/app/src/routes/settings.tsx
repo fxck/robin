@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api-client';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2, User, Upload, Camera } from 'lucide-react';
+import { Loader2, User, Camera } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 export const Route = createFileRoute('/settings')({
@@ -19,6 +19,17 @@ interface User {
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return 'Unknown';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return 'Unknown';
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 }
 
 interface UpdateProfileData {
@@ -141,7 +152,7 @@ function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-5 md:px-8 py-16 pt-28 md:pt-32">
+      <div className="max-w-4xl mx-auto px-5 md:px-8 py-16 pt-32 md:pt-36">
         <Flex align="center" justify="center" py="9">
           <Loader2 className="animate-spin" size={32} />
         </Flex>
@@ -152,7 +163,7 @@ function SettingsPage() {
   const user = userData?.user;
 
   return (
-    <div className="max-w-4xl mx-auto px-5 md:px-8 py-16 pt-28 md:pt-32">
+    <div className="max-w-4xl mx-auto px-5 md:px-8 py-16 pt-32 md:pt-36">
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
           Settings
@@ -264,11 +275,7 @@ function SettingsPage() {
 
                 <Flex justify="between" align="center" className="pt-4 border-t border-white/10">
                   <Text size="2" color="gray">
-                    Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    }) : 'Unknown'}
+                    Member since {formatDate(user?.createdAt)}
                   </Text>
                   <Button
                     variant="solid"
