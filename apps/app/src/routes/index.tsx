@@ -119,16 +119,8 @@ function Index() {
             <div
               className="absolute bottom-0 left-0 right-0 pointer-events-none"
               style={{
-                height: '100px',
-                background: 'linear-gradient(to bottom, transparent 0%, var(--color-bg-base) 100%)'
-              }}
-            />
-            {/* Gradient fade at top to blend with navbar */}
-            <div
-              className="absolute top-0 left-0 right-0 pointer-events-none"
-              style={{
                 height: '200px',
-                background: 'linear-gradient(to top, transparent 50%, var(--color-bg-base) 100%)'
+                background: 'linear-gradient(to bottom, transparent 0%, #111110 82%)'
               }}
             />
           </div>
