@@ -59,58 +59,35 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Parse markdown text and insert as rich content
 const parseAndInsertMarkdown = (editor: any, text: string, from: number, to: number) => {
-  // Delete the selection first
-  editor.chain().focus().deleteRange({ from, to }).run();
-
-  // Parse the markdown text line by line
+  // Build HTML from markdown
+  let html = '';
   const lines = text.split('\n');
 
-  lines.forEach((line, index) => {
-    // Skip empty lines (they'll become paragraph breaks)
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Skip empty lines
     if (line.trim() === '') {
-      if (index < lines.length - 1) {
-        editor.chain().focus().insertContent({ type: 'paragraph' }).run();
-      }
-      return;
+      html += '<p></p>';
+      continue;
     }
 
     // Check for headings first (must be at start of line)
     const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
     if (headingMatch) {
-      const level = headingMatch[1].length as 1 | 2 | 3 | 4 | 5 | 6;
-      const headingText = headingMatch[2];
-
-      // Parse inline markdown in heading text
-      const headingHTML = parseInlineMarkdown(headingText);
-
-      editor.chain().focus().insertContent({
-        type: 'heading',
-        attrs: { level },
-        content: headingHTML ? [{ type: 'text', text: headingHTML }] : [{ type: 'text', text: headingText }],
-      }).run();
-
-      if (index < lines.length - 1) {
-        editor.chain().focus().insertContent({ type: 'paragraph' }).run();
-      }
-      return;
+      const level = headingMatch[1].length;
+      const headingText = parseInlineMarkdown(headingMatch[2]);
+      html += `<h${level}>${headingText}</h${level}>`;
+      continue;
     }
 
-    // For regular text lines, parse inline markdown
+    // Regular paragraph with inline markdown
     const processedHTML = parseInlineMarkdown(line);
+    html += `<p>${processedHTML}</p>`;
+  }
 
-    if (processedHTML !== line && processedHTML.includes('<')) {
-      // Insert as HTML if markdown was found and converted
-      editor.chain().focus().insertContent(processedHTML).run();
-    } else {
-      // Insert as plain text
-      editor.chain().focus().insertContent(line).run();
-    }
-
-    // Add paragraph break if not the last line
-    if (index < lines.length - 1) {
-      editor.chain().focus().insertContent({ type: 'paragraph' }).run();
-    }
-  });
+  // Delete selection and insert the parsed HTML
+  editor.chain().focus().deleteRange({ from, to }).insertContent(html).run();
 };
 
 // Helper to parse inline markdown (bold, italic, links, code)
@@ -292,7 +269,7 @@ export function ChromelessPostEditor({
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
-  const [showCoverUpload, setShowCoverUpload] = useState(false);
+  const editorRef = useRef<any>(null);
 
   // Auto-resize title textarea
   const adjustTitleHeight = useCallback(() => {
@@ -551,7 +528,7 @@ export function ChromelessPostEditor({
               <EditorContent
                 extensions={extensions}
                 onCreate={({ editor }) => {
-                  // Set initial content as markdown
+                  editorRef.current = editor;
                   if (content) {
                     editor.commands.setContent(content);
                   }
@@ -599,18 +576,16 @@ export function ChromelessPostEditor({
                     // Check if text contains markdown syntax (multiline flag for headings)
                     const hasMarkdown = /^#{1,6}\s|!\[.+\]\(.+\)|\[.+\]\(.+\)|\*\*.+\*\*|\*[^*]+\*|`.+`/m.test(text);
 
-                    if (hasMarkdown) {
+                    if (hasMarkdown && editorRef.current) {
                       // Prevent default paste
                       event.preventDefault();
 
-                      // Get editor instance from view
+                      // Get selection position
                       const { state } = view;
                       const { selection } = state;
-                      const editor = (view as any).editor;
 
-                      if (editor) {
-                        parseAndInsertMarkdown(editor, text, selection.from, selection.to);
-                      }
+                      // Use the editor ref
+                      parseAndInsertMarkdown(editorRef.current, text, selection.from, selection.to);
 
                       return true;
                     }
