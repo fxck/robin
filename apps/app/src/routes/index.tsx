@@ -88,28 +88,24 @@ function Index() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <Section spacing="xl" className="mesh-gradient relative overflow-hidden pt-36 md:pt-40">
-        {/* Advanced Gradient Mesh */}
-        <div className="gradient-mesh">
-          <div className="absolute top-10 left-[10%] w-[500px] h-[500px] bg-amber-500/20 rounded-full blur-[120px] float-orb morph-orb" />
-          <div className="absolute top-20 right-[15%] w-[400px] h-[400px] bg-blue-500/15 rounded-full blur-[100px] float-orb-slow morph-orb" style={{ animationDelay: '-10s' }} />
-          <div className="absolute bottom-0 left-[20%] w-[450px] h-[450px] bg-purple-500/10 rounded-full blur-[110px] float-orb" style={{ animationDelay: '-15s' }} />
+      <Section spacing="xl" className="relative overflow-hidden pt-36 md:pt-40">
+        {/* Minimal ambient lighting */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-amber-500/[0.03] rounded-full blur-[150px]" />
+          <div className="absolute top-1/4 right-1/3 w-[500px] h-[500px] bg-blue-500/[0.02] rounded-full blur-[140px]" />
         </div>
 
-        {/* Subtle Grid Pattern */}
-        <div className="absolute inset-0 opacity-[0.015]" style={{
-          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
-                           linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px)`,
-          backgroundSize: '64px 64px',
+        {/* Subtle noise texture */}
+        <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }} />
 
         <Container size="standard">
           <div className="text-center max-w-4xl mx-auto relative">
             {/* Hero Badge */}
-            <div className="hero-badge inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500/10 via-amber-400/15 to-amber-500/10 border border-amber-500/30 mb-12 backdrop-blur-md relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <Sparkles size={16} className="text-amber-400 relative z-10" />
-              <Text size="sm" className="relative z-10 font-semibold bg-gradient-to-r from-amber-200 via-amber-100 to-amber-200 bg-clip-text text-transparent">
+            <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] mb-12 backdrop-blur-sm cursor-default group hover:bg-white/[0.04] hover:border-amber-500/20 transition-all duration-300">
+              <Sparkles size={15} className="text-amber-400/80 group-hover:text-amber-400 transition-colors" />
+              <Text size="sm" className="text-gray-400 group-hover:text-gray-300 transition-colors font-medium">
                 Discover stories that matter
               </Text>
             </div>
@@ -118,12 +114,13 @@ function Index() {
             <Heading
               level={1}
               variant="display"
-              className="hero-title mb-8 tracking-tight text-gradient"
+              className="hero-title mb-6 tracking-tight"
               style={{
-                fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+                fontSize: 'clamp(2.5rem, 7vw, 4.5rem)',
                 lineHeight: '1.1',
-                fontWeight: '800',
-                letterSpacing: '-0.03em'
+                fontWeight: '700',
+                letterSpacing: '-0.025em',
+                color: '#e8e8e8'
               }}
             >
               Welcome to Robin
@@ -132,18 +129,16 @@ function Index() {
             {/* Hero Subtitle */}
             <Text
               size="lg"
-              className="hero-subtitle mb-0 max-w-2xl mx-auto leading-relaxed text-gray-300"
+              className="hero-subtitle mb-0 max-w-2xl mx-auto leading-relaxed"
               style={{
-                fontSize: 'clamp(1.125rem, 2vw, 1.375rem)',
-                lineHeight: '1.7'
+                fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
+                lineHeight: '1.7',
+                color: '#a0a0a0'
               }}
             >
               A modern platform for sharing ideas, stories, and insights.
               Join our community of writers and readers.
             </Text>
-
-            {/* Decorative Elements */}
-            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-amber-500/5 to-transparent blur-3xl rounded-full pointer-events-none" />
           </div>
         </Container>
       </Section>
