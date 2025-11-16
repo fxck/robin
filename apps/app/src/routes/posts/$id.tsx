@@ -236,7 +236,7 @@ function PostPage() {
             <div
               className="absolute left-0 right-0 h-[60px] pointer-events-none"
               style={{
-                bottom: '-100px',
+                bottom: '-60px',
                 backgroundImage: 'linear-gradient(to bottom, #111110 0%, transparent 100%)',
               }}
             />

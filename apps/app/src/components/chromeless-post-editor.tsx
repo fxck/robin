@@ -522,7 +522,7 @@ export function ChromelessPostEditor({
               />
               {/* Extended gradient below cover - EXACT match */}
               <div
-                className="absolute left-0 right-0 h-[100px] pointer-events-none"
+                className="absolute left-0 right-0 h-[60px] pointer-events-none"
                 style={{
                   bottom: '-60px',
                   backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, transparent 100%)',
