@@ -12,9 +12,9 @@ function AuthPage() {
 
   return (
     <div className="auth-layout mesh-gradient">
-      <div className="max-w-[540px] mx-auto px-5 md:px-8">
+      <div className="mx-auto px-5 md:px-8" style={{ maxWidth: '450px' }}>
         <div className="flex flex-col items-center justify-center gap-8" style={{ minHeight: 'calc(100vh - 60px)', paddingTop: 'var(--space-9)', paddingBottom: 'var(--space-9)' }}>
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-2 w-full">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
               {mode === 'signin' ? 'Welcome back' : 'Create your account'}
             </h1>

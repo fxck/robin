@@ -49,14 +49,14 @@ function ForgotPasswordPage() {
   if (sent) {
     return (
       <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
-        <Container size="1">
+        <Box style={{ maxWidth: '450px', margin: '0 auto', padding: '0 var(--space-5)' }}>
           <Flex
             direction="column"
             align="center"
             justify="center"
             style={{ minHeight: 'calc(100vh - 60px)' }}
           >
-            <Card style={{ maxWidth: 450, width: '100%' }}>
+            <Card style={{ width: '100%' }}>
               <Flex direction="column" gap="5" p="5">
                 <Flex direction="column" align="center" gap="3" style={{ textAlign: 'center' }}>
                   <Box
@@ -110,7 +110,7 @@ function ForgotPasswordPage() {
 
   return (
     <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
-      <Container size="1">
+      <Box style={{ maxWidth: '450px', margin: '0 auto', padding: '0 var(--space-5)' }}>
         <Flex
           direction="column"
           align="center"
@@ -118,14 +118,14 @@ function ForgotPasswordPage() {
           gap="6"
           style={{ minHeight: 'calc(100vh - 60px)', paddingTop: 'var(--space-9)', paddingBottom: 'var(--space-9)' }}
         >
-          <Flex direction="column" align="center" gap="2" style={{ textAlign: 'center' }}>
+          <Flex direction="column" align="center" gap="2" style={{ textAlign: 'center', width: '100%' }}>
             <Heading size="7">Forgot your password?</Heading>
             <Text size="3" color="gray">
               Enter your email and we'll send you a reset link
             </Text>
           </Flex>
 
-          <Card style={{ maxWidth: 450, width: '100%' }}>
+          <Card style={{ width: '100%' }}>
             <form onSubmit={handleSubmit}>
               <Flex direction="column" gap="4" p="5">
                 <TextField.Root

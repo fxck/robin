@@ -94,7 +94,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
   });
 
   return (
-    <div className="w-full max-w-md glass-surface p-8 animate-fade-in">
+    <div className="w-full glass-surface p-8 animate-fade-in" style={{ maxWidth: '450px' }}>
       <Flex direction="column" gap="5">
         {/* Social Auth Buttons - Only show if providers are enabled */}
         {hasSocialProviders && (

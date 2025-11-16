@@ -1,7 +1,7 @@
 import { defineEventHandler, readBody, createError } from 'h3';
 import { z } from 'zod';
 import { ulid } from 'ulidx';
-import { sql } from 'drizzle-orm';
+import { sql, eq, and } from 'drizzle-orm';
 import { db } from '../../../services/db';
 import { schema } from '@robin/database';
 import { requireAuth } from '../../../utils/auth-guard';
@@ -35,8 +35,9 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const data = createPostSchema.parse(body);
 
-  // Generate slug from title
-  const slug = generateSlug(data.title);
+  // Generate unique slug from title
+  const baseSlug = generateSlug(data.title);
+  const slug = await generateUniqueSlug(user.id, baseSlug);
 
   // Create post
   const postId = ulid();
@@ -106,4 +107,37 @@ function generateSlug(title: string): string {
     .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
     .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
     .substring(0, 100); // Limit length
+}
+
+/**
+ * Generate a unique slug for a user by appending a counter if needed
+ */
+async function generateUniqueSlug(userId: string, baseSlug: string): Promise<string> {
+  let slug = baseSlug;
+  let counter = 1;
+
+  // Check if slug exists for this user
+  while (true) {
+    const existing = await db
+      .select({ id: schema.posts.id })
+      .from(schema.posts)
+      .where(and(eq(schema.posts.userId, userId), eq(schema.posts.slug, slug)))
+      .limit(1);
+
+    if (existing.length === 0) {
+      return slug;
+    }
+
+    // Append counter and try again
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+
+    // Safety limit to prevent infinite loops
+    if (counter > 100) {
+      throw createError({
+        statusCode: 500,
+        message: 'Unable to generate unique slug',
+      });
+    }
+  }
 }
