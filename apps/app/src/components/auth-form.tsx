@@ -31,7 +31,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
   // Fetch enabled providers
   const { data: providersData } = useQuery({
     queryKey: ['auth-providers'],
-    queryFn: () => api.get<{ providers: { email: boolean; github: boolean; google: boolean } }>('/api/auth/providers'),
+    queryFn: () => api.get<{ providers: { email: boolean; github: boolean; google: boolean } }>('/auth/providers'),
     staleTime: 60 * 60 * 1000, // 1 hour
   });
 

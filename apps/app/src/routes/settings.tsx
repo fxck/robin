@@ -53,7 +53,7 @@ function SettingsPage() {
   // Fetch current user data
   const { data: userData, isLoading } = useQuery<{ user: User }>({
     queryKey: ['currentUser'],
-    queryFn: () => api.get('/api/users/me'),
+    queryFn: () => api.get('/users/me'),
   });
 
   // Set initial values when data loads (only once)
