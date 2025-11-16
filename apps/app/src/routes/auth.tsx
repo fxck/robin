@@ -37,7 +37,7 @@ function AuthPage() {
             mode={mode}
             onToggleMode={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
             onSuccess={() => {
-              navigate({ to: '/dashboard' });
+              navigate({ to: '/dashboard', search: { verified: false } });
             }}
           />
         </div>
