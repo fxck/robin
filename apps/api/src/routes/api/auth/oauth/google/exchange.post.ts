@@ -212,24 +212,29 @@ export default defineEventHandler(async (event) => {
   }
 
   // Build cookie string manually to include Partitioned attribute
+  // Note: Cookie attributes are case-insensitive, but values for SameSite must match exactly
   const cookieParts = [
     `better-auth.session_token=${sessionToken}`,
-    `Path=${cookieOptions.path}`,
-    `Max-Age=${cookieOptions.maxAge}`,
-    `SameSite=${cookieOptions.sameSite}`,
+    `path=${cookieOptions.path}`,
+    `max-age=${cookieOptions.maxAge}`,
   ];
 
   if (cookieOptions.httpOnly) {
-    cookieParts.push('HttpOnly');
+    cookieParts.push('httponly');
   }
 
   if (cookieOptions.secure) {
-    cookieParts.push('Secure');
-    cookieParts.push('Partitioned'); // Required for cross-site cookies in Chrome
+    cookieParts.push('secure');
+  }
+
+  // SameSite must be capitalized correctly: None, Lax, or Strict
+  if (cookieOptions.sameSite) {
+    const sameSiteValue = cookieOptions.sameSite.charAt(0).toUpperCase() + cookieOptions.sameSite.slice(1);
+    cookieParts.push(`samesite=${sameSiteValue}`);
   }
 
   if (cookieOptions.domain) {
-    cookieParts.push(`Domain=${cookieOptions.domain}`);
+    cookieParts.push(`domain=${cookieOptions.domain}`);
   }
 
   const cookieString = cookieParts.join('; ');
@@ -243,6 +248,7 @@ export default defineEventHandler(async (event) => {
     cookieSet: true,
     isProduction,
     cookieString,
+    note: 'Cookie should be accessible at domain ' + cookieOptions.domain,
   });
 
   return {
