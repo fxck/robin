@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Avatar as RadixAvatar } from '@radix-ui/themes';
-import { Heart, Eye, ArrowLeft, Share2, Bookmark } from 'lucide-react';
+import { Heart, Eye, ArrowLeft, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { api } from '../../lib/api-client';
@@ -299,13 +299,6 @@ function PostPage() {
                 <Share2 size={18} />
                 Share
               </Button>
-
-              {session && (
-                <Button size="3" variant="ghost">
-                  <Bookmark size={18} />
-                  Save
-                </Button>
-              )}
             </Flex>
 
             <Link to="/" className="no-underline">

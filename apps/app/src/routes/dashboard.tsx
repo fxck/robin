@@ -10,7 +10,7 @@ import {
   Badge,
   AlertDialog,
 } from '@radix-ui/themes';
-import { PlusCircle, Edit, Trash2, Eye, TrendingUp, FileText, Clock, BarChart3, Heart } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Eye, FileText, Clock, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useSession, authClient } from '../lib/auth';
@@ -32,31 +32,18 @@ interface StatCardProps {
   value: number;
   icon: React.ReactNode;
   gradient: string;
-  change?: {
-    value: number;
-    trend: 'up' | 'down';
-  };
 }
 
-function StatCard({ title, value, icon, gradient, change }: StatCardProps) {
+function StatCard({ title, value, icon, gradient }: StatCardProps) {
   return (
     <div className="glass-surface p-6 rounded-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
       {/* Gradient overlay */}
       <div className={`absolute inset-0 ${gradient} opacity-10 group-hover:opacity-20 transition-opacity`}></div>
 
       <Flex direction="column" gap="3" className="relative z-10">
-        <Flex justify="between" align="start">
-          <div className={`p-3 rounded-xl ${gradient} bg-opacity-20`}>
-            {icon}
-          </div>
-          {change && (
-            <div className={`px-2 py-1 rounded-lg text-xs font-medium ${
-              change.trend === 'up' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-            }`}>
-              {change.trend === 'up' ? '+' : ''}{change.value}%
-            </div>
-          )}
-        </Flex>
+        <div className={`p-3 rounded-xl ${gradient} bg-opacity-20 w-fit`}>
+          {icon}
+        </div>
 
         <div>
           <Text size="2" className="text-gray-400 block mb-1">
@@ -163,7 +150,6 @@ function DashboardPage() {
             value={publishedPosts.length}
             icon={<FileText className="h-6 w-6 text-purple-400" />}
             gradient="bg-gradient-to-br from-purple-500 to-purple-700"
-            change={{ value: 12, trend: 'up' }}
           />
           <StatCard
             title="Draft Posts"
@@ -176,46 +162,17 @@ function DashboardPage() {
             value={totalViews}
             icon={<Eye className="h-6 w-6 text-green-400" />}
             gradient="bg-gradient-to-br from-green-500 to-green-700"
-            change={{ value: 24, trend: 'up' }}
           />
           <StatCard
             title="Total Likes"
             value={totalLikes}
             icon={<Heart className="h-6 w-6 text-pink-400" />}
             gradient="bg-gradient-to-br from-pink-500 to-pink-700"
-            change={{ value: 18, trend: 'up' }}
           />
         </div>
 
         {/* Activity Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Quick Stats */}
-          <div className="glass-surface p-6 rounded-2xl">
-            <Flex direction="column" gap="4">
-              <Flex align="center" gap="2">
-                <BarChart3 className="h-5 w-5 text-purple-400" />
-                <Heading size="5">Quick Stats</Heading>
-              </Flex>
-
-              <div className="space-y-4">
-                <Flex justify="between" align="center" className="p-3 bg-white/5 rounded-lg">
-                  <Text size="2" className="text-gray-400">Avg. Reading Time</Text>
-                  <Text size="2" weight="bold">5.2 min</Text>
-                </Flex>
-                <Flex justify="between" align="center" className="p-3 bg-white/5 rounded-lg">
-                  <Text size="2" className="text-gray-400">Engagement Rate</Text>
-                  <Text size="2" weight="bold" className="text-green-400">8.4%</Text>
-                </Flex>
-                <Flex justify="between" align="center" className="p-3 bg-white/5 rounded-lg">
-                  <Text size="2" className="text-gray-400">This Week</Text>
-                  <Text size="2" weight="bold">{publishedPosts.slice(0, 3).length} posts</Text>
-                </Flex>
-              </div>
-            </Flex>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="glass-surface p-6 rounded-2xl lg:col-span-2">
+        <div className="glass-surface p-6 rounded-2xl">
             <Flex direction="column" gap="4">
               <Heading size="5">Recent Activity</Heading>
 
@@ -249,7 +206,6 @@ function DashboardPage() {
                 ))}
               </div>
             </Flex>
-          </div>
         </div>
 
         {/* Posts Table */}

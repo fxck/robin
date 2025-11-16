@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Heading, Flex, Text, TextField, Button, Box, Tabs } from '@radix-ui/themes';
+import { Heading, Flex, Text, TextField, Button, Box } from '@radix-ui/themes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api-client';
 import { FileUpload } from '../components';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
-import { Loader2, User, Shield, Bell, Palette } from 'lucide-react';
+import { Loader2, User } from 'lucide-react';
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -109,28 +109,7 @@ function SettingsPage() {
         <p className="text-lg text-gray-400">Manage your account settings and preferences</p>
       </div>
 
-      <Tabs.Root defaultValue="profile" className="w-full">
-        <Tabs.List className="mb-8">
-          <Tabs.Trigger value="profile" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Profile
-          </Tabs.Trigger>
-          <Tabs.Trigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Security
-          </Tabs.Trigger>
-          <Tabs.Trigger value="notifications" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
-          </Tabs.Trigger>
-          <Tabs.Trigger value="preferences" className="flex items-center gap-2">
-            <Palette className="h-4 w-4" />
-            Preferences
-          </Tabs.Trigger>
-        </Tabs.List>
-
-        {/* Profile Tab */}
-        <Tabs.Content value="profile" className="animate-fade-in">
+      <div className="w-full animate-fade-in">
           <div className="space-y-6">
             {/* Profile Picture Card */}
             <div className="glass-surface p-8 rounded-2xl">
@@ -243,187 +222,7 @@ function SettingsPage() {
               </Flex>
             </div>
           </div>
-        </Tabs.Content>
-
-        {/* Security Tab */}
-        <Tabs.Content value="security" className="animate-fade-in">
-          <div className="space-y-6">
-            <div className="glass-surface p-8 rounded-2xl">
-              <Flex direction="column" gap="6">
-                <div>
-                  <Heading size="5" mb="2">Password</Heading>
-                  <Text size="2" color="gray">
-                    Change your password to keep your account secure
-                  </Text>
-                </div>
-
-                <Box>
-                  <Text as="label" size="2" weight="bold" mb="2" className="block">
-                    Current Password
-                  </Text>
-                  <TextField.Root
-                    type="password"
-                    placeholder="Enter current password"
-                    size="3"
-                    className="w-full"
-                  />
-                </Box>
-
-                <Box>
-                  <Text as="label" size="2" weight="bold" mb="2" className="block">
-                    New Password
-                  </Text>
-                  <TextField.Root
-                    type="password"
-                    placeholder="Enter new password"
-                    size="3"
-                    className="w-full"
-                  />
-                </Box>
-
-                <Box>
-                  <Text as="label" size="2" weight="bold" mb="2" className="block">
-                    Confirm New Password
-                  </Text>
-                  <TextField.Root
-                    type="password"
-                    placeholder="Confirm new password"
-                    size="3"
-                    className="w-full"
-                  />
-                </Box>
-
-                <Flex justify="end" className="pt-4 border-t border-white/10">
-                  <Button variant="solid" className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
-                    Update Password
-                  </Button>
-                </Flex>
-              </Flex>
-            </div>
-
-            <div className="glass-surface p-8 rounded-2xl">
-              <Flex direction="column" gap="4">
-                <div>
-                  <Heading size="5" mb="2">Sessions</Heading>
-                  <Text size="2" color="gray">
-                    Manage your active sessions across devices
-                  </Text>
-                </div>
-
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div>
-                      <Text size="2" weight="bold">Current Session</Text>
-                      <Text size="1" color="gray">Last active: Now</Text>
-                    </div>
-                    <div className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
-                      Active
-                    </div>
-                  </div>
-                </div>
-              </Flex>
-            </div>
-          </div>
-        </Tabs.Content>
-
-        {/* Notifications Tab */}
-        <Tabs.Content value="notifications" className="animate-fade-in">
-          <div className="glass-surface p-8 rounded-2xl">
-            <Flex direction="column" gap="6">
-              <div>
-                <Heading size="5" mb="2">Email Notifications</Heading>
-                <Text size="2" color="gray">
-                  Choose what updates you want to receive
-                </Text>
-              </div>
-
-              <div className="space-y-4 pt-2">
-                <Flex justify="between" align="center" className="p-4 bg-white/5 rounded-lg">
-                  <div>
-                    <Text size="2" weight="bold" className="block mb-1">New Comments</Text>
-                    <Text size="1" color="gray">Get notified when someone comments on your posts</Text>
-                  </div>
-                  <input type="checkbox" className="toggle" defaultChecked />
-                </Flex>
-
-                <Flex justify="between" align="center" className="p-4 bg-white/5 rounded-lg">
-                  <div>
-                    <Text size="2" weight="bold" className="block mb-1">New Followers</Text>
-                    <Text size="1" color="gray">Get notified when someone follows you</Text>
-                  </div>
-                  <input type="checkbox" className="toggle" defaultChecked />
-                </Flex>
-
-                <Flex justify="between" align="center" className="p-4 bg-white/5 rounded-lg">
-                  <div>
-                    <Text size="2" weight="bold" className="block mb-1">Post Likes</Text>
-                    <Text size="1" color="gray">Get notified when someone likes your post</Text>
-                  </div>
-                  <input type="checkbox" className="toggle" />
-                </Flex>
-
-                <Flex justify="between" align="center" className="p-4 bg-white/5 rounded-lg">
-                  <div>
-                    <Text size="2" weight="bold" className="block mb-1">Weekly Digest</Text>
-                    <Text size="1" color="gray">Receive a weekly summary of your activity</Text>
-                  </div>
-                  <input type="checkbox" className="toggle" defaultChecked />
-                </Flex>
-              </div>
-            </Flex>
-          </div>
-        </Tabs.Content>
-
-        {/* Preferences Tab */}
-        <Tabs.Content value="preferences" className="animate-fade-in">
-          <div className="glass-surface p-8 rounded-2xl">
-            <Flex direction="column" gap="6">
-              <div>
-                <Heading size="5" mb="2">Appearance</Heading>
-                <Text size="2" color="gray">
-                  Customize how Robin looks for you
-                </Text>
-              </div>
-
-              <Box>
-                <Text as="label" size="2" weight="bold" mb="3" className="block">
-                  Theme
-                </Text>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="p-4 bg-white/5 rounded-lg border-2 border-purple-500 cursor-pointer hover:bg-white/10 transition-colors">
-                    <div className="w-full h-24 bg-gradient-to-br from-gray-900 to-gray-800 rounded mb-3"></div>
-                    <Text size="2" weight="bold" className="text-center block">Dark</Text>
-                  </div>
-                  <div className="p-4 bg-white/5 rounded-lg border-2 border-transparent cursor-pointer hover:bg-white/10 transition-colors opacity-50">
-                    <div className="w-full h-24 bg-gradient-to-br from-gray-100 to-white rounded mb-3"></div>
-                    <Text size="2" weight="bold" className="text-center block">Light</Text>
-                  </div>
-                  <div className="p-4 bg-white/5 rounded-lg border-2 border-transparent cursor-pointer hover:bg-white/10 transition-colors opacity-50">
-                    <div className="w-full h-24 bg-gradient-to-br from-gray-900 via-gray-100 to-gray-900 rounded mb-3"></div>
-                    <Text size="2" weight="bold" className="text-center block">Auto</Text>
-                  </div>
-                </div>
-              </Box>
-
-              <Box>
-                <Text as="label" size="2" weight="bold" mb="3" className="block">
-                  Reading Preferences
-                </Text>
-                <Flex direction="column" gap="3">
-                  <Flex justify="between" align="center" className="p-4 bg-white/5 rounded-lg">
-                    <Text size="2">Show reading time estimates</Text>
-                    <input type="checkbox" className="toggle" defaultChecked />
-                  </Flex>
-                  <Flex justify="between" align="center" className="p-4 bg-white/5 rounded-lg">
-                    <Text size="2">Auto-play videos</Text>
-                    <input type="checkbox" className="toggle" />
-                  </Flex>
-                </Flex>
-              </Box>
-            </Flex>
-          </div>
-        </Tabs.Content>
-      </Tabs.Root>
+      </div>
     </div>
   );
 }
