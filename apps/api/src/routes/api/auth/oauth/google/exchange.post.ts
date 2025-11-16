@@ -200,6 +200,15 @@ export default defineEventHandler(async (event) => {
   // Only set secure in production (required for SameSite=none)
   if (isProduction) {
     cookieOptions.secure = true;
+    // Set domain to parent domain to allow cross-subdomain cookies
+    // Extract parent domain from API base URL (e.g., .prg1.zerops.app from api-1b54-3000.prg1.zerops.app)
+    const apiUrl = new URL(config.public.apiBase);
+    const domainParts = apiUrl.hostname.split('.');
+    if (domainParts.length > 2) {
+      // Take the last two parts (e.g., zerops.app) or last three for special TLDs
+      const parentDomain = '.' + domainParts.slice(-3).join('.');
+      cookieOptions.domain = parentDomain;
+    }
   }
 
   setCookie(event, 'better-auth.session_token', sessionToken, cookieOptions);
@@ -209,6 +218,7 @@ export default defineEventHandler(async (event) => {
     email: user.email,
     cookieSet: true,
     isProduction,
+    cookieOptions,
   });
 
   return {
