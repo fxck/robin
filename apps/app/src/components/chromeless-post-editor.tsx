@@ -465,6 +465,7 @@ export function ChromelessPostEditor({
           <div className="mb-20 min-h-[60vh]">
             <EditorRoot>
               <EditorContent
+                initialContent={content}
                 extensions={extensions}
                 editorProps={{
                   attributes: {

@@ -292,6 +292,7 @@ function EditPostPage() {
 
   return (
     <ChromelessPostEditor
+      key={id} // Force remount when editing different post
       title={title}
       content={content}
       coverImage={coverImage}
