@@ -278,7 +278,11 @@ export function ChromelessPostEditor({
         },
       },
     }),
-    Markdown,
+    Markdown.configure({
+      html: true,
+      transformPastedText: true,
+      transformCopiedText: true,
+    }),
     Placeholder.configure({
       placeholder: "Start writing your story... Press '/' for commands",
     }),
@@ -465,8 +469,13 @@ export function ChromelessPostEditor({
           <div className="mb-20 min-h-[60vh]">
             <EditorRoot>
               <EditorContent
-                initialContent={content}
                 extensions={extensions}
+                onCreate={({ editor }) => {
+                  // Set initial content as markdown
+                  if (content) {
+                    editor.commands.setContent(content, false, { preserveWhitespace: 'full' });
+                  }
+                }}
                 editorProps={{
                   attributes: {
                     class: cn(
@@ -499,7 +508,13 @@ export function ChromelessPostEditor({
                     return handleImageDrop(view, event, moved, uploadFn);
                   },
                   handlePaste: (view, event) => {
-                    return handleImagePaste(view, event, uploadFn);
+                    // First check if there's an image being pasted
+                    const hasImagePaste = handleImagePaste(view, event, uploadFn);
+                    if (hasImagePaste) return true;
+
+                    // If no image, let the Markdown extension handle the paste
+                    // The Markdown extension will automatically convert markdown syntax
+                    return false;
                   },
                 }}
                 onUpdate={({ editor }) => {

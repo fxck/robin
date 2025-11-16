@@ -57,6 +57,9 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
             throw new Error(result.error.message || 'Sign up failed');
           }
 
+          // Reset form after successful signup
+          form.reset();
+
           // Since autoSignIn is enabled, user is now signed in
           toast.success('Account created! A verification email has been sent to confirm your address.', {
             duration: 4000,
@@ -70,6 +73,9 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
           if (result.error) {
             throw new Error(result.error.message || 'Sign in failed');
           }
+
+          // Reset form after successful signin
+          form.reset();
 
           toast.success('Signed in successfully!');
         }
