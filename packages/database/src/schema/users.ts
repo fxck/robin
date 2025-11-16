@@ -8,8 +8,8 @@ export const users = pgTable('users', {
   emailVerified: boolean('email_verified').default(false).notNull(), // Better Auth requires notNull
   image: text('image'),
   metadata: jsonb('metadata').$type<Record<string, any>>(),
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'string' })
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()
     .$onUpdate(() => sql`now()`) // Auto-update timestamp on changes
     .notNull(),
@@ -22,13 +22,13 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const sessions = pgTable('sessions', {
   id: text('id').primaryKey(),
-  expiresAt: timestamp('expires_at', { mode: 'string' }).notNull(),
+  expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
   token: text('token').notNull().unique(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
   userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'string' })
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' })
     .$onUpdate(() => sql`now()`) // Auto-update timestamp on changes
     .notNull(),
 });
@@ -48,12 +48,12 @@ export const accounts = pgTable('accounts', {
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),
-  accessTokenExpiresAt: timestamp('access_token_expires_at', { mode: 'string' }),
-  refreshTokenExpiresAt: timestamp('refresh_token_expires_at', { mode: 'string' }),
+  accessTokenExpiresAt: timestamp('access_token_expires_at', { mode: 'date' }),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at', { mode: 'date' }),
   scope: text('scope'),
   password: text('password'), // Hashed password for email/password auth
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'string' })
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' })
     .$onUpdate(() => sql`now()`) // Auto-update timestamp on changes
     .notNull(),
 });
@@ -63,9 +63,9 @@ export const verifications = pgTable('verifications', {
   id: text('id').primaryKey(),
   identifier: text('identifier').notNull(), // Email or phone number
   value: text('value').notNull(), // Verification code or token
-  expiresAt: timestamp('expires_at', { mode: 'string' }).notNull(),
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'string' })
+  expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()
     .$onUpdate(() => sql`now()`)
     .notNull(),

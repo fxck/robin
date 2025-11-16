@@ -20,14 +20,14 @@ export const posts = pgTable(
       .default('draft'),
     views: integer('views').notNull().default(0),
     likesCount: integer('likes_count').notNull().default(0),
-    publishedAt: timestamp('published_at', { mode: 'string' }),
-    deletedAt: timestamp('deleted_at', { mode: 'string' }), // Soft delete
+    publishedAt: timestamp('published_at', { mode: 'date' }),
+    deletedAt: timestamp('deleted_at', { mode: 'date' }), // Soft delete
     // Full-text search vector (populated via trigger or app)
     searchVector: text('search_vector'),
     // Optimistic locking
     version: integer('version').notNull().default(1),
-    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { mode: 'string' })
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'date' })
       .defaultNow()
       .$onUpdate(() => sql`now()`)
       .notNull(),
@@ -67,7 +67,7 @@ export const postLikes = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   },
   (table) => ({
     // Unique constraint: one like per user per post
