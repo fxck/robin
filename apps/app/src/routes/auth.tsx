@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate, useMatches } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { AuthForm } from '../components/auth-form';
 
@@ -9,15 +9,6 @@ export const Route = createFileRoute('/auth')({
 function AuthPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const navigate = useNavigate();
-  const matches = useMatches();
-
-  // If there's a child route (like /auth/callback/google), render only the Outlet
-  // Check if any match contains 'callback/google' in the id (handles malformed route IDs)
-  const hasChildRoute = matches.some(match => match.id.includes('callback/google'));
-
-  if (hasChildRoute) {
-    return <Outlet />;
-  }
 
   return (
     <div className="auth-layout mesh-gradient">

@@ -19,7 +19,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PostsIndexRouteImport } from './routes/posts/index'
 import { Route as PostsIdRouteImport } from './routes/posts/$id'
 import { Route as AdminPostsIndexRouteImport } from './routes/admin.posts.index'
-import { Route as AuthCallbackGoogleRouteImport } from './routes/auth.callback.google'
 import { Route as AdminPostsNewRouteImport } from './routes/admin.posts.new'
 import { Route as AdminPostsIdEditRouteImport } from './routes/admin.posts.$id.edit'
 
@@ -73,11 +72,6 @@ const AdminPostsIndexRoute = AdminPostsIndexRouteImport.update({
   path: '/admin/posts/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthCallbackGoogleRoute = AuthCallbackGoogleRouteImport.update({
-  id: '/callback/google',
-  path: '/callback/google',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AdminPostsNewRoute = AdminPostsNewRouteImport.update({
   id: '/admin/posts/new',
   path: '/admin/posts/new',
@@ -91,7 +85,7 @@ const AdminPostsIdEditRoute = AdminPostsIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -100,13 +94,12 @@ export interface FileRoutesByFullPath {
   '/posts/$id': typeof PostsIdRoute
   '/posts': typeof PostsIndexRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
-  '/auth/callback/google': typeof AuthCallbackGoogleRoute
   '/admin/posts': typeof AdminPostsIndexRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -115,14 +108,13 @@ export interface FileRoutesByTo {
   '/posts/$id': typeof PostsIdRoute
   '/posts': typeof PostsIndexRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
-  '/auth/callback/google': typeof AuthCallbackGoogleRoute
   '/admin/posts': typeof AdminPostsIndexRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -131,7 +123,6 @@ export interface FileRoutesById {
   '/posts/$id': typeof PostsIdRoute
   '/posts/': typeof PostsIndexRoute
   '/admin/posts/new': typeof AdminPostsNewRoute
-  '/auth/callback/google': typeof AuthCallbackGoogleRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
 }
@@ -148,7 +139,6 @@ export interface FileRouteTypes {
     | '/posts/$id'
     | '/posts'
     | '/admin/posts/new'
-    | '/auth/callback/google'
     | '/admin/posts'
     | '/admin/posts/$id/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -163,7 +153,6 @@ export interface FileRouteTypes {
     | '/posts/$id'
     | '/posts'
     | '/admin/posts/new'
-    | '/auth/callback/google'
     | '/admin/posts'
     | '/admin/posts/$id/edit'
   id:
@@ -178,14 +167,13 @@ export interface FileRouteTypes {
     | '/posts/$id'
     | '/posts/'
     | '/admin/posts/new'
-    | '/auth/callback/google'
     | '/admin/posts/'
     | '/admin/posts/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthRoute: typeof AuthRouteWithChildren
+  AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -270,13 +258,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPostsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/callback/google': {
-      id: '/auth/callback/google'
-      path: '/callback/google'
-      fullPath: '/auth/callback/google'
-      preLoaderRoute: typeof AuthCallbackGoogleRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/admin/posts/new': {
       id: '/admin/posts/new'
       path: '/admin/posts/new'
@@ -294,19 +275,9 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthRouteChildren {
-  AuthCallbackGoogleRoute: typeof AuthCallbackGoogleRoute
-}
-
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthCallbackGoogleRoute: AuthCallbackGoogleRoute,
-}
-
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthRoute: AuthRouteWithChildren,
+  AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,

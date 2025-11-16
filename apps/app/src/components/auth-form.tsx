@@ -132,15 +132,15 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                   variant="outline"
                   size="3"
                   className="w-full hover:bg-white/5 transition-colors"
-                  onClick={() => {
-                    // Custom OAuth flow: Google redirects to FRONTEND, then frontend exchanges code with backend
-                    // This avoids cross-domain cookie issues
-                    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                    const callbackUrl = encodeURIComponent(`${window.location.origin}/auth/callback/google`);
-
-                    // Redirect to API OAuth init endpoint, which will redirect to Google
-                    // Google will redirect back to our frontend callback
-                    window.location.href = `${apiUrl}/api/auth/oauth/google/init?callbackUrl=${callbackUrl}`;
+                  onClick={async () => {
+                    try {
+                      await signIn.social({
+                        provider: 'google',
+                        callbackURL: '/dashboard',
+                      });
+                    } catch (error) {
+                      toast.error('Google sign in failed');
+                    }
                   }}
                 >
                   <Flex align="center" gap="2">

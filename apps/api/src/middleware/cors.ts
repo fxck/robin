@@ -2,7 +2,8 @@ export default defineEventHandler((event) => {
   const config = useRuntimeConfig();
   const origin = event.node.req.headers.origin || '';
 
-  // In development, allow any localhost port. In production, use strict whitelist.
+  // Same-domain setup (robin.fxck.dev/api) doesn't need CORS, but keep for localhost dev
+  // In development, allow any localhost port. In production, allow same domain.
   const isDevelopment = process.env.NODE_ENV !== 'production';
   const localhostPattern = /^http:\/\/localhost:\d+$/;
 
@@ -10,14 +11,7 @@ export default defineEventHandler((event) => {
     ? localhostPattern.test(origin) || origin === config.public.appUrl
     : origin === config.public.appUrl;
 
-  // Debug logging for CORS issues
-  if (!isAllowed && origin) {
-    console.log('[CORS] Blocked origin:', origin);
-    console.log('[CORS] Expected APP_URL:', config.public.appUrl);
-    console.log('[CORS] NODE_ENV:', process.env.NODE_ENV);
-  }
-
-  if (isAllowed) {
+  if (isAllowed && origin) {
     event.node.res.setHeader('Access-Control-Allow-Origin', origin);
     event.node.res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     event.node.res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -29,5 +23,4 @@ export default defineEventHandler((event) => {
     event.node.res.statusCode = 204;
     event.node.res.end();
   }
-  // Don't return anything to let the request continue
 });
