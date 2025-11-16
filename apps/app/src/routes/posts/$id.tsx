@@ -211,7 +211,7 @@ function PostPage() {
       <TableOfContents content={post.content} />
 
       {/* Hero Section */}
-      <section className="relative min-h-[50vh] flex items-end pb-12 md:pb-16">
+      <section className="relative min-h-[70vh] flex items-end pb-12 md:pb-16">
         {/* Hero Background Image */}
         {post.coverImage && (
           <div className="absolute inset-0 z-0">
