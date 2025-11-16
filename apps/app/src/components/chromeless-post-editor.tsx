@@ -388,8 +388,8 @@ export function ChromelessPostEditor({
                 >
                   <X size={18} />
                 </button>
-                <button
-                  onClick={() => setShowCoverUpload(true)}
+                <div
+                  {...getCoverRootProps()}
                   className={cn(
                     'absolute top-4 left-4',
                     'px-4 py-2 rounded-full',
@@ -397,83 +397,47 @@ export function ChromelessPostEditor({
                     'text-white text-sm font-medium',
                     'opacity-0 group-hover:opacity-100',
                     'transition-all duration-200',
-                    'backdrop-blur-sm border border-white/20'
-                  )}
-                >
-                  Change Cover
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowCoverUpload(!showCoverUpload)}
-                className={cn(
-                  'group relative w-full py-8 rounded-2xl',
-                  'border-2 border-dashed transition-all duration-300',
-                  showCoverUpload
-                    ? 'border-purple-500/50 bg-purple-500/5'
-                    : 'border-white/10 hover:border-purple-500/30 bg-white/[0.02] hover:bg-purple-500/5'
-                )}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className={cn(
-                    'p-3 rounded-full transition-all duration-300',
-                    showCoverUpload
-                      ? 'bg-purple-500/20 text-purple-400'
-                      : 'bg-white/5 text-gray-500 group-hover:bg-purple-500/10 group-hover:text-purple-400'
-                  )}>
-                    <ImagePlus size={24} />
-                  </div>
-                  <div>
-                    <p className={cn(
-                      'text-sm font-medium transition-colors',
-                      showCoverUpload ? 'text-purple-400' : 'text-gray-400 group-hover:text-purple-400'
-                    )}>
-                      Add a cover image
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Click to browse or drag and drop
-                    </p>
-                  </div>
-                </div>
-              </button>
-            )}
-
-            {/* Cover Upload Dropzone */}
-            {showCoverUpload && !coverImage && (
-              <div className="mt-4">
-                <div
-                  {...getCoverRootProps()}
-                  className={cn(
-                    'relative p-12 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer',
-                    isDragActive
-                      ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-white/20 bg-white/5 hover:border-purple-500/50 hover:bg-purple-500/5'
+                    'backdrop-blur-sm border border-white/20',
+                    'cursor-pointer'
                   )}
                 >
                   <input {...getCoverInputProps()} />
-                  <div className="flex flex-col items-center gap-4">
-                    {isUploadingCover ? (
-                      <>
-                        <Loader2 size={48} className="text-purple-400 animate-spin" />
-                        <p className="text-sm text-gray-400">Uploading cover image...</p>
-                      </>
-                    ) : (
-                      <>
-                        <ImagePlus size={48} className={isDragActive ? 'text-purple-400' : 'text-gray-500'} />
-                        <div className="text-center">
-                          <p className={cn(
-                            'text-sm font-medium',
-                            isDragActive ? 'text-purple-400' : 'text-gray-400'
-                          )}>
-                            {isDragActive ? 'Drop your image here' : 'Drag & drop your cover image'}
-                          </p>
-                          <p className="text-xs text-gray-600 mt-1">
-                            or click to browse • Max 10MB • PNG, JPG, GIF, WebP
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  Change Cover
+                </div>
+              </div>
+            ) : (
+              <div
+                {...getCoverRootProps()}
+                className={cn(
+                  'relative p-12 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer',
+                  isDragActive
+                    ? 'border-purple-500 bg-purple-500/10'
+                    : 'border-white/20 bg-white/5 hover:border-purple-500/50 hover:bg-purple-500/5'
+                )}
+              >
+                <input {...getCoverInputProps()} />
+                <div className="flex flex-col items-center gap-4">
+                  {isUploadingCover ? (
+                    <>
+                      <Loader2 size={48} className="text-purple-400 animate-spin" />
+                      <p className="text-sm text-gray-400">Uploading cover image...</p>
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus size={48} className={isDragActive ? 'text-purple-400' : 'text-gray-500'} />
+                      <div className="text-center">
+                        <p className={cn(
+                          'text-sm font-medium',
+                          isDragActive ? 'text-purple-400' : 'text-gray-400'
+                        )}>
+                          {isDragActive ? 'Drop your image here' : 'Drag & drop your cover image'}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          or click to browse • Max 10MB • PNG, JPG, GIF, WebP
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}

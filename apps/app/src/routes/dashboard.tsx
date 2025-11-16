@@ -321,7 +321,7 @@ function DashboardPage() {
                 </div>
               </Box>
             ) : posts.length === 0 ? (
-              <Flex direction="column" align="center" gap="4" py="12">
+              <Flex direction="column" align="center" gap="6" py="20">
                 <div className="p-4 bg-white/5 rounded-full">
                   <FileText size={32} className="text-gray-500" />
                 </div>
