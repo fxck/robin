@@ -217,13 +217,20 @@ function PostPage() {
 
       {/* Hero Section with Cover Image */}
       <section className="relative min-h-[70vh] flex items-end pb-12 md:pb-16">
-        {/* Hero Background Image */}
+        {/* Hero Background Image with internal gradient overlay */}
         {post.coverImage && (
           <div className="absolute inset-0 z-0">
             <Image
               src={post.coverImage}
               alt={post.title}
               className="w-full h-full object-cover"
+            />
+            {/* Gradient overlay inside cover: transparent (top) → black (bottom 100px) */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: 'linear-gradient(to bottom, transparent 0%, transparent calc(100% - 100px), rgba(0, 0, 0, 1) 100%)',
+              }}
             />
           </div>
         )}
@@ -283,12 +290,12 @@ function PostPage() {
         </Container>
       </section>
 
-      {/* Gradient Fade Overlay - positioned BELOW cover, ABOVE content */}
+      {/* Gradient continuation below cover: black (top) → transparent (bottom) */}
       {post.coverImage && (
         <div
-          className="relative -mt-48 h-48 pointer-events-none z-20"
+          className="relative h-[100px] -mt-[100px] pointer-events-none z-20"
           style={{
-            backgroundImage: 'linear-gradient(0deg, var(--color-bg-base) 0%, rgba(10, 10, 10, 0.95) 20%, rgba(10, 10, 10, 0.8) 40%, rgba(10, 10, 10, 0.5) 60%, rgba(10, 10, 10, 0.2) 80%, transparent 100%)',
+            backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, transparent 100%)',
           }}
         />
       )}
