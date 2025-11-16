@@ -431,32 +431,30 @@ function AdminPostsPage() {
                       </div>
                     </Table.Cell>
                     <Table.Cell className="admin-table-cell">
-                      <Flex gap="1.5">
+                      <Flex gap="2">
                         <Button
-                          size="1"
-                          variant="ghost"
+                          size="2"
+                          variant="soft"
                           onClick={() => navigate({ to: `/posts/${post.id}` })}
-                          className="hover:bg-white/5"
                         >
-                          <Eye size={14} />
+                          <Eye size={16} />
                         </Button>
                         <Button
-                          size="1"
-                          variant="ghost"
+                          size="2"
+                          variant="soft"
+                          color="blue"
                           onClick={() => navigate({ to: `/admin/posts/${post.id}/edit` })}
-                          className="hover:bg-white/5"
                         >
-                          <Edit size={14} />
+                          <Edit size={16} />
                         </Button>
                         <Button
-                          size="1"
-                          variant="ghost"
+                          size="2"
+                          variant="soft"
                           color="red"
                           onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
                           disabled={deleteMutation.isPending}
-                          className="hover:bg-red-500/10"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={16} />
                         </Button>
                       </Flex>
                     </Table.Cell>
