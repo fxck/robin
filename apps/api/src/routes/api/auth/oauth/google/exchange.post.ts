@@ -102,6 +102,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     // Create new user
     const [newUser] = await db.insert(users).values({
+      id: crypto.randomUUID(),
       email,
       name: name || email.split('@')[0],
       image: picture || null,
@@ -117,6 +118,7 @@ export default defineEventHandler(async (event) => {
 
   if (!existingAccount) {
     await db.insert(accounts).values({
+      id: crypto.randomUUID(),
       userId: user.id,
       accountId: googleId,
       providerId: 'google',
@@ -143,6 +145,7 @@ export default defineEventHandler(async (event) => {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   const [session] = await db.insert(sessions).values({
+    id: crypto.randomUUID(),
     userId: user.id,
     token: sessionToken,
     expiresAt,
