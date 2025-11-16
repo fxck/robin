@@ -6,7 +6,8 @@ import { getRedis } from './redis';
 const config = useRuntimeConfig();
 
 export const auth = createAuth(db, {
-  baseURL: `${config.public.apiBase}/api/auth`, // Better Auth endpoints are at /api/auth/*
+  baseURL: config.public.apiBase, // Base URL of the API server
+  basePath: '/api/auth', // Path where auth routes are mounted
   secret: process.env.AUTH_SECRET || 'development-secret-change-in-production-make-it-at-least-32-chars',
   trustedOrigins: [config.public.appUrl],
   appURL: config.public.appUrl,
