@@ -41,9 +41,9 @@ export function AppBar() {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50',
-        'transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]',
+        'transition-all duration-300 ease-out',
         'px-6 pt-6',
-        isVisible ? 'translate-y-0' : '-translate-y-full'
+        isVisible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'
       )}
     >
       <nav ref={navRef} className="fluid-glass-appbar relative py-4 px-8 mx-auto max-w-[1400px]">

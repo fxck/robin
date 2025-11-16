@@ -306,10 +306,15 @@ export default function FloatingLines({
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
     camera.position.z = 1;
 
-    const renderer = new WebGLRenderer({ antialias: true, alpha: false });
+    const renderer = new WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
+    renderer.domElement.style.display = 'block';
     containerRef.current.appendChild(renderer.domElement);
 
     const uniforms = {
@@ -498,9 +503,15 @@ export default function FloatingLines({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative overflow-hidden floating-lines-container"
+      className="w-full h-full absolute inset-0"
       style={{
-        mixBlendMode: mixBlendMode
+        mixBlendMode: mixBlendMode,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: interactive ? 'auto' : 'none'
       }}
     />
   );

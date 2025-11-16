@@ -91,7 +91,7 @@ function Index() {
       {/* Hero Section */}
       <Section spacing="xl" className="relative pt-64 md:pt-72 pb-24 md:pb-32">
         {/* Floating Lines Background */}
-        <div className="absolute inset-0 -z-10 opacity-60">
+        <div className="absolute inset-0 -z-10 opacity-80" style={{ minHeight: '100%' }}>
           <FloatingLines
             linesGradient={['#f59e0b', '#fbbf24', '#d97706']}
             enabledWaves={['top', 'middle', 'bottom']}
@@ -106,7 +106,7 @@ function Index() {
             bendStrength={-0.8}
             parallax={true}
             parallaxStrength={0.15}
-            mixBlendMode="lighten"
+            mixBlendMode="normal"
           />
         </div>
 
