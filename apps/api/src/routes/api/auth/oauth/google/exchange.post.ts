@@ -8,6 +8,12 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<{ code: string; state: string; redirectUri: string }>(event);
   const { code, state, redirectUri } = body;
 
+  console.log('[OAuth] Exchange request:', {
+    hasCode: !!code,
+    hasState: !!state,
+    redirectUri,
+  });
+
   if (!code || !state) {
     throw createError({
       statusCode: 400,
@@ -18,6 +24,12 @@ export default defineEventHandler(async (event) => {
   // Validate state from Redis
   const redis = getRedis();
   const storedCallbackUrl = await redis.get(`oauth:state:${state}`);
+  console.log('[OAuth] State validation:', {
+    state,
+    storedCallbackUrl,
+    valid: !!storedCallbackUrl,
+  });
+
   if (!storedCallbackUrl) {
     throw createError({
       statusCode: 400,
@@ -52,7 +64,7 @@ export default defineEventHandler(async (event) => {
 
   if (!tokenResponse.ok) {
     const error = await tokenResponse.text();
-    console.error('Google token exchange failed:', error);
+    console.error('[OAuth] Google token exchange failed:', error);
     throw createError({
       statusCode: 500,
       message: 'Failed to exchange authorization code',
@@ -62,12 +74,25 @@ export default defineEventHandler(async (event) => {
   const tokens = await tokenResponse.json();
   const { access_token, id_token, refresh_token, expires_in } = tokens;
 
+  console.log('[OAuth] Token exchange successful:', {
+    hasAccessToken: !!access_token,
+    hasIdToken: !!id_token,
+    hasRefreshToken: !!refresh_token,
+  });
+
   // Decode ID token to get user info (basic verification)
   const idTokenPayload = JSON.parse(
     Buffer.from(id_token.split('.')[1], 'base64').toString()
   );
 
   const { sub: googleId, email, name, picture } = idTokenPayload;
+
+  console.log('[OAuth] User info from Google:', {
+    googleId,
+    email,
+    name,
+    hasPicture: !!picture,
+  });
 
   // Find or create user
   let user = await db.query.users.findFirst({
@@ -117,19 +142,70 @@ export default defineEventHandler(async (event) => {
   const sessionToken = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-  await db.insert(sessions).values({
+  const [session] = await db.insert(sessions).values({
     userId: user.id,
     token: sessionToken,
     expiresAt,
+  }).returning();
+
+  console.log('[OAuth] Session created in DB:', {
+    sessionId: session.id,
+    userId: user.id,
+    token: sessionToken.substring(0, 8) + '...',
   });
 
+  // Store session in Redis for Better Auth compatibility (secondary storage)
+  const sessionData = {
+    session: {
+      id: session.id,
+      userId: user.id,
+      token: sessionToken,
+      expiresAt: expiresAt.toISOString(),
+    },
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      image: user.image,
+      emailVerified: user.emailVerified,
+    },
+  };
+
+  // Store in Redis with TTL matching session expiry
+  await redis.set(
+    `session:${sessionToken}`,
+    JSON.stringify(sessionData),
+    'EX',
+    7 * 24 * 60 * 60 // 7 days in seconds
+  );
+
+  console.log('[OAuth] Session stored in Redis');
+
   // Set session cookie with SameSite=none for cross-domain
-  setCookie(event, 'better-auth.session_token', sessionToken, {
+  // Get the runtime config to check if we're in production
+  const config = useRuntimeConfig();
+  const isProduction = config.public.apiBase.includes('https://');
+
+  // Set the cookie with appropriate settings for cross-domain
+  const cookieOptions: any = {
     httpOnly: true,
-    secure: true,
     sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60, // 7 days
     path: '/',
+  };
+
+  // Only set secure in production (required for SameSite=none)
+  if (isProduction) {
+    cookieOptions.secure = true;
+  }
+
+  setCookie(event, 'better-auth.session_token', sessionToken, cookieOptions);
+
+  console.log('[OAuth] Session created:', {
+    userId: user.id,
+    email: user.email,
+    cookieSet: true,
+    isProduction,
   });
 
   return {

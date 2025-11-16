@@ -21,6 +21,12 @@ export default defineEventHandler(async (event) => {
   const redis = getRedis();
   await redis.set(`oauth:state:${state}`, frontendCallbackUrl, 'EX', 600);
 
+  console.log('[OAuth] Init Google OAuth:', {
+    state,
+    frontendCallbackUrl,
+    clientId: googleClientId.substring(0, 10) + '...',
+  });
+
   // Build Google OAuth URL that redirects to FRONTEND
   const scope = 'openid email profile';
   const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
