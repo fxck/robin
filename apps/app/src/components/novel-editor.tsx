@@ -188,7 +188,11 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
         },
       },
     }),
-    Markdown,
+    Markdown.configure({
+      html: true,
+      transformPastedText: true,
+      transformCopiedText: true,
+    }),
     Placeholder.configure({
       placeholder,
     }),
@@ -245,7 +249,13 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
               return handleImageDrop(view, event, moved, uploadFn);
             },
             handlePaste: (view, event) => {
-              return handleImagePaste(view, event, uploadFn);
+              // First check if there's an image being pasted
+              const hasImagePaste = handleImagePaste(view, event, uploadFn);
+              if (hasImagePaste) return true;
+
+              // If no image, let the Markdown extension handle the paste
+              // The Markdown extension will automatically convert markdown syntax
+              return false;
             },
           }}
           onUpdate={({ editor }) => {
