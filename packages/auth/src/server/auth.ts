@@ -31,7 +31,6 @@ async function sendEmail(
 
 export function createAuth(db: Database, config: {
   baseURL: string;
-  basePath?: string;
   secret: string;
   trustedOrigins?: string[];
   appURL: string;
@@ -57,7 +56,6 @@ export function createAuth(db: Database, config: {
     }),
 
     baseURL: config.baseURL,
-    basePath: config.basePath,
     secret: config.secret,
     trustedOrigins: config.trustedOrigins || [],
 
