@@ -129,8 +129,6 @@ See [CLAUDE.md](CLAUDE.md) for detailed documentation.
 ## Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - Comprehensive project documentation for AI assistants
-- **[IMPLEMENTATION.md](IMPLEMENTATION.md)** - Implementation log and challenges
-- **[TESTING_STATUS.md](TESTING_STATUS.md)** - Testing progress
 
 ## License
 
