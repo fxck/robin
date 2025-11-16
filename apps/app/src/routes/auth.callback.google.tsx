@@ -51,11 +51,17 @@ function GoogleCallback() {
         if (response.user) {
           setStatus('Sign in successful! Redirecting...');
 
+          // Check cookies after exchange
+          console.log('[OAuth] Cookies after exchange:', document.cookie);
+
           // Invalidate all queries to refresh auth state
           await queryClient.invalidateQueries();
 
           // Small delay to ensure cookie is set
           await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Check cookies again before redirect
+          console.log('[OAuth] Cookies before redirect:', document.cookie);
 
           // Success! Redirect to dashboard with full page reload to ensure auth state is updated
           window.location.href = '/dashboard';

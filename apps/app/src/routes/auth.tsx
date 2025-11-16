@@ -11,20 +11,13 @@ function AuthPage() {
   const navigate = useNavigate();
   const matches = useMatches();
 
-  // Debug: log matches
-  console.log('[Auth Route] Matches:', matches.map(m => ({ id: m.id, pathname: m.pathname })));
-
   // If there's a child route (like /auth/callback/google), render only the Outlet
   // Check if any match contains 'callback/google' in the id (handles malformed route IDs)
   const hasChildRoute = matches.some(match => match.id.includes('callback/google'));
-  console.log('[Auth Route] Has child route:', hasChildRoute);
 
   if (hasChildRoute) {
-    console.log('[Auth Route] Rendering Outlet');
     return <Outlet />;
   }
-
-  console.log('[Auth Route] Rendering auth form');
 
   return (
     <div className="auth-layout mesh-gradient">
