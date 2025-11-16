@@ -225,11 +225,19 @@ function PostPage() {
               alt={post.title}
               className="w-full h-full object-cover"
             />
-            {/* Gradient overlay inside cover: transparent (top) → black (bottom 100px) */}
+            {/* Gradient overlay inside cover: transparent (top) → black (bottom) */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: 'linear-gradient(to bottom, transparent 0%, transparent calc(100% - 100px), rgba(0, 0, 0, 1) 100%)',
+                backgroundImage: 'linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 1) 100%)',
+              }}
+            />
+            {/* Extended gradient below cover: black (top) → transparent (bottom) */}
+            <div
+              className="absolute left-0 right-0 h-[100px] pointer-events-none"
+              style={{
+                bottom: '-100px',
+                backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, transparent 100%)',
               }}
             />
           </div>
@@ -289,16 +297,6 @@ function PostPage() {
           </div>
         </Container>
       </section>
-
-      {/* Gradient continuation below cover: black (top) → transparent (bottom) */}
-      {post.coverImage && (
-        <div
-          className="relative h-[100px] -mt-[100px] pointer-events-none z-20"
-          style={{
-            backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, transparent 100%)',
-          }}
-        />
-      )}
 
       {/* Article Content */}
       <Container size="reading" className="py-12">
