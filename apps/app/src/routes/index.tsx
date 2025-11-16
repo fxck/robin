@@ -11,6 +11,7 @@ import { Flex } from '../components/layout/Flex';
 import { Heading } from '../components/typography/Heading';
 import { Text } from '../components/typography/Text';
 import { PostCard } from '../components/posts/PostCard';
+import FloatingLines from '../components/backgrounds/FloatingLines';
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -89,6 +90,19 @@ function Index() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <Section spacing="xl" className="relative pt-64 md:pt-72 pb-24 md:pb-32">
+        {/* Floating Lines Background */}
+        <div className="absolute inset-0 -z-10">
+          <FloatingLines
+            linesGradient={['#f59e0b', '#fbbf24', '#3b82f6']}
+            enabledWaves={['middle', 'bottom']}
+            lineCount={[8, 6]}
+            lineDistance={[3, 4]}
+            animationSpeed={0.5}
+            interactive={true}
+            parallax={true}
+            mixBlendMode="screen"
+          />
+        </div>
 
         <Container size="standard">
           <div className="text-center max-w-4xl mx-auto relative">
