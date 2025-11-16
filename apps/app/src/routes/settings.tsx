@@ -92,7 +92,7 @@ function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-5 md:px-8 py-16">
+      <div className="max-w-4xl mx-auto px-5 md:px-8 py-16 pt-20 md:pt-24">
         <Flex align="center" justify="center" py="9">
           <Loader2 className="animate-spin" size={32} />
         </Flex>
@@ -103,7 +103,7 @@ function SettingsPage() {
   const user = userData?.user;
 
   return (
-    <div className="max-w-4xl mx-auto px-5 md:px-8 py-16">
+    <div className="max-w-4xl mx-auto px-5 md:px-8 py-16 pt-20 md:pt-24">
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-3">Settings</h1>
         <p className="text-lg text-gray-400">Manage your account settings and preferences</p>

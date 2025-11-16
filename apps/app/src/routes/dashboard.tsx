@@ -115,7 +115,7 @@ function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 pt-20 md:pt-24">
         <Flex align="center" justify="center" style={{ minHeight: 'calc(100vh - 200px)' }}>
           <div className="shimmer w-32 h-8 rounded"></div>
         </Flex>
@@ -125,7 +125,7 @@ function DashboardPage() {
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 pt-20 md:pt-24">
         <Flex
           align="center"
           justify="center"
@@ -149,7 +149,7 @@ function DashboardPage() {
   const totalLikes = posts.reduce((acc, p) => acc + p.likesCount, 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-5 md:px-8 py-16">
+    <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 pt-20 md:pt-24">
       <Flex direction="column" gap="8">
         {/* Header */}
         <Flex justify="between" align="start" className="flex-col md:flex-row gap-4">

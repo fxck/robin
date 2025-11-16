@@ -14,6 +14,7 @@ interface TableOfContentsProps {
 export function TableOfContents({ content }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>('');
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     // Extract headings from markdown content
@@ -61,6 +62,27 @@ export function TableOfContents({ content }: TableOfContentsProps) {
 
     return () => observer.disconnect();
   }, [headings]);
+
+  useEffect(() => {
+    // Update scroll progress on scroll
+    const updateScrollProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      const winHeight = window.innerHeight;
+      const scrollPercent = (scrollTop / (docHeight - winHeight)) * 100;
+      setScrollProgress(Math.min(100, Math.max(0, scrollPercent)));
+    };
+
+    // Set initial value
+    updateScrollProgress();
+
+    // Listen to scroll events
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', updateScrollProgress);
+    };
+  }, []);
 
   if (headings.length === 0) {
     return null;
@@ -110,21 +132,12 @@ export function TableOfContents({ content }: TableOfContentsProps) {
             <div
               className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-300"
               style={{
-                width: `${Math.min(
-                  100,
-                  ((window.scrollY || 0) / ((document.documentElement.scrollHeight || 1) - window.innerHeight)) * 100
-                )}%`,
+                width: `${scrollProgress}%`,
               }}
             ></div>
           </div>
           <Text size="1" className="text-gray-400 font-mono">
-            {Math.round(
-              Math.min(
-                100,
-                ((window.scrollY || 0) / ((document.documentElement.scrollHeight || 1) - window.innerHeight)) * 100
-              )
-            )}
-            %
+            {Math.round(scrollProgress)}%
           </Text>
         </div>
       </div>

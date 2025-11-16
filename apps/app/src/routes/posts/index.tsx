@@ -57,7 +57,7 @@ function PublicPostsPage() {
   const posts = data?.pages.flatMap((page) => page.posts) || [];
 
   return (
-    <Box style={{ minHeight: 'calc(100vh - 60px)' }}>
+    <Box style={{ minHeight: 'calc(100vh - 60px)' }} className="pt-20 md:pt-24">
       <Container size="4" py="8">
         <Flex direction="column" gap="6">
           <Flex gap="2">

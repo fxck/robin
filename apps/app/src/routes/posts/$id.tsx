@@ -21,7 +21,7 @@ export const Route = createFileRoute('/posts/$id')({
     return post;
   },
   pendingComponent: () => (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20 md:pt-24">
       <div className="h-[60vh] bg-bg-elevated animate-shimmer" />
       <Container size="reading" className="py-12">
         <div className="space-y-8">
@@ -35,7 +35,7 @@ export const Route = createFileRoute('/posts/$id')({
   ),
   errorComponent: ({ error }) => {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-24">
         <Container size="narrow">
           <div className="glass-surface p-12 text-center rounded-2xl">
             <Text size="lg" className="mb-6">
@@ -163,7 +163,7 @@ function PostPage() {
 
   if (!data?.post) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-24">
         <Container size="narrow">
           <div className="glass-surface p-12 text-center rounded-2xl">
             <Text size="lg" className="mb-6">
@@ -183,12 +183,12 @@ function PostPage() {
   const readTime = Math.max(1, Math.ceil(post.content.split(' ').length / 200));
 
   return (
-    <div className="post-detail relative">
+    <div className="post-detail relative pt-20 md:pt-24">
       {/* Table of Contents (Desktop only - fixed position) */}
       <TableOfContents content={post.content} />
 
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-end pb-16 md:pb-24">
+      <section className="relative min-h-[50vh] flex items-end pb-12 md:pb-16">
         {/* Hero Background Image */}
         {post.coverImage && (
           <div className="absolute inset-0 z-0">
@@ -267,15 +267,15 @@ function PostPage() {
       </section>
 
       {/* Article Content */}
-      <Container size="reading" className="py-12">
+      <Container size="reading" className="py-8">
         <article className="prose prose-lg dark:prose-invert max-w-full">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </article>
 
         {/* Engagement Actions */}
-        <div className="mt-16 pt-8 border-t border-white/10">
-          <Flex align="center" justify="between" wrap="wrap" gap="4">
-            <Flex gap="3">
+        <div className="mt-12 pt-8 pb-8 border-t border-white/10">
+          <Flex align="center" justify="between" gap="6">
+            <Flex gap="4" align="center">
               {session ? (
                 <Button
                   size="3"
@@ -308,35 +308,13 @@ function PostPage() {
             </Flex>
 
             <Link to="/" className="no-underline">
-              <Button size="2" variant="ghost">
+              <Button size="3" variant="ghost">
                 <ArrowLeft size={16} />
                 Back to Home
               </Button>
             </Link>
           </Flex>
         </div>
-
-        {/* Author Bio */}
-        {post.author && (
-          <div className="mt-16 glass-surface p-8 rounded-2xl">
-            <Flex gap="4">
-              <RadixAvatar
-                size="5"
-                src={post.author.image}
-                fallback={post.author.name?.[0] || 'A'}
-                radius="full"
-              />
-              <div className="flex-1">
-                <Text size="lg" weight="semibold" className="mb-2">
-                  {post.author.name}
-                </Text>
-                <Text size="base" color="secondary">
-                  Writer and creator sharing stories on Robin
-                </Text>
-              </div>
-            </Flex>
-          </div>
-        )}
 
         {/* Related Posts */}
         <RelatedPosts postId={post.id} />
