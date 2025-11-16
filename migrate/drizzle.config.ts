@@ -3,7 +3,7 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
   dialect: 'postgresql',
-  out: './migrations',
+  out: '../packages/database/migrations',
   dbCredentials: {
     url: process.env.NITRO_DATABASE_URL!,
   },

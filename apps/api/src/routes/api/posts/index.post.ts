@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody, createError } from 'h3';
 import { z } from 'zod';
 import { ulid } from 'ulidx';
+import { sql } from 'drizzle-orm';
 import { db } from '../../../services/db';
 import { schema } from '@robin/database';
 import { requireAuth } from '../../../utils/auth-guard';
@@ -53,7 +54,7 @@ export default defineEventHandler(async (event) => {
       excerpt,
       coverImage: data.coverImage,
       status: data.status,
-      publishedAt: data.status === 'published' ? new Date() : null,
+      publishedAt: data.status === 'published' ? sql`now()` : null,
     })
     .returning();
 

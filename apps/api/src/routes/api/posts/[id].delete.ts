@@ -1,5 +1,5 @@
 import { defineEventHandler, getRouterParam, createError } from 'h3';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, sql } from 'drizzle-orm';
 import { db } from '../../../services/db';
 import { schema } from '@robin/database';
 import { requireAuth } from '../../../utils/auth-guard';
@@ -46,8 +46,8 @@ export default defineEventHandler(async (event) => {
   await db
     .update(schema.posts)
     .set({
-      deletedAt: new Date(),
-      updatedAt: new Date(),
+      deletedAt: sql`now()`,
+      updatedAt: sql`now()`,
     })
     .where(eq(schema.posts.id, id));
 

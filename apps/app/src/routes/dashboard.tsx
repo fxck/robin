@@ -61,11 +61,15 @@ function StatCard({ title, value, icon, gradient }: StatCardProps) {
   );
 }
 
-function formatDate(date: Date | string | null | undefined): string {
+function formatDate(date: string | null | undefined): string {
   if (!date) return 'N/A';
-  const d = new Date(date);
-  if (isNaN(d.getTime())) return 'Invalid Date';
-  return d.toLocaleDateString();
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return 'Invalid Date';
+    return d.toLocaleDateString();
+  } catch {
+    return 'Invalid Date';
+  }
 }
 
 function DashboardPage() {

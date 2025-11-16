@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "db:generate": "drizzle-kit generate --config=./migrate/drizzle.config.ts"
+    "db:generate": "pnpm --filter @robin/database db:generate"
   },
   "private": true,
   "devDependencies": {

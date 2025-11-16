@@ -11,9 +11,9 @@ export interface Post {
   status: 'draft' | 'published';
   views: number;
   likesCount: number;
-  publishedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
   version: number;
   author?: {
     id: string;
@@ -33,9 +33,9 @@ export interface PostListItem {
   status: 'draft' | 'published';
   views: number;
   likesCount: number;
-  publishedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
   author: {
     id: string;
     name: string;

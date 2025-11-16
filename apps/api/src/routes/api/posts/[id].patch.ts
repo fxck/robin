@@ -1,6 +1,6 @@
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3';
 import { z } from 'zod';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, sql } from 'drizzle-orm';
 import { db } from '../../../services/db';
 import { schema } from '@robin/database';
 import { requireAuth } from '../../../utils/auth-guard';
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
   // Prepare update data
   const updateData: any = {
     version: existingPost.version + 1,
-    updatedAt: new Date(),
+    updatedAt: sql`now()`,
   };
 
   if (data.title !== undefined) {
@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
     updateData.status = data.status;
     // Set publishedAt when publishing for first time
     if (data.status === 'published' && !existingPost.publishedAt) {
-      updateData.publishedAt = new Date();
+      updateData.publishedAt = sql`now()`;
     }
   }
 

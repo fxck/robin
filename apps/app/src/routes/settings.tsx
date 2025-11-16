@@ -21,15 +21,19 @@ interface User {
   updatedAt: string;
 }
 
-function formatDate(date: Date | string | null | undefined): string {
+function formatDate(date: string | null | undefined): string {
   if (!date) return 'Unknown';
-  const d = new Date(date);
-  if (isNaN(d.getTime())) return 'Unknown';
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return 'Unknown';
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch {
+    return 'Unknown';
+  }
 }
 
 interface UpdateProfileData {

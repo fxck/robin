@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
       .update(schema.posts)
       .set({
         likesCount: sql`${schema.posts.likesCount} - 1`,
-        updatedAt: new Date(),
+        updatedAt: sql`now()`,
       })
       .where(eq(schema.posts.id, id));
 
@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
       .update(schema.posts)
       .set({
         likesCount: sql`${schema.posts.likesCount} + 1`,
-        updatedAt: new Date(),
+        updatedAt: sql`now()`,
       })
       .where(eq(schema.posts.id, id));
 

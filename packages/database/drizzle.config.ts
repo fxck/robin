@@ -10,7 +10,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 export default defineConfig({
   dialect: 'postgresql',
-  schema: './src/schema/index.ts',
+  schema: './src/schema/*.ts',
   out: './migrations',
   dbCredentials: {
     url: process.env.NITRO_DATABASE_URL!,

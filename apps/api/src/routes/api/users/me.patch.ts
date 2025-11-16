@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { requireAuth } from '~/utils/auth-guard';
 import { db } from '~/services/db';
 import { schema } from '@robin/database';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { log } from '~/utils/logger';
 
 const updateProfileSchema = z.object({
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       .update(schema.users)
       .set({
         ...updates,
-        updatedAt: new Date(),
+        updatedAt: sql`now()`,
       })
       .where(eq(schema.users.id, user.id))
       .returning({

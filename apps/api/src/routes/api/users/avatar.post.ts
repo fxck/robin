@@ -3,7 +3,7 @@ import { uploadFile, validateImageFile, validateFileSize } from '~/services/s3';
 import { checkRateLimit } from '~/services/redis';
 import { db } from '~/services/db';
 import { schema } from '@robin/database';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { log } from '~/utils/logger';
 import { rewriteImageUrlsInObject } from '~/utils/cdn';
 
@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
       .update(schema.users)
       .set({
         image: url,
-        updatedAt: new Date(),
+        updatedAt: sql`now()`,
       })
       .where(eq(schema.users.id, user.id))
       .returning({

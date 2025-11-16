@@ -66,7 +66,9 @@ nx lint app
 
 ### Database Migrations
 
-**IMPORTANT:** The migration system uses an isolated `migrate/` folder with its own locked dependencies.
+**Architecture:**
+- **`packages/database/`** - Owns schema definitions and generates migrations
+- **`migrate/`** - Runtime-only folder with isolated dependencies for deployment
 
 ```bash
 # 1. Edit schema in packages/database/src/schema/*.ts
@@ -74,19 +76,22 @@ nx lint app
 pnpm db:generate
 
 # 3. Review the generated SQL
-cat migrate/migrations/XXXX_*.sql
+cat packages/database/migrations/XXXX_*.sql
 
 # 4. Commit migrations to git
-git add migrate/
+git add packages/database/migrations/
 git commit -m "feat: add migration"
 
 # Migrations run automatically on deployment via zerops.yml
 ```
 
 **How migrations work:**
+- `packages/database/drizzle.config.ts` - Has schema paths, generates migrations to `./migrations/`
+- `migrate/drizzle.config.ts` - Points to `../packages/database/migrations/`, runs migrations in production
 - `migrate/` has isolated dependencies (drizzle-kit + postgres) with locked versions in `migrate/pnpm-lock.yaml`
-- On deployment, Zerops runs `drizzle-kit migrate` from the standalone `migrate/` folder using `zsc execOnce` for idempotency
-- No workspace dependencies or TypeScript files are shipped to production
+- On deployment, Zerops deploys both `migrate/` and `packages/database/migrations/`
+- Zerops runs `drizzle-kit migrate` from `migrate/` folder using `zsc execOnce` for idempotency
+- No duplication, single source of truth: `packages/database/migrations/`
 
 ## Architecture
 
@@ -98,12 +103,18 @@ robin/
 │   ├── api/          # Backend Nitropack application
 │   └── app/          # Frontend React application
 ├── packages/
-│   ├── database/     # Shared database client and schema
+│   ├── database/     # Shared database client, schema, and migrations
+│   │   ├── src/schema/           # Drizzle schema definitions
+│   │   ├── migrations/           # Generated SQL migrations (committed)
+│   │   └── drizzle.config.ts     # Schema + generation config
 │   ├── auth/         # Shared auth configuration
 │   ├── types/        # Shared TypeScript types
 │   ├── utils/        # Shared utilities
 │   └── config/       # Shared configuration
-└── migrate/          # Standalone migration runtime (isolated deps)
+└── migrate/          # Runtime migration executor (isolated deps)
+    ├── drizzle.config.ts         # Points to ../packages/database/migrations
+    ├── package.json              # Isolated dependencies
+    └── pnpm-lock.yaml            # Locked versions for production
 ```
 
 ### Backend Architecture (`apps/api/`)

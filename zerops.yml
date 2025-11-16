@@ -11,6 +11,7 @@ zerops:
       deployFiles:
         - apps/api/.output
         - migrate
+        - packages/database/migrations
         - scripts
       cache:
         - node_modules
