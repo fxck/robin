@@ -363,7 +363,7 @@ export function ChromelessPostEditor({
     <div className="fixed inset-0 bg-black overflow-hidden">
       {/* Top Control Bar - Floating, minimal */}
       <div className="absolute top-0 left-0 right-0 z-50">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-6 py-6">
           {/* Left: Exit */}
           <button
             onClick={onExit}
