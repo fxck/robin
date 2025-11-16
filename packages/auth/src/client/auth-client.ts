@@ -3,9 +3,8 @@ import { createAuthClient } from 'better-auth/react';
 // Get base URL from environment or use sensible defaults
 const getBaseURL = () => {
   // In Vite environments, check for VITE_API_URL
-  // @ts-ignore - import.meta.env is available in Vite runtime
   if (typeof import.meta !== 'undefined' && 'env' in import.meta) {
-    // @ts-ignore
+    // @ts-expect-error - accessing Vite env
     const viteApiUrl = import.meta.env?.['VITE_API_URL'];
     if (viteApiUrl) {
       return viteApiUrl as string;

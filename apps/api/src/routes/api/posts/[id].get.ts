@@ -5,7 +5,7 @@ import { schema } from '@robin/database';
 import { getCache, setCache, incrementCounter, getCounter } from '../../../services/redis';
 import { log } from '../../../utils/logger';
 import { rewriteImageUrlsInObject } from '../../../utils/cdn';
-import { getAuth } from '../../../utils/auth-guard';
+import { optionalAuth } from '../../../utils/auth-guard';
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check if user is authenticated (optional)
-  const user = await getAuth(event);
+  const user = await optionalAuth(event);
 
   // Try to get from cache
   const cacheKey = `post:${id}`;

@@ -6,7 +6,7 @@
 /**
  * Generate a gradient placeholder based on a seed (like user ID or post ID)
  */
-export function generateGradientPlaceholder(seed: string = ''): string {
+export function generateGradientPlaceholder(seed = ''): string {
   const colors = [
     ['#667eea', '#764ba2'], // Purple
     ['#f093fb', '#f5576c'], // Pink
@@ -40,7 +40,7 @@ export function generateGradientPlaceholder(seed: string = ''): string {
  */
 export function generateInitialsPlaceholder(
   text: string,
-  size: number = 200
+  size = 200
 ): string {
   const initials = text
     .split(' ')
@@ -82,7 +82,7 @@ export function generateInitialsPlaceholder(
  */
 export function generateIconPlaceholder(
   icon: 'image' | 'user' | 'file' = 'image',
-  size: number = 200
+  size = 200
 ): string {
   const gradient = generateGradientPlaceholder(icon);
   const [, color1, color2] = gradient.match(/linear-gradient\(.+?, (.+?) 0%, (.+?) 100%\)/) || [];
