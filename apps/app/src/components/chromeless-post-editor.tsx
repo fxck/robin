@@ -422,7 +422,7 @@ export function ChromelessPostEditor({
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
       {/* Main Editor Container */}
-      <div className="h-full overflow-y-auto pt-32 pb-32">
+      <div className="h-full overflow-y-auto pt-36 pb-32">
         <div className="max-w-4xl mx-auto px-8">
           {/* Cover Image Section */}
           <div className="mb-12">

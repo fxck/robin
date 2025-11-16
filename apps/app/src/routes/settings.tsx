@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Heading, Flex, Text, TextField, Button, Box } from '@radix-ui/themes';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api-client';
+import { useSession } from '../lib/auth';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback } from 'react';
 import { Loader2, User, Camera } from 'lucide-react';
@@ -45,6 +46,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function SettingsPage() {
   const queryClient = useQueryClient();
+  const { refetch: refetchSession } = useSession();
   const [name, setName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [initialized, setInitialized] = useState(false);
@@ -69,9 +71,10 @@ function SettingsPage() {
   const updateProfileMutation = useMutation({
     mutationFn: (data: UpdateProfileData) =>
       api.patch<User>('/users/me', data),
-    onSuccess: (updatedUser) => {
+    onSuccess: async (updatedUser) => {
       queryClient.setQueryData(['currentUser'], { user: updatedUser });
-      queryClient.invalidateQueries({ queryKey: ['session'] });
+      // Refetch session to update all components using useSession (like AppBar)
+      await refetchSession();
       toast.success('Profile updated successfully');
     },
     onError: (error: Error) => {
@@ -104,7 +107,8 @@ function SettingsPage() {
       setAvatarUrl(data.url);
       const updatedUser = await api.patch<User>('/users/me', { image: data.url });
       queryClient.setQueryData(['currentUser'], { user: updatedUser });
-      queryClient.invalidateQueries({ queryKey: ['session'] });
+      // Refetch session to update all components using useSession (like AppBar)
+      refetchSession();
       toast.success('Avatar updated successfully');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to update avatar');
