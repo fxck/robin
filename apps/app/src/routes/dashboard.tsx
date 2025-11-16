@@ -39,12 +39,12 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon, gradient }: StatCardProps) {
   return (
-    <div className="glass-surface rounded-xl p-6 transition-all duration-200 hover:bg-white/[0.07]">
-      <Flex direction="column" gap="3">
-        <div className={`w-fit rounded-lg ${gradient} p-3.5`}>
+    <div className="glass-surface rounded-xl p-8 transition-all duration-200 hover:bg-white/[0.07]">
+      <Flex direction="column" gap="4">
+        <div className={`w-fit rounded-lg ${gradient} p-4`}>
           {icon}
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Text size="1" weight="medium" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wider">
             {title}
           </Text>
@@ -162,14 +162,14 @@ function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-8 py-16 pt-32 md:pt-36">
-      <Flex direction="column" gap="10">
+      <Flex direction="column" gap="16">
         {/* Header */}
-        <Flex justify="between" align="start" className="flex-col md:flex-row gap-4 md:items-start">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+        <Flex justify="between" align="start" className="flex-col md:flex-row gap-6 md:items-start">
+          <div className="space-y-3">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
               Dashboard
             </h1>
-            <Text size="3" style={{ color: 'var(--color-text-tertiary)' }}>
+            <Text size="2" style={{ color: 'var(--color-text-tertiary)' }}>
               Welcome back, {session?.user?.name || session?.user?.email}
             </Text>
           </div>
@@ -233,46 +233,46 @@ function DashboardPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <StatCard
             title="Published Posts"
             value={publishedPosts.length}
-            icon={<FileText className="h-7 w-7 text-amber-400" />}
+            icon={<FileText className="h-8 w-8 text-amber-400" />}
             gradient="bg-gradient-to-br from-amber-500/30 to-amber-600/30"
           />
           <StatCard
             title="Draft Posts"
             value={draftPosts.length}
-            icon={<Clock className="h-7 w-7 text-blue-400" />}
+            icon={<Clock className="h-8 w-8 text-blue-400" />}
             gradient="bg-gradient-to-br from-blue-500/30 to-blue-600/30"
           />
           <StatCard
             title="Total Views"
             value={totalViews}
-            icon={<Eye className="h-7 w-7 text-green-400" />}
+            icon={<Eye className="h-8 w-8 text-green-400" />}
             gradient="bg-gradient-to-br from-green-500/30 to-emerald-600/30"
           />
           <StatCard
             title="Total Likes"
             value={totalLikes}
-            icon={<Heart className="h-7 w-7 text-pink-400" />}
+            icon={<Heart className="h-8 w-8 text-pink-400" />}
             gradient="bg-gradient-to-br from-pink-500/30 to-rose-600/30"
           />
         </div>
 
         {/* Activity Section - Only show if there are posts */}
         {posts.length > 0 && (
-          <div className="glass-surface p-6 rounded-xl">
-            <Flex direction="column" gap="5">
-              <Heading size="6" weight="bold" style={{ color: 'var(--color-text-primary)' }}>
+          <div className="glass-surface p-8 rounded-xl">
+            <Flex direction="column" gap="6">
+              <Heading size="5" weight="bold" style={{ color: 'var(--color-text-primary)' }}>
                 Recent Activity
               </Heading>
 
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {posts.slice(0, 4).map((post) => (
-                  <div key={post.id} className="p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-200 cursor-pointer">
-                    <Flex justify="between" align="start" gap="4">
-                      <div className="flex-1 min-w-0 space-y-2">
+                  <div key={post.id} className="p-5 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                    <Flex justify="between" align="start" gap="6">
+                      <div className="flex-1 min-w-0 space-y-2.5">
                         <Text size="2" weight="bold" className="block" style={{ color: 'var(--color-text-primary)' }}>
                           {post.title}
                         </Text>
@@ -285,7 +285,7 @@ function DashboardPage() {
                           </Badge>
                         </Flex>
                       </div>
-                      <Flex gap="4" align="center" className="flex-shrink-0" style={{ color: 'var(--color-text-tertiary)' }}>
+                      <Flex gap="5" align="center" className="flex-shrink-0" style={{ color: 'var(--color-text-tertiary)' }}>
                         <Flex gap="1.5" align="center">
                           <Eye size={14} />
                           <Text size="1" weight="medium">{post.views}</Text>
@@ -306,8 +306,8 @@ function DashboardPage() {
         {/* Posts Table */}
         <div className="glass-surface rounded-xl overflow-hidden">
           <Flex direction="column">
-            <Flex justify="between" align="center" className="px-6 py-5 border-b border-white/10">
-              <Heading size="6" weight="bold" style={{ color: 'var(--color-text-primary)' }}>
+            <Flex justify="between" align="center" className="px-8 py-6 border-b border-white/10">
+              <Heading size="5" weight="bold" style={{ color: 'var(--color-text-primary)' }}>
                 All Posts
               </Heading>
               <Link to="/admin/posts" style={{ textDecoration: 'none' }}>
@@ -349,22 +349,22 @@ function DashboardPage() {
                 <Table.Root variant="surface">
                   <Table.Header>
                     <Table.Row>
-                      <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '45%' }}>
+                      <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '45%' }}>
                         <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Title</Text>
                       </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '12%' }}>
+                      <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '12%' }}>
                         <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Status</Text>
                       </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '10%' }}>
+                      <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '10%' }}>
                         <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Views</Text>
                       </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '10%' }}>
+                      <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '10%' }}>
                         <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Likes</Text>
                       </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '13%' }}>
+                      <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '13%' }}>
                         <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Date</Text>
                       </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '10%' }}>
+                      <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '10%' }}>
                         <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Actions</Text>
                       </Table.ColumnHeaderCell>
                     </Table.Row>
@@ -372,8 +372,8 @@ function DashboardPage() {
                   <Table.Body>
                     {posts.slice(0, 10).map((post) => (
                       <Table.Row key={post.id} className="hover:bg-white/[0.08] transition-colors duration-150">
-                        <Table.Cell className="py-4 px-5">
-                          <Flex direction="column" gap="1.5">
+                        <Table.Cell className="py-5 px-6">
+                          <Flex direction="column" gap="2">
                             <Text size="2" weight="medium" style={{ color: 'var(--color-text-primary)' }}>
                               {post.title}
                             </Text>
@@ -384,29 +384,29 @@ function DashboardPage() {
                             )}
                           </Flex>
                         </Table.Cell>
-                        <Table.Cell className="py-4 px-5">
+                        <Table.Cell className="py-5 px-6">
                           <Badge color={post.status === 'published' ? 'green' : 'gray'} size="1">
                             {post.status}
                           </Badge>
                         </Table.Cell>
-                        <Table.Cell className="py-4 px-5">
+                        <Table.Cell className="py-5 px-6">
                           <Flex gap="1.5" align="center">
                             <Eye size={14} style={{ color: 'var(--color-text-tertiary)' }} />
                             <Text size="2" weight="medium">{post.views}</Text>
                           </Flex>
                         </Table.Cell>
-                        <Table.Cell className="py-4 px-5">
+                        <Table.Cell className="py-5 px-6">
                           <Flex gap="1.5" align="center">
                             <Heart size={14} style={{ color: 'var(--color-text-tertiary)' }} />
                             <Text size="2" weight="medium">{post.likesCount}</Text>
                           </Flex>
                         </Table.Cell>
-                        <Table.Cell className="py-4 px-5">
+                        <Table.Cell className="py-5 px-6">
                           <Text size="1" style={{ color: 'var(--color-text-tertiary)' }}>
                             {formatDate(post.publishedAt || post.createdAt)}
                           </Text>
                         </Table.Cell>
-                        <Table.Cell className="py-4 px-5">
+                        <Table.Cell className="py-5 px-6">
                           <Flex gap="2.5">
                             <Button
                               size="1"

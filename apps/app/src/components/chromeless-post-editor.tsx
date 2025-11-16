@@ -528,43 +528,6 @@ export function ChromelessPostEditor({
                   backgroundImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, transparent 100%)',
                 }}
               />
-
-              {/* Edit controls - shown on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-              <button
-                onClick={() => onCoverImageChange('')}
-                className={cn(
-                  'absolute top-6 right-6 z-10',
-                  'p-3 rounded-full',
-                  'bg-red-500/90 hover:bg-red-600',
-                  'text-white',
-                  'opacity-0 group-hover:opacity-100',
-                  'transition-all duration-200',
-                  'backdrop-blur-sm shadow-xl',
-                  'pointer-events-auto'
-                )}
-              >
-                <X size={20} />
-              </button>
-              <div
-                {...getCoverRootProps()}
-                className={cn(
-                  'absolute top-6 left-6 z-10',
-                  'px-5 py-2.5 rounded-full',
-                  'bg-white/10 hover:bg-white/20',
-                  'text-white text-sm font-medium',
-                  'opacity-0 group-hover:opacity-100',
-                  'transition-all duration-200',
-                  'backdrop-blur-sm border border-white/20 shadow-xl',
-                  'cursor-pointer pointer-events-auto'
-                )}
-              >
-                <input {...getCoverInputProps()} />
-                <span className="flex items-center gap-2">
-                  <ImagePlus size={16} />
-                  Change Cover
-                </span>
-              </div>
             </div>
           ) : (
             // No cover - show upload area with same positioning
@@ -608,6 +571,44 @@ export function ChromelessPostEditor({
 
           {/* Hero Content - Title and Author Meta - EXACT MATCH to post detail */}
           <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12">
+            {/* Cover Controls - Subtle and positioned above title */}
+            {coverImage && (
+              <div className="max-w-4xl mb-6 flex items-center gap-3">
+                <div
+                  {...getCoverRootProps()}
+                  className={cn(
+                    'px-4 py-2 rounded-lg',
+                    'bg-white/5 hover:bg-white/10',
+                    'text-gray-400 hover:text-white text-xs font-medium',
+                    'transition-all duration-200',
+                    'backdrop-blur-sm border border-white/10',
+                    'cursor-pointer'
+                  )}
+                >
+                  <input {...getCoverInputProps()} />
+                  <span className="flex items-center gap-2">
+                    <ImagePlus size={14} />
+                    Change
+                  </span>
+                </div>
+                <button
+                  onClick={() => onCoverImageChange('')}
+                  className={cn(
+                    'px-4 py-2 rounded-lg',
+                    'bg-white/5 hover:bg-red-500/10',
+                    'text-gray-400 hover:text-red-400 text-xs font-medium',
+                    'transition-all duration-200',
+                    'backdrop-blur-sm border border-white/10 hover:border-red-500/30'
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <X size={14} />
+                    Remove
+                  </span>
+                </button>
+              </div>
+            )}
+
             <div className="max-w-4xl space-y-6">
               {/* Title Input - Styled exactly like display title */}
               <textarea
@@ -666,8 +667,8 @@ export function ChromelessPostEditor({
         </section>
 
         {/* Article Content - EXACT match to post detail */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="max-w-4xl py-12">
+        <div className="w-full max-w-7xl mx-auto px-6 md:px-12">
+          <div className="w-full max-w-4xl py-12">
             <article
               id="article-content"
               className={cn(
@@ -693,7 +694,8 @@ export function ChromelessPostEditor({
                     attributes: {
                       class: cn(
                         'prose prose-lg prose-invert max-w-none min-h-[60vh]',
-                        'focus:outline-none',
+                        'focus:outline-none focus:ring-0 focus:border-transparent',
+                        '[&_.ProseMirror]:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:focus:ring-0 [&_.ProseMirror]:focus:border-transparent',
                         // Match EXACT typography from styles.css .prose
                         'prose-headings:font-serif prose-headings:font-bold prose-headings:text-white',
                         'prose-h1:text-[clamp(2rem,4vw,3rem)] prose-h1:leading-[1.2] prose-h1:tracking-[-0.015em] prose-h1:mt-[var(--space-9)] prose-h1:mb-[var(--space-6)]',

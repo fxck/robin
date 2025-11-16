@@ -164,14 +164,14 @@ function AdminPostsPage() {
   return (
     <Box style={{ minHeight: 'calc(100vh - 60px)', paddingTop: '100px' }}>
       <Container size="4" py="8">
-        <Flex direction="column" gap="8">
+        <Flex direction="column" gap="12">
           {/* Header */}
-          <Flex justify="between" align="start" className="mb-6">
-            <div className="space-y-2">
-              <Heading size="8" weight="bold" className="tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
+          <Flex justify="between" align="start" className="mb-4">
+            <div className="space-y-3">
+              <Heading size="7" weight="bold" className="tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
                 Posts
               </Heading>
-              <Text size="3" style={{ color: 'var(--color-text-tertiary)' }}>
+              <Text size="2" style={{ color: 'var(--color-text-tertiary)' }}>
                 Manage your blog posts and drafts
               </Text>
             </div>
@@ -184,14 +184,14 @@ function AdminPostsPage() {
           </Flex>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {/* TOTAL POSTS */}
-            <div className="glass-surface rounded-xl p-6 transition-all duration-200 hover:bg-white/[0.07]">
-              <Flex direction="column" gap="3">
-                <div className="w-fit rounded-lg bg-gradient-to-br from-purple-500/30 to-purple-600/30 p-3.5">
-                  <FileText className="h-7 w-7 text-purple-400" />
+            <div className="glass-surface rounded-xl p-8 transition-all duration-200 hover:bg-white/[0.07]">
+              <Flex direction="column" gap="4">
+                <div className="w-fit rounded-lg bg-gradient-to-br from-purple-500/30 to-purple-600/30 p-4">
+                  <FileText className="h-8 w-8 text-purple-400" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Text size="1" weight="medium" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wider">
                     Total Posts
                   </Text>
@@ -203,12 +203,12 @@ function AdminPostsPage() {
             </div>
 
             {/* PUBLISHED */}
-            <div className="glass-surface rounded-xl p-6 transition-all duration-200 hover:bg-white/[0.07]">
-              <Flex direction="column" gap="3">
-                <div className="w-fit rounded-lg bg-gradient-to-br from-green-500/30 to-emerald-600/30 p-3.5">
-                  <CheckCircle className="h-7 w-7 text-green-400" />
+            <div className="glass-surface rounded-xl p-8 transition-all duration-200 hover:bg-white/[0.07]">
+              <Flex direction="column" gap="4">
+                <div className="w-fit rounded-lg bg-gradient-to-br from-green-500/30 to-emerald-600/30 p-4">
+                  <CheckCircle className="h-8 w-8 text-green-400" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Text size="1" weight="medium" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wider">
                     Published
                   </Text>
@@ -220,12 +220,12 @@ function AdminPostsPage() {
             </div>
 
             {/* DRAFTS */}
-            <div className="glass-surface rounded-xl p-6 transition-all duration-200 hover:bg-white/[0.07]">
-              <Flex direction="column" gap="3">
-                <div className="w-fit rounded-lg bg-gradient-to-br from-blue-500/30 to-blue-600/30 p-3.5">
-                  <Clock className="h-7 w-7 text-blue-400" />
+            <div className="glass-surface rounded-xl p-8 transition-all duration-200 hover:bg-white/[0.07]">
+              <Flex direction="column" gap="4">
+                <div className="w-fit rounded-lg bg-gradient-to-br from-blue-500/30 to-blue-600/30 p-4">
+                  <Clock className="h-8 w-8 text-blue-400" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Text size="1" weight="medium" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wider">
                     Drafts
                   </Text>
@@ -239,7 +239,7 @@ function AdminPostsPage() {
 
           {/* Search and Filters */}
           <div className="glass-surface rounded-xl">
-            <Flex direction="column" gap="4" className="p-5">
+            <Flex direction="column" gap="5" className="p-7">
               <Flex gap="2.5" wrap="wrap" align="center">
                 {/* Search */}
                 <Box style={{ flex: '1', minWidth: '280px' }}>
@@ -367,28 +367,28 @@ function AdminPostsPage() {
               <Table.Root variant="surface">
                 <Table.Header>
                   <Table.Row>
-                    <Table.ColumnHeaderCell className="py-3 px-4" style={{ width: '40px' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-5" style={{ width: '40px' }}>
                       <Checkbox
                         checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
                         onCheckedChange={() => toggleSelectAll(filteredPosts)}
                       />
                     </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '42%' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '42%' }}>
                       <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Title</Text>
                     </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '12%' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '12%' }}>
                       <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Status</Text>
                     </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '10%' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '10%' }}>
                       <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Views</Text>
                     </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '10%' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '10%' }}>
                       <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Likes</Text>
                     </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '13%' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '13%' }}>
                       <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Date</Text>
                     </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="py-3 px-5" style={{ width: '13%' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-6" style={{ width: '13%' }}>
                       <Text size="1" weight="bold" style={{ color: 'var(--color-text-tertiary)' }} className="uppercase tracking-wide">Actions</Text>
                     </Table.ColumnHeaderCell>
                   </Table.Row>
@@ -396,14 +396,14 @@ function AdminPostsPage() {
                 <Table.Body>
                   {filteredPosts.map((post) => (
                     <Table.Row key={post.id} className="hover:bg-white/[0.08] transition-colors duration-150">
-                      <Table.Cell className="py-4 px-4">
+                      <Table.Cell className="py-5 px-5">
                         <Checkbox
                           checked={selectedPosts.has(post.id)}
                           onCheckedChange={() => togglePostSelection(post.id)}
                         />
                       </Table.Cell>
-                      <Table.Cell className="py-4 px-5">
-                        <Flex direction="column" gap="1.5">
+                      <Table.Cell className="py-5 px-6">
+                        <Flex direction="column" gap="2">
                           <Text size="2" weight="medium" style={{ color: 'var(--color-text-primary)' }}>
                             {post.title}
                           </Text>
@@ -414,29 +414,29 @@ function AdminPostsPage() {
                           )}
                         </Flex>
                       </Table.Cell>
-                      <Table.Cell className="py-4 px-5">
+                      <Table.Cell className="py-5 px-6">
                         <Badge color={post.status === 'published' ? 'green' : 'gray'} size="1">
                           {post.status}
                         </Badge>
                       </Table.Cell>
-                      <Table.Cell className="py-4 px-5">
+                      <Table.Cell className="py-5 px-6">
                         <Flex gap="1.5" align="center">
                           <Eye size={14} style={{ color: 'var(--color-text-tertiary)' }} />
                           <Text size="2" weight="medium">{post.views}</Text>
                         </Flex>
                       </Table.Cell>
-                      <Table.Cell className="py-4 px-5">
+                      <Table.Cell className="py-5 px-6">
                         <Flex gap="1.5" align="center">
                           <Heart size={14} style={{ color: 'var(--color-text-tertiary)' }} />
                           <Text size="2" weight="medium">{post.likesCount}</Text>
                         </Flex>
                       </Table.Cell>
-                      <Table.Cell className="py-4 px-5">
+                      <Table.Cell className="py-5 px-6">
                         <Text size="1" style={{ color: 'var(--color-text-tertiary)' }}>
                           {new Date(post.createdAt).toLocaleDateString()}
                         </Text>
                       </Table.Cell>
-                      <Table.Cell className="py-4 px-5">
+                      <Table.Cell className="py-5 px-6">
                         <Flex gap="2.5">
                           <Button
                             size="1"
