@@ -33,6 +33,9 @@ function NewPostPage() {
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
   const [version, setVersion] = useState(1);
 
+  // Use ref for immediate access to createdPostId (prevents race condition)
+  const createdPostIdRef = useRef<string | null>(null);
+
   // Generate stable storage key for this editing session
   const storageKeyRef = useRef(DraftManager.generateTempKey());
   const hasLoadedDraftRef = useRef(false);
@@ -55,6 +58,7 @@ function NewPostPage() {
         setStatus(draft.status);
         if (draft.postId) {
           setCreatedPostId(draft.postId);
+          createdPostIdRef.current = draft.postId;
           setVersion(draft.version);
         }
         toast.success('Draft restored from local storage');
@@ -67,9 +71,10 @@ function NewPostPage() {
   // Autosave logic with proper create/update flow
   const autosave = useAutosave<CreatePostInput | UpdatePostInput, PostResponse>(
     async (data) => {
+      // Use ref for immediate check (prevents race condition during navigation)
       // If we already created a post, UPDATE it (PATCH)
-      if (createdPostId) {
-        return api.patch<PostResponse>(`/posts/${createdPostId}`, {
+      if (createdPostIdRef.current) {
+        return api.patch<PostResponse>(`/posts/${createdPostIdRef.current}`, {
           ...data,
           version, // Include version for optimistic locking
         } as UpdatePostInput);
@@ -86,9 +91,16 @@ function NewPostPage() {
         const post = response.post;
 
         // First time creating? Store the ID and navigate to edit page
-        if (!createdPostId && post.id) {
+        if (!createdPostIdRef.current && post.id) {
+          // Update ref immediately (prevents race condition)
+          createdPostIdRef.current = post.id;
           setCreatedPostId(post.id);
           setVersion(post.version);
+
+          // Update storage key to use real post ID (before navigation)
+          const newKey = `post_${post.id}`;
+          DraftManager.remove(storageKeyRef.current);
+          storageKeyRef.current = newKey;
 
           // Navigate to edit page with the new post ID
           // Use replace to avoid back button issues
@@ -96,11 +108,6 @@ function NewPostPage() {
             to: `/admin/posts/${post.id}/edit`,
             replace: true,
           });
-
-          // Update storage key to use real post ID
-          const newKey = `post_${post.id}`;
-          DraftManager.remove(storageKeyRef.current);
-          storageKeyRef.current = newKey;
 
           toast.success('Draft created! Now editing...');
         } else {
@@ -145,6 +152,8 @@ function NewPostPage() {
       },
       draftData
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Intentionally exclude: autosave (stable ref), version (don't autosave on version sync), initialized
   }, [title, content, coverImage]);
 
   // Create/Update mutation for manual saves (Publish / Save Draft)
@@ -157,8 +166,9 @@ function NewPostPage() {
         status: data.publish ? 'published' : 'draft',
       } as CreatePostInput;
 
-      if (createdPostId) {
-        return api.patch<PostResponse>(`/posts/${createdPostId}`, {
+      // Use ref for immediate check
+      if (createdPostIdRef.current) {
+        return api.patch<PostResponse>(`/posts/${createdPostIdRef.current}`, {
           ...saveData,
           version,
         } as UpdatePostInput);

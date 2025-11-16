@@ -158,6 +158,8 @@ function EditPostPage() {
       },
       draftData
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Intentionally exclude: autosave (stable ref), version (included in data, not trigger)
   }, [title, content, coverImage, status, initialized]);
 
   // Manual update mutation (Publish / Save Draft)

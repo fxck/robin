@@ -5,10 +5,33 @@
  * - Retry with exponential backoff
  * - localStorage backup
  * - Optimistic updates
+ *
+ * @example
+ * ```tsx
+ * const autosave = useAutosave(
+ *   (data) => api.patch(`/posts/${id}`, data),
+ *   {
+ *     storageKey: `post_${id}`,
+ *     debounceMs: 3000,
+ *     maxRetries: 3,
+ *     onSaveSuccess: (response) => setVersion(response.post.version),
+ *     onSaveError: (error) => console.error('Save failed:', error),
+ *   }
+ * );
+ *
+ * // Schedule autosave with local backup
+ * autosave.scheduleAutosave(serverData, localDraftData);
+ *
+ * // Force immediate save
+ * autosave.saveNow(data);
+ *
+ * // Access state
+ * const { isSaving, lastSaved, hasUnsavedChanges, error } = autosave;
+ * ```
  */
 
 import { useRef, useEffect, useCallback, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { DraftManager } from '../lib/draft-manager';
 import type { DraftData } from '../lib/draft-manager';
@@ -29,6 +52,13 @@ interface AutosaveState {
   retryCount: number;
 }
 
+/**
+ * Autosave hook with debouncing, retry, and localStorage backup
+ *
+ * @param saveFn - Function to save data to server
+ * @param options - Configuration options
+ * @returns Autosave state and control functions
+ */
 export function useAutosave<TData = any, TResponse = any>(
   saveFn: (data: TData) => Promise<TResponse>,
   options: AutosaveOptions
@@ -40,8 +70,6 @@ export function useAutosave<TData = any, TResponse = any>(
     onSaveError,
     storageKey,
   } = options;
-
-  const queryClient = useQueryClient();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [state, setState] = useState<AutosaveState>({

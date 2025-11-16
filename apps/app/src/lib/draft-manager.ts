@@ -40,9 +40,12 @@ export class DraftManager {
       if (error instanceof Error && error.name === 'QuotaExceededError') {
         this.cleanupOldDrafts(10);
         try {
-          localStorage.setItem(`${DRAFT_KEY_PREFIX}${key}`, JSON.stringify(data));
-        } catch {
-          console.error('Still failed after cleanup');
+          const draftKey = `${DRAFT_KEY_PREFIX}${key}`;
+          localStorage.setItem(draftKey, JSON.stringify(data));
+        } catch (retryError) {
+          console.error('Still failed after cleanup. Draft may be too large:', retryError);
+          // Draft itself might be too large (e.g., embedded large images)
+          // Don't throw - fail silently but log for debugging
         }
       }
     }
