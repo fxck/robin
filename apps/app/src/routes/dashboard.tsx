@@ -444,5 +444,6 @@ function DashboardPage() {
           </Flex>
         </AlertDialog.Content>
       </AlertDialog.Root>
+    </div>
   );
 }

@@ -1,17 +1,13 @@
 import { createFileRoute, Link, useNavigate, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Container,
-  Heading,
   Flex,
   Button,
-  Card,
   Text,
   Badge,
   Box,
   Table,
   AlertDialog,
-  Grid,
   TextField,
   Select,
   Checkbox,
@@ -523,5 +519,6 @@ function AdminPostsPage() {
           </Flex>
         </AlertDialog.Content>
       </AlertDialog.Root>
+    </div>
   );
 }
