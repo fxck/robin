@@ -7,6 +7,7 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
   defaultPendingMs: 0,
   defaultPendingMinMs: 0,
+  scrollRestoration: true,
 });
 
 declare module '@tanstack/react-router' {
