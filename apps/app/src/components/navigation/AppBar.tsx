@@ -41,12 +41,12 @@ export function AppBar() {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50',
-        'transition-transform duration-300 ease-out',
-        'px-4 pt-4',
+        'transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]',
+        'px-6 pt-6',
         isVisible ? 'translate-y-0' : '-translate-y-full'
       )}
     >
-      <nav ref={navRef} className="glass-appbar relative py-3 px-6 mx-auto max-w-7xl">
+      <nav ref={navRef} className="fluid-glass-appbar relative py-4 px-8 mx-auto max-w-[1400px]">
         <Flex align="center" justify="between">
           {/* Logo - 3D Cube */}
           <Link to="/" className="logo-link no-underline">

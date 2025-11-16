@@ -91,16 +91,22 @@ function Index() {
       {/* Hero Section */}
       <Section spacing="xl" className="relative pt-64 md:pt-72 pb-24 md:pb-32">
         {/* Floating Lines Background */}
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 -z-10 opacity-60">
           <FloatingLines
-            linesGradient={['#f59e0b', '#fbbf24', '#3b82f6']}
-            enabledWaves={['middle', 'bottom']}
-            lineCount={[8, 6]}
-            lineDistance={[3, 4]}
-            animationSpeed={0.5}
+            linesGradient={['#f59e0b', '#fbbf24', '#d97706']}
+            enabledWaves={['top', 'middle', 'bottom']}
+            lineCount={[4, 6, 5]}
+            lineDistance={[8, 5, 6]}
+            topWavePosition={{ x: 10, y: 0.6, rotate: -0.3 }}
+            middleWavePosition={{ x: 5, y: 0, rotate: 0.1 }}
+            bottomWavePosition={{ x: 2, y: -0.6, rotate: 0.4 }}
+            animationSpeed={0.8}
             interactive={true}
+            bendRadius={3.0}
+            bendStrength={-0.8}
             parallax={true}
-            mixBlendMode="screen"
+            parallaxStrength={0.15}
+            mixBlendMode="lighten"
           />
         </div>
 
