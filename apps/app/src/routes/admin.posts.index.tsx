@@ -16,7 +16,7 @@ import {
   Select,
   Checkbox,
 } from '@radix-ui/themes';
-import { PlusCircle, Edit, Trash2, Eye, Search, Filter, X } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Eye, Search, Filter, X, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { api } from '../lib/api-client';
@@ -164,110 +164,84 @@ function AdminPostsPage() {
   return (
     <Box style={{ minHeight: 'calc(100vh - 60px)', paddingTop: '100px' }}>
       <Container size="4" py="8">
-        <Flex direction="column" gap="10">
+        <Flex direction="column" gap="6">
           {/* Header */}
-          <Flex justify="between" align="center" className="flex-col gap-6 md:flex-row md:items-center">
-            <div className="space-y-3">
-              <Heading size="9" className="bg-gradient-to-br from-white via-gray-100 to-gray-500 bg-clip-text font-black tracking-tight text-transparent">
-                Posts
-              </Heading>
-              <Text size="3" className="text-gray-400">
-                Manage and organize all your content
-              </Text>
-            </div>
+          <Flex justify="between" align="center">
+            <Heading size="8">Posts</Heading>
             <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
-              <Button
-                size="4"
-                className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 px-8 py-4 text-base font-bold text-black shadow-lg shadow-amber-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-500/50"
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  <PlusCircle size={20} className="transition-transform duration-300 group-hover:rotate-90" />
-                  New Post
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-300 to-amber-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+              <Button size="3">
+                <PlusCircle size={18} />
+                New Post
               </Button>
             </Link>
           </Flex>
 
           {/* Stats */}
-          <Grid columns={{ initial: '1', sm: '3' }} gap="6">
-            <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/10">
-              <Flex direction="column" gap="3">
-                <Text size="2" className="font-medium uppercase tracking-wider text-gray-500">
+          <Grid columns={{ initial: '1', sm: '3' }} gap="4">
+            <Card>
+              <Flex direction="column" gap="2" p="3">
+                <Text size="2" color="gray">
                   Total Posts
                 </Text>
-                <Heading size="8" className="bg-gradient-to-br from-white to-gray-400 bg-clip-text font-bold text-transparent">
-                  {allPosts.length}
-                </Heading>
+                <Heading size="7">{allPosts.length}</Heading>
               </Flex>
-              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-amber-500/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100"></div>
-            </div>
-            <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-green-500/30 hover:shadow-lg hover:shadow-green-500/10">
-              <Flex direction="column" gap="3">
-                <Text size="2" className="font-medium uppercase tracking-wider text-gray-500">
+            </Card>
+            <Card>
+              <Flex direction="column" gap="2" p="3">
+                <Text size="2" color="gray">
                   Published
                 </Text>
-                <Heading size="8" className="bg-gradient-to-br from-white to-gray-400 bg-clip-text font-bold text-transparent">
-                  {allPosts.filter(p => p.status === 'published').length}
-                </Heading>
+                <Heading size="7">{allPosts.filter(p => p.status === 'published').length}</Heading>
               </Flex>
-              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-green-500/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100"></div>
-            </div>
-            <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10">
-              <Flex direction="column" gap="3">
-                <Text size="2" className="font-medium uppercase tracking-wider text-gray-500">
+            </Card>
+            <Card>
+              <Flex direction="column" gap="2" p="3">
+                <Text size="2" color="gray">
                   Drafts
                 </Text>
-                <Heading size="8" className="bg-gradient-to-br from-white to-gray-400 bg-clip-text font-bold text-transparent">
-                  {allPosts.filter(p => p.status === 'draft').length}
-                </Heading>
+                <Heading size="7">{allPosts.filter(p => p.status === 'draft').length}</Heading>
               </Flex>
-              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-blue-500/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100"></div>
-            </div>
+            </Card>
           </Grid>
 
           {/* Search and Filters */}
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-6 backdrop-blur-sm">
-            <Flex direction="column" gap="6">
-              <Flex gap="4" wrap="wrap" align="center">
+          <Card>
+            <Flex direction="column" gap="4" p="4">
+              <Flex gap="3" wrap="wrap" align="center">
                 {/* Search */}
-                <Box style={{ flex: '1', minWidth: '300px' }}>
-                  <div className="relative">
-                    <TextField.Root
-                      placeholder="Search posts..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      size="3"
-                      className="rounded-xl border-white/20 bg-white/5 pl-12 transition-all focus-within:border-amber-500/50 focus-within:bg-white/10"
-                    >
-                      <TextField.Slot className="pl-4">
-                        <Search size={18} className="text-gray-400" />
+                <Box style={{ flex: '1', minWidth: '250px' }}>
+                  <TextField.Root
+                    placeholder="Search posts..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    size="2"
+                  >
+                    <TextField.Slot>
+                      <Search size={16} />
+                    </TextField.Slot>
+                    {searchQuery && (
+                      <TextField.Slot>
+                        <Button
+                          size="1"
+                          variant="ghost"
+                          onClick={() => setSearchQuery('')}
+                        >
+                          <X size={14} />
+                        </Button>
                       </TextField.Slot>
-                      {searchQuery && (
-                        <TextField.Slot>
-                          <Button
-                            size="2"
-                            variant="ghost"
-                            onClick={() => setSearchQuery('')}
-                            className="rounded-lg hover:bg-white/10"
-                          >
-                            <X size={16} />
-                          </Button>
-                        </TextField.Slot>
-                      )}
-                    </TextField.Root>
-                  </div>
+                    )}
+                  </TextField.Root>
                 </Box>
 
                 {/* Status Filter */}
                 <Select.Root value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-                  <Select.Trigger style={{ minWidth: '150px' }} className="rounded-xl border-white/20 bg-white/5 px-4 py-3 transition-all hover:border-white/30 hover:bg-white/10">
+                  <Select.Trigger style={{ minWidth: '130px' }}>
                     <Flex align="center" gap="2">
-                      <Filter size={16} />
-                      <span className="font-medium">Status</span>
+                      <Filter size={14} />
+                      Status
                     </Flex>
                   </Select.Trigger>
-                  <Select.Content className="rounded-xl border-white/20 bg-black/90 backdrop-blur-xl">
+                  <Select.Content>
                     <Select.Item value="all">All Status</Select.Item>
                     <Select.Item value="published">Published</Select.Item>
                     <Select.Item value="draft">Draft</Select.Item>
@@ -276,13 +250,13 @@ function AdminPostsPage() {
 
                 {/* Date Filter */}
                 <Select.Root value={dateFilter} onValueChange={(v) => setDateFilter(v as any)}>
-                  <Select.Trigger style={{ minWidth: '150px' }} className="rounded-xl border-white/20 bg-white/5 px-4 py-3 transition-all hover:border-white/30 hover:bg-white/10">
+                  <Select.Trigger style={{ minWidth: '130px' }}>
                     <Flex align="center" gap="2">
-                      <Filter size={16} />
-                      <span className="font-medium">Date</span>
+                      <Filter size={14} />
+                      Date
                     </Flex>
                   </Select.Trigger>
-                  <Select.Content className="rounded-xl border-white/20 bg-black/90 backdrop-blur-xl">
+                  <Select.Content>
                     <Select.Item value="all">All Time</Select.Item>
                     <Select.Item value="today">Today</Select.Item>
                     <Select.Item value="week">Past Week</Select.Item>
@@ -292,13 +266,8 @@ function AdminPostsPage() {
 
                 {/* Clear Filters */}
                 {hasActiveFilters && (
-                  <Button
-                    variant="soft"
-                    onClick={clearFilters}
-                    size="3"
-                    className="rounded-xl border border-white/20 bg-white/5 font-medium transition-all hover:border-white/30 hover:bg-white/10"
-                  >
-                    <X size={16} />
+                  <Button variant="soft" onClick={clearFilters}>
+                    <X size={14} />
                     Clear Filters
                   </Button>
                 )}
@@ -306,215 +275,149 @@ function AdminPostsPage() {
 
               {/* Bulk Actions */}
               {selectedPosts.size > 0 && (
-                <div className="rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-4">
-                  <Flex gap="3" align="center">
-                    <Text size="3" weight="bold" className="text-amber-400">
-                      {selectedPosts.size} selected
-                    </Text>
-                    <Button
-                      size="3"
-                      variant="soft"
-                      color="red"
-                      onClick={() => setBulkDeleteDialog(true)}
-                      className="rounded-lg font-semibold"
-                    >
-                      <Trash2 size={16} />
-                      Delete Selected
-                    </Button>
-                    <Button
-                      size="3"
-                      variant="ghost"
-                      onClick={() => setSelectedPosts(new Set())}
-                      className="rounded-lg font-medium"
-                    >
-                      Clear Selection
-                    </Button>
-                  </Flex>
-                </div>
+                <Flex gap="2" align="center" style={{
+                  padding: '12px',
+                  background: 'var(--amber-3)',
+                  borderRadius: 'var(--radius-3)',
+                }}>
+                  <Text size="2" weight="medium">
+                    {selectedPosts.size} selected
+                  </Text>
+                  <Button
+                    size="2"
+                    variant="soft"
+                    color="red"
+                    onClick={() => setBulkDeleteDialog(true)}
+                  >
+                    <Trash2 size={14} />
+                    Delete Selected
+                  </Button>
+                  <Button
+                    size="2"
+                    variant="ghost"
+                    onClick={() => setSelectedPosts(new Set())}
+                  >
+                    Clear Selection
+                  </Button>
+                </Flex>
               )}
 
               {/* Results info */}
               {hasActiveFilters && (
-                <Flex align="center" gap="2">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-                  <Text size="2" className="font-medium text-gray-400">
-                    Showing {filteredPosts.length} of {allPosts.length} posts
-                  </Text>
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-                </Flex>
+                <Text size="2" color="gray">
+                  Showing {filteredPosts.length} of {allPosts.length} posts
+                </Text>
               )}
             </Flex>
-          </div>
+          </Card>
 
           {/* Posts Table */}
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm">
+          <Card>
             {isLoading ? (
-              <Box py="16">
-                <Flex direction="column" align="center" gap="4">
-                  <div className="shimmer h-8 w-64 rounded-lg"></div>
-                  <div className="shimmer h-5 w-48 rounded-lg"></div>
-                </Flex>
+              <Box py="9">
+                <Text align="center" color="gray">Loading...</Text>
               </Box>
             ) : filteredPosts.length === 0 ? (
-              <Flex direction="column" align="center" gap="8" py="24">
-                <div className="rounded-3xl bg-gradient-to-br from-white/10 to-white/5 p-8 ring-1 ring-white/10">
-                  <Search size={48} className="text-gray-600" />
-                </div>
-                <div className="space-y-3 text-center">
-                  <Text size="6" weight="bold" className="block text-white">
-                    {hasActiveFilters ? 'No posts match your filters' : 'No posts yet'}
-                  </Text>
-                  <Text size="3" className="block text-gray-500">
-                    {hasActiveFilters ? 'Try adjusting your search criteria' : 'Create your first post to get started'}
-                  </Text>
-                </div>
+              <Flex direction="column" align="center" gap="4" py="9">
+                <Text size="5" color="gray">
+                  {hasActiveFilters ? 'No posts match your filters' : 'No posts yet'}
+                </Text>
                 {hasActiveFilters ? (
-                  <Button
-                    variant="soft"
-                    onClick={clearFilters}
-                    size="3"
-                    className="rounded-xl font-semibold"
-                  >
+                  <Button variant="soft" onClick={clearFilters}>
                     Clear Filters
                   </Button>
                 ) : (
                   <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
-                    <Button
-                      size="4"
-                      className="rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 px-8 py-4 font-bold text-black shadow-lg shadow-amber-500/30 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50"
-                    >
-                      <PlusCircle size={20} />
+                    <Button size="3">
+                      <PlusCircle size={18} />
                       Create your first post
                     </Button>
                   </Link>
                 )}
               </Flex>
             ) : (
-              <div className="overflow-x-auto">
-                <Table.Root>
-                  <Table.Header>
-                    <Table.Row className="border-b border-white/10">
-                      <Table.ColumnHeaderCell style={{ width: '50px' }} className="py-5">
+              <Table.Root>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.ColumnHeaderCell style={{ width: '40px' }}>
+                      <Checkbox
+                        checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
+                        onCheckedChange={() => toggleSelectAll(filteredPosts)}
+                      />
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Views</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Likes</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Created</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {filteredPosts.map((post) => (
+                    <Table.Row key={post.id}>
+                      <Table.Cell>
                         <Checkbox
-                          checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
-                          onCheckedChange={() => toggleSelectAll(filteredPosts)}
-                          className="rounded-md"
+                          checked={selectedPosts.has(post.id)}
+                          onCheckedChange={() => togglePostSelection(post.id)}
                         />
-                      </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Title
-                      </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Status
-                      </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Views
-                      </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Likes
-                      </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Created
-                      </Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell className="py-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        Actions
-                      </Table.ColumnHeaderCell>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {filteredPosts.map((post, index) => (
-                      <Table.Row
-                        key={post.id}
-                        className="group border-b border-white/5 transition-all hover:bg-white/5"
-                        style={{ animationDelay: `${index * 30}ms` }}
-                      >
-                        <Table.Cell className="py-5">
-                          <Checkbox
-                            checked={selectedPosts.has(post.id)}
-                            onCheckedChange={() => togglePostSelection(post.id)}
-                            className="rounded-md"
-                          />
-                        </Table.Cell>
-                        <Table.Cell className="py-5">
-                          <Flex direction="column" gap="2">
-                            <Text weight="bold" className="text-white">
-                              {post.title}
-                            </Text>
-                            {post.excerpt && (
-                              <Text size="2" className="text-gray-500">
-                                {post.excerpt.substring(0, 60)}...
-                              </Text>
-                            )}
-                          </Flex>
-                        </Table.Cell>
-                        <Table.Cell className="py-5">
-                          <Badge
-                            color={post.status === 'published' ? 'green' : 'gray'}
-                            size="2"
-                            className="font-medium"
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Flex direction="column" gap="1">
+                          <Text weight="medium">{post.title}</Text>
+                          {post.excerpt && (
+                            <Text size="1" color="gray">{post.excerpt.substring(0, 60)}...</Text>
+                          )}
+                        </Flex>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Badge color={post.status === 'published' ? 'green' : 'gray'}>
+                          {post.status}
+                        </Badge>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Text size="2">{post.views}</Text>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Text size="2">{post.likesCount}</Text>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Text size="2">{new Date(post.createdAt).toLocaleDateString()}</Text>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Flex gap="2">
+                          <Button
+                            size="1"
+                            variant="soft"
+                            onClick={() => navigate({ to: `/posts/${post.id}` })}
                           >
-                            {post.status}
-                          </Badge>
-                        </Table.Cell>
-                        <Table.Cell className="py-5">
-                          <Flex gap="2" align="center" className="text-gray-400">
-                            <Eye size={16} />
-                            <Text size="2" weight="medium">
-                              {post.views}
-                            </Text>
-                          </Flex>
-                        </Table.Cell>
-                        <Table.Cell className="py-5">
-                          <Flex gap="2" align="center" className="text-gray-400">
-                            <Heart size={16} />
-                            <Text size="2" weight="medium">
-                              {post.likesCount}
-                            </Text>
-                          </Flex>
-                        </Table.Cell>
-                        <Table.Cell className="py-5">
-                          <Text size="2" className="text-gray-500">
-                            {new Date(post.createdAt).toLocaleDateString()}
-                          </Text>
-                        </Table.Cell>
-                        <Table.Cell className="py-5">
-                          <Flex gap="2">
-                            <Button
-                              size="2"
-                              variant="soft"
-                              onClick={() => navigate({ to: `/posts/${post.id}` })}
-                              className="transition-all hover:scale-105"
-                            >
-                              <Eye size={16} />
-                            </Button>
-                            <Button
-                              size="2"
-                              variant="soft"
-                              color="blue"
-                              onClick={() => navigate({ to: `/admin/posts/${post.id}/edit` })}
-                              className="transition-all hover:scale-105"
-                            >
-                              <Edit size={16} />
-                            </Button>
-                            <Button
-                              size="2"
-                              variant="soft"
-                              color="red"
-                              onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
-                              disabled={deleteMutation.isPending}
-                              className="transition-all hover:scale-105"
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                          </Flex>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Root>
-              </div>
+                            <Eye size={14} />
+                          </Button>
+                          <Button
+                            size="1"
+                            variant="soft"
+                            color="blue"
+                            onClick={() => navigate({ to: `/admin/posts/${post.id}/edit` })}
+                          >
+                            <Edit size={14} />
+                          </Button>
+                          <Button
+                            size="1"
+                            variant="soft"
+                            color="red"
+                            onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
+                            disabled={deleteMutation.isPending}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </Flex>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Root>
             )}
-          </div>
+          </Card>
         </Flex>
       </Container>
 

@@ -48,11 +48,12 @@ export function AppBar() {
         <Flex align="center" justify="between">
           {/* Logo - Refined & Elegant */}
           <Link to="/" className="flex items-center gap-3 no-underline group">
-            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-amber-500/30 group-hover:scale-105">
-              <span className="text-black font-bold text-lg tracking-tight select-none">R</span>
+            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 transition-all duration-500 group-hover:shadow-xl group-hover:shadow-amber-500/40 group-hover:scale-110 group-hover:rotate-[-4deg] overflow-hidden">
+              <span className="text-black font-bold text-lg tracking-tight select-none relative z-10 transition-transform duration-500 group-hover:scale-110">R</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/15"></div>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
-            <span className="text-[17px] font-semibold tracking-tight text-white/95 transition-all duration-300 group-hover:text-white">
+            <span className="text-[17px] font-semibold tracking-tight text-white/95 transition-all duration-300 group-hover:text-white group-hover:tracking-normal">
               Robin
             </span>
           </Link>
@@ -69,9 +70,10 @@ export function AppBar() {
             {session?.user && (
               <>
                 <Link to="/admin/posts/new" className="no-underline">
-                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] font-semibold bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black shadow-accent hover:shadow-accent-hover transition-all duration-200 hover:-translate-y-0.5">
-                    <PenLine size={16} strokeWidth={2.5} />
-                    Write
+                  <button className="relative inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] font-semibold bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black shadow-accent hover:shadow-accent-hover transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <PenLine size={16} strokeWidth={2.5} className="relative z-10" />
+                    <span className="relative z-10">Write</span>
                   </button>
                 </Link>
 
@@ -124,8 +126,9 @@ export function AppBar() {
 
             {!session?.user && (
               <Link to="/auth" className="no-underline">
-                <button className="px-6 py-2.5 rounded-lg text-[15px] font-semibold bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black shadow-accent hover:shadow-accent-hover transition-all duration-200 hover:-translate-y-0.5">
-                  Sign In
+                <button className="relative px-6 py-2.5 rounded-lg text-[15px] font-semibold bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black shadow-accent hover:shadow-accent-hover transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative z-10">Sign In</span>
                 </button>
               </Link>
             )}
