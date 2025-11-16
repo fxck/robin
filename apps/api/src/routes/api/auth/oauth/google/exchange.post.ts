@@ -211,14 +211,38 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  setCookie(event, 'better-auth.session_token', sessionToken, cookieOptions);
+  // Build cookie string manually to include Partitioned attribute
+  const cookieParts = [
+    `better-auth.session_token=${sessionToken}`,
+    `Path=${cookieOptions.path}`,
+    `Max-Age=${cookieOptions.maxAge}`,
+    `SameSite=${cookieOptions.sameSite}`,
+  ];
+
+  if (cookieOptions.httpOnly) {
+    cookieParts.push('HttpOnly');
+  }
+
+  if (cookieOptions.secure) {
+    cookieParts.push('Secure');
+    cookieParts.push('Partitioned'); // Required for cross-site cookies in Chrome
+  }
+
+  if (cookieOptions.domain) {
+    cookieParts.push(`Domain=${cookieOptions.domain}`);
+  }
+
+  const cookieString = cookieParts.join('; ');
+
+  // Set cookie using setHeader to have full control
+  setHeader(event, 'Set-Cookie', cookieString);
 
   console.log('[OAuth] Session created:', {
     userId: user.id,
     email: user.email,
     cookieSet: true,
     isProduction,
-    cookieOptions,
+    cookieString,
   });
 
   return {
