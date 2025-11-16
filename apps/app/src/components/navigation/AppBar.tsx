@@ -44,70 +44,58 @@ export function AppBar() {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       )}
     >
-      <nav className="glass-appbar relative py-4 px-7 mx-auto max-w-6xl">
+      <nav className="glass-appbar relative py-5 px-8 mx-auto max-w-7xl">
         <Flex align="center" justify="between">
-          {/* Logo - Enhanced with better proportions */}
-          <Link to="/" className="flex items-center gap-3 no-underline group">
-            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-500/25 ring-1 ring-white/10 transition-all duration-200 group-hover:shadow-purple-500/40 group-hover:scale-105">
-              <span className="text-white font-bold text-lg tracking-tight">R</span>
+          {/* Logo - World-class design */}
+          <Link to="/" className="flex items-center gap-3.5 no-underline group">
+            <div className="relative h-10 w-10 rounded-2xl bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center shadow-xl shadow-purple-500/30 ring-1 ring-purple-400/20 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-purple-500/50 group-hover:scale-110 group-hover:rotate-3">
+              <span className="text-white font-bold text-xl tracking-tight select-none">R</span>
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-transparent to-white/20"></div>
             </div>
-            <span className="text-[17px] font-semibold tracking-tight text-gray-100 transition-colors group-hover:text-white">
+            <span className="text-lg font-bold tracking-tight text-white transition-all duration-300 group-hover:text-purple-300">
               Robin
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <Flex align="center" gap="2" className="hidden lg:flex">
+          <Flex align="center" gap="3" className="hidden lg:flex">
             <Link
               to="/posts"
-              className="no-underline px-3 py-1.5 rounded-lg text-[15px] font-medium text-gray-400 hover:text-gray-100 hover:bg-white/5 transition-all duration-200"
+              className="no-underline px-4 py-2 rounded-xl text-[15px] font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
               Explore
             </Link>
 
             {session?.user && (
               <>
-                <Link to="/admin/posts/new" className="no-underline ml-2">
-                  <Button
-                    variant="soft"
-                    size="2"
-                    className="font-medium text-[15px] px-4 h-9 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:border-purple-500/30 transition-all duration-200"
-                  >
-                    <PenLine size={16} strokeWidth={2} />
+                <Link to="/admin/posts/new" className="no-underline">
+                  <button className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-[15px] font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200 border border-purple-400/30">
+                    <PenLine size={17} strokeWidth={2.5} />
                     Write
-                  </Button>
+                  </button>
                 </Link>
 
                 <Link to="/dashboard" className="no-underline" search={{ verified: false }}>
-                  <Button
-                    variant="ghost"
-                    size="2"
-                    className="font-medium text-[15px] px-4 h-9 text-gray-300 hover:text-gray-100 hover:bg-white/5 transition-all duration-200"
-                  >
-                    <LayoutDashboard size={16} strokeWidth={2} />
+                  <button className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-[15px] font-semibold text-gray-200 hover:text-white hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-200">
+                    <LayoutDashboard size={17} strokeWidth={2.5} />
                     Dashboard
-                  </Button>
+                  </button>
                 </Link>
 
-                <div className="ml-1">
+                <div className="ml-2">
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger>
-                      <Button
-                        variant="soft"
-                        size="2"
-                        className="font-medium text-[15px] px-3 h-9 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-200"
-                        style={{ cursor: 'pointer' }}
-                      >
+                      <button className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-[15px] font-semibold bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-200 cursor-pointer text-gray-100">
                         <Avatar
                           size="1"
                           src={session.user.image || undefined}
-                          fallback={<User size={14} strokeWidth={2} />}
+                          fallback={<User size={16} strokeWidth={2.5} />}
                           radius="full"
                         />
-                        <span className="max-w-[120px] truncate">
+                        <span className="max-w-[100px] truncate">
                           {session.user.name || session.user.email?.split('@')[0]}
                         </span>
-                      </Button>
+                      </button>
                     </DropdownMenu.Trigger>
 
                     <DropdownMenu.Content align="end" className="min-w-[200px]">
@@ -135,14 +123,10 @@ export function AppBar() {
             )}
 
             {!session?.user && (
-              <Link to="/auth" className="no-underline ml-2">
-                <Button
-                  variant="soft"
-                  size="2"
-                  className="font-medium text-[15px] px-5 h-9 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:border-purple-500/30 transition-all duration-200"
-                >
+              <Link to="/auth" className="no-underline">
+                <button className="px-6 py-2 rounded-xl text-[15px] font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200 border border-purple-400/30">
                   Sign In
-                </Button>
+                </button>
               </Link>
             )}
           </Flex>
