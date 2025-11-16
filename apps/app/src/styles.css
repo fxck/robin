@@ -201,23 +201,17 @@
   }
 
   @keyframes shimmer {
-    0% {
-      background-position: -1000px 0;
+    0%, 100% {
+      opacity: 0.5;
     }
-    100% {
-      background-position: 1000px 0;
+    50% {
+      opacity: 0.8;
     }
   }
 
   .shimmer {
-    background: linear-gradient(
-      90deg,
-      var(--color-bg-elevated) 0%,
-      var(--color-bg-hover) 50%,
-      var(--color-bg-elevated) 100%
-    );
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
+    background: var(--color-bg-elevated);
+    animation: shimmer 2s ease-in-out infinite;
   }
 
   @keyframes slideUp {
@@ -737,4 +731,31 @@
 
 .prose td {
   color: var(--color-text-secondary);
+}
+
+/* Line-clamp utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Improved table hover */
+.rt-TableRow:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transition: background-color 150ms ease;
+}
+
+/* Better focus states for checkboxes */
+.rt-CheckboxButton:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
 }
