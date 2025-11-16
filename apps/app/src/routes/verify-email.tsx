@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { Container, Flex, Heading, Text, Spinner } from '@radix-ui/themes';
-import { authClient } from '../lib/auth';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/verify-email')({
@@ -29,7 +28,7 @@ function VerifyEmailPage() {
         // Call Better Auth verify endpoint via fetch
         // We use fetch directly because Better Auth client might not expose verifyEmail method
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/verify-email`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/verify-email`,
           {
             method: 'POST',
             headers: {
@@ -52,7 +51,7 @@ function VerifyEmailPage() {
 
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {
-          navigate({ to: '/dashboard', search: { verified: 'true' } });
+          navigate({ to: '/dashboard', search: { verified: true } });
         }, 2000);
       } catch (error) {
         setStatus('error');
@@ -113,10 +112,10 @@ function VerifyEmailPage() {
                   <Text size="2" color="gray" align="center" className="pt-4">
                     The verification link may have expired or is invalid.{' '}
                     <button
-                      onClick={() => navigate({ to: '/dashboard' })}
+                      onClick={() => navigate({ to: '/' })}
                       className="text-amber-400 hover:text-amber-300 underline"
                     >
-                      Go to dashboard
+                      Go to home
                     </button>
                   </Text>
                 </>
