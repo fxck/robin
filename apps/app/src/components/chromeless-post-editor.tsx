@@ -214,7 +214,6 @@ export function ChromelessPostEditor({
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [showCoverUpload, setShowCoverUpload] = useState(false);
-  const [initialContent] = useState<string | undefined>(content);
 
   // Auto-resize title textarea
   const adjustTitleHeight = useCallback(() => {
@@ -466,7 +465,6 @@ export function ChromelessPostEditor({
           <div className="mb-20 min-h-[60vh]">
             <EditorRoot>
               <EditorContent
-                initialContent={initialContent}
                 extensions={extensions}
                 editorProps={{
                   attributes: {
