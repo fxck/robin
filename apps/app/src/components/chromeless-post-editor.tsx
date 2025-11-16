@@ -302,7 +302,6 @@ export function ChromelessPostEditor({
         setIsUploadingCover(true);
         const url = await handleImageUpload(file);
         onCoverImageChange(url);
-        setShowCoverUpload(false);
         toast.success('Cover image uploaded!');
       } catch (error) {
         // Error already handled
