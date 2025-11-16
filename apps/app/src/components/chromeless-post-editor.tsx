@@ -471,6 +471,7 @@ export function ChromelessPostEditor({
                     class: cn(
                       'prose prose-lg prose-invert max-w-none min-h-[60vh]',
                       'focus:outline-none',
+                      'py-2 px-3',
                       'prose-headings:font-bold prose-headings:text-white',
                       'prose-h1:text-4xl prose-h1:mt-8 prose-h1:mb-4',
                       'prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4',

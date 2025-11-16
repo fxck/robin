@@ -23,7 +23,7 @@ export const Route = createFileRoute('/posts/$id')({
     const post = await api.get<PostResponse>(`/posts/${params.id}`);
     return post;
   },
-  errorComponent: ({ error }) => {
+  errorComponent: () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Container size="narrow">
@@ -197,22 +197,22 @@ function PostPage() {
         )}
 
         {/* Hero Content */}
-        <Container size="reading" className="relative z-10">
-          <div className="space-y-6">
+        <Container size="reading" className="relative z-10 w-full">
+          <div className="space-y-6 max-w-full">
             <Heading
               level={1}
               variant="display"
-              className="text-shadow-lg"
+              className="text-shadow-lg text-left"
               style={{ textShadow: '0 2px 20px rgba(0, 0, 0, 0.8)' }}
             >
               {post.title}
             </Heading>
 
             {/* Author Meta */}
-            <Flex align="center" gap="4">
+            <Flex align="center" gap="4" className="justify-start">
               <RadixAvatar
                 size="3"
-                src={post.author?.image}
+                src={post.author?.image || undefined}
                 fallback={post.author?.name?.[0] || 'A'}
                 radius="full"
               />

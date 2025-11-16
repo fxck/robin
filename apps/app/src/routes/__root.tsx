@@ -59,7 +59,7 @@ function RootComponent() {
             <AppBar />
             <Outlet />
           </Box>
-          <Toaster position="top-right" richColors />
+          <Toaster position="bottom-left" richColors closeButton />
           {import.meta.env.DEV && (
             <>
               <TanStackRouterDevtools position="bottom-right" />

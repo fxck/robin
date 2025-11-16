@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, type CSSProperties } from 'react';
 import { cn } from '../../lib/utils';
 
 interface HeadingProps {
@@ -7,6 +7,7 @@ interface HeadingProps {
   variant?: 'display' | 'default';
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
 export function Heading({
@@ -14,7 +15,8 @@ export function Heading({
   as,
   variant = 'default',
   children,
-  className
+  className,
+  style
 }: HeadingProps) {
   const Component = as || (`h${level}` as const);
 
@@ -31,6 +33,7 @@ export function Heading({
         variant === 'display' && 'text-display leading-display tracking-display',
         className
       )}
+      style={style}
     >
       {children}
     </Component>
