@@ -1,12 +1,11 @@
 import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Container, Heading, Flex, Button, Card, TextField, Box, Select, Text } from '@radix-ui/themes';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Box, Container, Flex, Card, Text } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
-import { AdvancedEditor, FileUpload } from '../components';
+import { ChromelessPostEditor } from '../components/chromeless-post-editor';
 import type { UpdatePostInput, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/$id/edit')({
@@ -39,6 +38,7 @@ function EditPostPage() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasUnsavedChanges = useRef(false);
 
   // Set form values when data loads (only once)
   useEffect(() => {
@@ -57,6 +57,7 @@ function EditPostPage() {
       return api.patch<PostResponse>(`/api/posts/${id}`, updateData);
     },
     onSuccess: () => {
+      hasUnsavedChanges.current = false;
       toast.success('Post updated successfully!');
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -76,6 +77,7 @@ function EditPostPage() {
     onSuccess: () => {
       setLastSaved(new Date());
       setIsSaving(false);
+      hasUnsavedChanges.current = false;
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['post', id] });
@@ -92,6 +94,8 @@ function EditPostPage() {
       clearTimeout(autoSaveTimerRef.current);
     }
 
+    hasUnsavedChanges.current = true;
+
     autoSaveTimerRef.current = setTimeout(() => {
       if (title.trim() && content.trim() && initialized) {
         setIsSaving(true);
@@ -103,8 +107,8 @@ function EditPostPage() {
           version,
         });
       }
-    }, 2000); // Auto-save after 2 seconds of inactivity
-  }, [title, content, coverImage, status, version, initialized]);
+    }, 3000); // Auto-save after 3 seconds of inactivity
+  }, [title, content, coverImage, status, version, initialized, autoSaveMutation]);
 
   // Trigger auto-save when content changes
   useEffect(() => {
@@ -119,9 +123,19 @@ function EditPostPage() {
     };
   }, [title, content, coverImage, status, scheduleAutoSave, initialized]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges.current) {
+        e.preventDefault();
+      }
+    };
 
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  const handlePublish = useCallback(() => {
     if (!title.trim()) {
       toast.error('Title is required');
       return;
@@ -132,16 +146,51 @@ function EditPostPage() {
       return;
     }
 
+    // Cancel auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
     updatePostMutation.mutate({
       title,
       content,
       coverImage: coverImage || undefined,
-      status,
+      status: 'published',
       version,
     });
-  };
+  }, [title, content, coverImage, version, updatePostMutation]);
 
-  if (isLoading) {
+  const handleSaveDraft = useCallback(() => {
+    if (!title.trim() && !content.trim()) {
+      toast.error('Post is empty');
+      return;
+    }
+
+    // Cancel auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    updatePostMutation.mutate({
+      title: title.trim() || 'Untitled',
+      content,
+      coverImage: coverImage || undefined,
+      status: 'draft',
+      version,
+    });
+  }, [title, content, coverImage, version, updatePostMutation]);
+
+  const handleExit = useCallback(() => {
+    if (hasUnsavedChanges.current) {
+      if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+        navigate({ to: '/admin/posts' });
+      }
+    } else {
+      navigate({ to: '/admin/posts' });
+    }
+  }, [navigate]);
+
+  if (isLoading || !initialized) {
     return (
       <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
         <Container size="3" py="6">
@@ -162,25 +211,6 @@ function EditPostPage() {
           <Card>
             <Flex direction="column" align="center" gap="4" py="9">
               <Text size="5">Post not found</Text>
-              <Button onClick={() => navigate({ to: '/admin/posts' })}>
-                <ArrowLeft size={16} />
-                Back to Posts
-              </Button>
-            </Flex>
-          </Card>
-        </Container>
-      </Box>
-    );
-  }
-
-  // Wait for initialization to complete before rendering form
-  if (!initialized) {
-    return (
-      <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
-        <Container size="3" py="6">
-          <Card>
-            <Flex align="center" justify="center" py="9">
-              <Text>Loading...</Text>
             </Flex>
           </Card>
         </Container>
@@ -189,78 +219,22 @@ function EditPostPage() {
   }
 
   return (
-    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
-      <Container size="4" py="6">
-        <form onSubmit={handleSubmit}>
-          <Flex direction="column" gap="6">
-            {/* Header */}
-            <Flex justify="between" align="center">
-              <Heading size="8">Edit Post</Heading>
-              <Flex gap="2">
-                <Button type="button" variant="soft" onClick={() => navigate({ to: '/admin/posts' })}>
-                  <ArrowLeft size={16} />
-                  Back
-                </Button>
-                <Button type="submit" disabled={updatePostMutation.isPending}>
-                  <Save size={16} />
-                  {updatePostMutation.isPending ? 'Publishing...' : 'Publish'}
-                </Button>
-              </Flex>
-            </Flex>
-
-            {/* Metadata Card */}
-            <Card>
-              <Flex direction="column" gap="4" p="4">
-                <Flex gap="4" wrap="wrap">
-                  {/* Cover Image */}
-                  <Box style={{ flex: '1', minWidth: '200px' }}>
-                    <Text size="2" weight="bold" mb="2" as="label">
-                      Cover Image
-                    </Text>
-                    <FileUpload value={coverImage} onChange={setCoverImage} />
-                  </Box>
-
-                  {/* Status */}
-                  <Box style={{ minWidth: '150px' }}>
-                    <Text size="2" weight="bold" mb="2" as="label">
-                      Status
-                    </Text>
-                    <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
-                      <Select.Trigger />
-                      <Select.Content>
-                        <Select.Item value="draft">Draft</Select.Item>
-                        <Select.Item value="published">Published</Select.Item>
-                      </Select.Content>
-                    </Select.Root>
-                  </Box>
-                </Flex>
-
-                {/* Title */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Title
-                  </Text>
-                  <TextField.Root
-                    size="3"
-                    placeholder="Enter post title..."
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    style={{ fontSize: '1.5rem', fontWeight: '600' }}
-                  />
-                </Box>
-              </Flex>
-            </Card>
-
-            {/* Editor */}
-            <AdvancedEditor
-              value={content}
-              onChange={setContent}
-              placeholder="Write your post content here... Press '/' for commands"
-            />
-          </Flex>
-        </form>
-      </Container>
-    </Box>
+    <ChromelessPostEditor
+      title={title}
+      content={content}
+      coverImage={coverImage}
+      status={status}
+      onTitleChange={setTitle}
+      onContentChange={setContent}
+      onCoverImageChange={setCoverImage}
+      onStatusChange={setStatus}
+      onPublish={handlePublish}
+      onSaveDraft={handleSaveDraft}
+      onExit={handleExit}
+      isPublishing={updatePostMutation.isPending}
+      isSaving={isSaving}
+      lastSaved={lastSaved}
+      isNewPost={false}
+    />
   );
 }

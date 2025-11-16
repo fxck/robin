@@ -20,31 +20,8 @@ import { cn } from '../../lib/utils';
 export const Route = createFileRoute('/posts/$id')({
   component: PostPage,
   loader: async ({ params }) => {
-    console.log('[Loader] Loading post:', params.id);
-    try {
-      const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
-      console.log('[Loader] Post loaded successfully:', post);
-      return post;
-    } catch (error) {
-      console.error('[Loader] Failed to load post:', error);
-      throw error;
-    }
-  },
-  pendingComponent: () => {
-    console.log('[Route] Showing pending component');
-    return (
-      <div className="min-h-screen">
-        <div className="h-[60vh] bg-bg-elevated animate-shimmer" />
-        <Container size="reading" className="py-12">
-          <div className="space-y-8">
-            <div className="h-12 bg-bg-elevated rounded animate-shimmer" />
-            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-3/4" />
-            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-5/6" />
-            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-2/3" />
-          </div>
-        </Container>
-      </div>
-    );
+    const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
+    return post;
   },
   errorComponent: ({ error }) => {
     return (
@@ -145,8 +122,6 @@ function PostPage() {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const data = Route.useLoaderData();
-
-  console.log('[PostPage] Rendering with data:', data);
 
   const likeMutation = useMutation({
     mutationFn: () => api.post(`/api/posts/${id}/like`, {}),

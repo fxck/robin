@@ -1,12 +1,10 @@
 import { createFileRoute, useNavigate, redirect } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Container, Heading, Flex, Button, Card, TextField, Box, Select, Text } from '@radix-ui/themes';
-import { Save, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
-import { AdvancedEditor, FileUpload } from '../components';
+import { ChromelessPostEditor } from '../components/chromeless-post-editor';
 import type { CreatePostInput, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/new')({
@@ -27,12 +25,17 @@ function NewPostPage() {
   const [content, setContent] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasUnsavedChanges = useRef(false);
 
   const createPostMutation = useMutation({
     mutationFn: async (data: CreatePostInput) => {
       return api.post<PostResponse>('/api/posts', data);
     },
     onSuccess: (data) => {
+      hasUnsavedChanges.current = false;
       toast.success('Post created successfully!');
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -43,10 +46,70 @@ function NewPostPage() {
     },
   });
 
+  // Auto-save mutation (silent)
+  const autoSaveMutation = useMutation({
+    mutationFn: async (data: CreatePostInput) => {
+      return api.post<PostResponse>('/api/posts', data);
+    },
+    onSuccess: () => {
+      setLastSaved(new Date());
+      setIsSaving(false);
+      hasUnsavedChanges.current = false;
+      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+    onError: (error: Error) => {
+      setIsSaving(false);
+      console.error('Auto-save failed:', error);
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Auto-save debounced function
+  const scheduleAutoSave = useCallback(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
 
+    hasUnsavedChanges.current = true;
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      if (title.trim() || content.trim()) {
+        setIsSaving(true);
+        autoSaveMutation.mutate({
+          title: title.trim() || 'Untitled',
+          content,
+          coverImage: coverImage || undefined,
+          status: 'draft', // Always save as draft for auto-save
+        });
+      }
+    }, 3000); // Auto-save after 3 seconds of inactivity
+  }, [title, content, coverImage]);
+
+  // Trigger auto-save when content changes
+  useEffect(() => {
+    scheduleAutoSave();
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [title, content, coverImage, scheduleAutoSave]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges.current) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  const handlePublish = useCallback(() => {
     if (!title.trim()) {
       toast.error('Title is required');
       return;
@@ -57,87 +120,65 @@ function NewPostPage() {
       return;
     }
 
+    // Cancel auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
     createPostMutation.mutate({
       title,
       content,
       coverImage: coverImage || undefined,
-      status,
+      status: 'published',
     });
-  };
+  }, [title, content, coverImage, createPostMutation]);
+
+  const handleSaveDraft = useCallback(() => {
+    if (!title.trim() && !content.trim()) {
+      toast.error('Post is empty');
+      return;
+    }
+
+    // Cancel auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    createPostMutation.mutate({
+      title: title.trim() || 'Untitled',
+      content,
+      coverImage: coverImage || undefined,
+      status: 'draft',
+    });
+  }, [title, content, coverImage, createPostMutation]);
+
+  const handleExit = useCallback(() => {
+    if (hasUnsavedChanges.current) {
+      if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+        navigate({ to: '/admin/posts' });
+      }
+    } else {
+      navigate({ to: '/admin/posts' });
+    }
+  }, [navigate]);
 
   return (
-    <Box style={{ minHeight: '100vh', background: 'var(--gray-2)', paddingTop: '100px' }}>
-      <Container size="4" py="6">
-        <form onSubmit={handleSubmit}>
-          <Flex direction="column" gap="6">
-            {/* Header */}
-            <Flex justify="between" align="center">
-              <Heading size="8">Create Post</Heading>
-              <Flex gap="2">
-                <Button type="button" variant="soft" onClick={() => navigate({ to: '/admin/posts' })}>
-                  <ArrowLeft size={16} />
-                  Back
-                </Button>
-                <Button type="submit" disabled={createPostMutation.isPending}>
-                  <Save size={16} />
-                  {createPostMutation.isPending ? 'Creating...' : 'Create'}
-                </Button>
-              </Flex>
-            </Flex>
-
-            {/* Metadata Card */}
-            <Card>
-              <Flex direction="column" gap="4" p="4">
-                <Flex gap="4" wrap="wrap">
-                  {/* Cover Image */}
-                  <Box style={{ flex: '1', minWidth: '200px' }}>
-                    <Text size="2" weight="bold" mb="2" as="label">
-                      Cover Image
-                    </Text>
-                    <FileUpload value={coverImage} onChange={setCoverImage} />
-                  </Box>
-
-                  {/* Status */}
-                  <Box style={{ minWidth: '150px' }}>
-                    <Text size="2" weight="bold" mb="2" as="label">
-                      Status
-                    </Text>
-                    <Select.Root value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
-                      <Select.Trigger />
-                      <Select.Content>
-                        <Select.Item value="draft">Draft</Select.Item>
-                        <Select.Item value="published">Published</Select.Item>
-                      </Select.Content>
-                    </Select.Root>
-                  </Box>
-                </Flex>
-
-                {/* Title */}
-                <Box>
-                  <Text size="2" weight="bold" mb="2" as="label">
-                    Title
-                  </Text>
-                  <TextField.Root
-                    size="3"
-                    placeholder="Enter post title..."
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    style={{ fontSize: '1.5rem', fontWeight: '600' }}
-                  />
-                </Box>
-              </Flex>
-            </Card>
-
-            {/* Editor */}
-            <AdvancedEditor
-              value={content}
-              onChange={setContent}
-              placeholder="Write your post content here... Press '/' for commands"
-            />
-          </Flex>
-        </form>
-      </Container>
-    </Box>
+    <ChromelessPostEditor
+      title={title}
+      content={content}
+      coverImage={coverImage}
+      status={status}
+      onTitleChange={setTitle}
+      onContentChange={setContent}
+      onCoverImageChange={setCoverImage}
+      onStatusChange={setStatus}
+      onPublish={handlePublish}
+      onSaveDraft={handleSaveDraft}
+      onExit={handleExit}
+      isPublishing={createPostMutation.isPending}
+      isSaving={isSaving}
+      lastSaved={lastSaved}
+      isNewPost={true}
+    />
   );
 }
