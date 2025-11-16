@@ -530,41 +530,53 @@ export function ChromelessPostEditor({
               />
             </div>
           ) : (
-            // No cover - show upload area with same positioning
-            <div className="absolute inset-0 z-0 flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
-              <div
-                {...getCoverRootProps()}
-                className={cn(
-                  'relative p-16 rounded-3xl border-2 border-dashed transition-all duration-300 cursor-pointer max-w-2xl',
-                  isDragActive
-                    ? 'border-amber-500 bg-amber-500/10'
-                    : 'border-white/20 bg-white/5 hover:border-amber-500/50 hover:bg-amber-500/5'
+            // No cover - fullscreen upload area
+            <div
+              {...getCoverRootProps()}
+              className={cn(
+                'absolute inset-0 z-0 flex items-center justify-center cursor-pointer transition-all duration-300',
+                'bg-gradient-to-b from-gray-900 to-black',
+                isDragActive
+                  ? 'bg-amber-500/5'
+                  : 'hover:bg-white/[0.02]'
+              )}
+            >
+              <input {...getCoverInputProps()} />
+
+              {/* Subtle border indication when dragging */}
+              {isDragActive && (
+                <div className="absolute inset-4 border-2 border-dashed border-amber-500 rounded-2xl pointer-events-none" />
+              )}
+
+              {/* Centered upload prompt */}
+              <div className="flex flex-col items-center gap-6 px-8">
+                {isUploadingCover ? (
+                  <>
+                    <Loader2 size={64} className="text-amber-400 animate-spin" />
+                    <p className="text-base text-gray-400">Uploading cover image...</p>
+                  </>
+                ) : (
+                  <>
+                    <ImagePlus
+                      size={72}
+                      className={cn(
+                        'transition-all duration-300',
+                        isDragActive ? 'text-amber-400 scale-110' : 'text-gray-600 group-hover:text-gray-500'
+                      )}
+                    />
+                    <div className="text-center">
+                      <p className={cn(
+                        'text-lg font-medium mb-2 transition-colors duration-300',
+                        isDragActive ? 'text-amber-400' : 'text-gray-400'
+                      )}>
+                        {isDragActive ? 'Drop your image here' : 'Drag & drop your cover image'}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        or click to browse • Max 10MB • PNG, JPG, GIF, WebP
+                      </p>
+                    </div>
+                  </>
                 )}
-              >
-                <input {...getCoverInputProps()} />
-                <div className="flex flex-col items-center gap-6">
-                  {isUploadingCover ? (
-                    <>
-                      <Loader2 size={64} className="text-amber-400 animate-spin" />
-                      <p className="text-base text-gray-400">Uploading cover image...</p>
-                    </>
-                  ) : (
-                    <>
-                      <ImagePlus size={64} className={isDragActive ? 'text-amber-400' : 'text-gray-500'} />
-                      <div className="text-center">
-                        <p className={cn(
-                          'text-base font-medium mb-2',
-                          isDragActive ? 'text-amber-400' : 'text-gray-300'
-                        )}>
-                          {isDragActive ? 'Drop your image here' : 'Drag & drop your cover image'}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          or click to browse • Max 10MB • PNG, JPG, GIF, WebP
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
               </div>
             </div>
           )}
