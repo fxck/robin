@@ -5,7 +5,9 @@ import { toast } from 'sonner';
 import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
 import { ChromelessPostEditor } from '../components/chromeless-post-editor';
-import type { CreatePostInput, PostResponse } from '@robin/types';
+import { useAutosave } from '../hooks/use-autosave';
+import { DraftManager } from '../lib/draft-manager';
+import type { CreatePostInput, UpdatePostInput, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/new')({
   component: NewPostPage,
@@ -21,93 +23,164 @@ function NewPostPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // State
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const hasUnsavedChanges = useRef(false);
 
-  const createPostMutation = useMutation({
-    mutationFn: async (data: CreatePostInput) => {
-      return api.post('/posts', data);
-    },
-    onSuccess: (data) => {
-      hasUnsavedChanges.current = false;
-      toast.success('Post created successfully!');
-      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      navigate({ to: `/admin/posts` });
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create post');
-    },
-  });
+  // Track created post ID - this is the key to preventing duplicates!
+  const [createdPostId, setCreatedPostId] = useState<string | null>(null);
+  const [version, setVersion] = useState(1);
 
-  // Auto-save mutation (silent)
-  const autoSaveMutation = useMutation({
-    mutationFn: async (data: CreatePostInput) => {
-      return api.post('/posts', data);
-    },
-    onSuccess: () => {
-      setLastSaved(new Date());
-      setIsSaving(false);
-      hasUnsavedChanges.current = false;
-      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-    },
-    onError: (error: Error) => {
-      setIsSaving(false);
-      console.error('Auto-save failed:', error);
-    },
-  });
+  // Generate stable storage key for this editing session
+  const storageKeyRef = useRef(DraftManager.generateTempKey());
+  const hasLoadedDraftRef = useRef(false);
 
-  // Auto-save debounced function
-  const scheduleAutoSave = useCallback(() => {
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    if (hasLoadedDraftRef.current) return;
+    hasLoadedDraftRef.current = true;
+
+    const draft = DraftManager.load(storageKeyRef.current);
+    if (draft) {
+      const shouldRestore = window.confirm(
+        'Found unsaved changes from a previous session. Do you want to restore them?'
+      );
+
+      if (shouldRestore) {
+        setTitle(draft.title);
+        setContent(draft.content);
+        setCoverImage(draft.coverImage || '');
+        setStatus(draft.status);
+        if (draft.postId) {
+          setCreatedPostId(draft.postId);
+          setVersion(draft.version);
+        }
+        toast.success('Draft restored from local storage');
+      } else {
+        DraftManager.remove(storageKeyRef.current);
+      }
+    }
+  }, []);
+
+  // Autosave logic with proper create/update flow
+  const autosave = useAutosave<CreatePostInput | UpdatePostInput, PostResponse>(
+    async (data) => {
+      // If we already created a post, UPDATE it (PATCH)
+      if (createdPostId) {
+        return api.patch<PostResponse>(`/posts/${createdPostId}`, {
+          ...data,
+          version, // Include version for optimistic locking
+        } as UpdatePostInput);
+      }
+
+      // Otherwise, CREATE new post (POST) - only happens ONCE
+      return api.post<PostResponse>('/posts', data as CreatePostInput);
+    },
+    {
+      storageKey: storageKeyRef.current,
+      debounceMs: 3000,
+      maxRetries: 3,
+      onSaveSuccess: (response) => {
+        const post = response.post;
+
+        // First time creating? Store the ID and navigate to edit page
+        if (!createdPostId && post.id) {
+          setCreatedPostId(post.id);
+          setVersion(post.version);
+
+          // Navigate to edit page with the new post ID
+          // Use replace to avoid back button issues
+          navigate({
+            to: `/admin/posts/${post.id}/edit`,
+            replace: true,
+          });
+
+          // Update storage key to use real post ID
+          const newKey = `post_${post.id}`;
+          DraftManager.remove(storageKeyRef.current);
+          storageKeyRef.current = newKey;
+
+          toast.success('Draft created! Now editing...');
+        } else {
+          // Subsequent saves - update version from server
+          setVersion(post.version);
+        }
+
+        // Invalidate queries
+        queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
+      },
+      onSaveError: (error) => {
+        console.error('Autosave failed:', error);
+        // Error handling is in the hook (retries, toasts, etc.)
+      },
+    }
+  );
+
+  // Trigger autosave when content changes
+  useEffect(() => {
+    // Don't autosave if both title and content are empty
+    if (!title.trim() && !content.trim()) {
+      return;
     }
 
-    hasUnsavedChanges.current = true;
+    const draftData = {
+      title,
+      content,
+      coverImage: coverImage || undefined,
+      status: 'draft', // Always draft for autosave
+      version,
+      postId: createdPostId || undefined,
+      lastModified: Date.now(),
+    };
 
-    autoSaveTimerRef.current = setTimeout(() => {
-      if (title.trim() || content.trim()) {
-        setIsSaving(true);
-        autoSaveMutation.mutate({
-          title: title.trim() || 'Untitled',
-          content,
-          coverImage: coverImage || undefined,
-          status: 'draft', // Always save as draft for auto-save
-        });
-      }
-    }, 3000); // Auto-save after 3 seconds of inactivity
+    autosave.scheduleAutosave(
+      {
+        title: title.trim() || 'Untitled',
+        content,
+        coverImage: coverImage || undefined,
+        status: 'draft',
+      },
+      draftData
+    );
   }, [title, content, coverImage]);
 
-  // Trigger auto-save when content changes
-  useEffect(() => {
-    scheduleAutoSave();
+  // Create/Update mutation for manual saves (Publish / Save Draft)
+  const saveMutation = useMutation({
+    mutationFn: async (data: CreatePostInput | UpdatePostInput & { publish?: boolean }) => {
+      const saveData = {
+        title: data.title,
+        content: data.content,
+        coverImage: data.coverImage,
+        status: data.publish ? 'published' : 'draft',
+      } as CreatePostInput;
 
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
+      if (createdPostId) {
+        return api.patch<PostResponse>(`/posts/${createdPostId}`, {
+          ...saveData,
+          version,
+        } as UpdatePostInput);
       }
-    };
-  }, [title, content, coverImage, scheduleAutoSave]);
 
-  // Warn before leaving with unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges.current) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
+      return api.post<PostResponse>('/posts', saveData);
+    },
+    onSuccess: (response, variables) => {
+      autosave.removeDraft(); // Clear localStorage
+      autosave.cancelSave(); // Cancel pending autosave
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, []);
+      const isPublish = 'publish' in variables && variables.publish;
+      toast.success(isPublish ? 'Post published successfully!' : 'Draft saved!');
+
+      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      navigate({ to: '/admin/posts' });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to save post');
+    },
+  });
 
   const handlePublish = useCallback(() => {
     if (!title.trim()) {
@@ -120,18 +193,13 @@ function NewPostPage() {
       return;
     }
 
-    // Cancel auto-save
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-
-    createPostMutation.mutate({
+    saveMutation.mutate({
       title,
       content,
       coverImage: coverImage || undefined,
-      status: 'published',
+      publish: true,
     });
-  }, [title, content, coverImage, createPostMutation]);
+  }, [title, content, coverImage, saveMutation]);
 
   const handleSaveDraft = useCallback(() => {
     if (!title.trim() && !content.trim()) {
@@ -139,28 +207,38 @@ function NewPostPage() {
       return;
     }
 
-    // Cancel auto-save
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-
-    createPostMutation.mutate({
+    saveMutation.mutate({
       title: title.trim() || 'Untitled',
       content,
       coverImage: coverImage || undefined,
-      status: 'draft',
+      publish: false,
     });
-  }, [title, content, coverImage, createPostMutation]);
+  }, [title, content, coverImage, saveMutation]);
 
   const handleExit = useCallback(() => {
-    if (hasUnsavedChanges.current) {
+    if (autosave.hasUnsavedChanges) {
       if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+        autosave.removeDraft();
         navigate({ to: '/admin/posts' });
       }
     } else {
+      autosave.removeDraft();
       navigate({ to: '/admin/posts' });
     }
-  }, [navigate]);
+  }, [autosave.hasUnsavedChanges, navigate]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (autosave.hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [autosave.hasUnsavedChanges]);
 
   return (
     <ChromelessPostEditor
@@ -175,9 +253,9 @@ function NewPostPage() {
       onPublish={handlePublish}
       onSaveDraft={handleSaveDraft}
       onExit={handleExit}
-      isPublishing={createPostMutation.isPending}
-      isSaving={isSaving}
-      lastSaved={lastSaved}
+      isPublishing={saveMutation.isPending}
+      isSaving={autosave.isSaving}
+      lastSaved={autosave.lastSaved}
       isNewPost={true}
     />
   );

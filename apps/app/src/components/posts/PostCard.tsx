@@ -90,13 +90,13 @@ export function PostCard({ post }: PostCardProps) {
 
               {/* Stats */}
               <Flex align="center" gap="3">
-                <Flex align="center" gap="1">
+                <Flex align="center" gap="2">
                   <Heart size={14} className="text-text-tertiary" />
                   <Text size="xs" color="tertiary">
                     {post.likesCount || 0}
                   </Text>
                 </Flex>
-                <Flex align="center" gap="1">
+                <Flex align="center" gap="2">
                   <Eye size={14} className="text-text-tertiary" />
                   <Text size="xs" color="tertiary">
                     {post.views || 0}
