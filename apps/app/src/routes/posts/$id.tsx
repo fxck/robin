@@ -4,6 +4,9 @@ import { Button, Avatar as RadixAvatar } from '@radix-ui/themes';
 import { Heart, Eye, ArrowLeft, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 import { api } from '../../lib/api-client';
 import { useSession } from '../../lib/auth';
 import { Image, TableOfContents, RelatedPosts } from '../../components';
@@ -267,9 +270,14 @@ function PostPage() {
       </section>
 
       {/* Article Content */}
-      <Container size="reading" className="py-8">
-        <article className="prose prose-lg dark:prose-invert max-w-full">
-          <ReactMarkdown>{post.content}</ReactMarkdown>
+      <Container size="reading" className="py-12">
+        <article className="prose prose-lg dark:prose-invert max-w-full prose-headings:font-serif prose-headings:font-bold prose-p:text-text-primary prose-p:leading-relaxed prose-a:text-purple-400 prose-a:no-underline hover:prose-a:underline prose-code:text-purple-300 prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, rehypeSanitize]}
+          >
+            {post.content}
+          </ReactMarkdown>
         </article>
 
         {/* Engagement Actions */}

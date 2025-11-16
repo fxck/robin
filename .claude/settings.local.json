@@ -6,7 +6,8 @@
       "Bash(cat:*)",
       "Bash(tree:*)",
       "Bash(nx run:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(pnpm add:*)"
     ],
     "deny": [],
     "ask": []

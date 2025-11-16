@@ -9,7 +9,6 @@ import {
   Table,
   Badge,
   AlertDialog,
-  Callout,
 } from '@radix-ui/themes';
 import { PlusCircle, Edit, Trash2, Eye, FileText, Clock, Heart, Mail, CheckCircle, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -62,6 +61,13 @@ function StatCard({ title, value, icon, gradient }: StatCardProps) {
   );
 }
 
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return 'N/A';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return 'Invalid Date';
+  return d.toLocaleDateString();
+}
+
 function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -77,7 +83,7 @@ function DashboardPage() {
       setShowSuccessBanner(true);
       toast.success('Email verified successfully!');
       // Remove the query param from URL
-      navigate({ to: '/dashboard', replace: true });
+      navigate({ to: '/dashboard', search: { verified: false }, replace: true });
     }
   }, [search.verified, navigate]);
 
@@ -91,8 +97,14 @@ function DashboardPage() {
   }, [session]);
 
   const { data: postsData, isLoading: postsLoading } = useQuery({
-    queryKey: ['admin-posts'],
-    queryFn: () => api.get<PostsListResponse>('/api/posts?status=all&limit=100'),
+    queryKey: ['admin-posts', session?.user?.id],
+    queryFn: () => {
+      if (!session?.user?.id) {
+        throw new Error('User not authenticated');
+      }
+      return api.get<PostsListResponse>(`/api/posts?status=all&limit=100&userId=${session.user.id}`);
+    },
+    enabled: !!session?.user?.id,
   });
 
   const deleteMutation = useMutation({
@@ -149,7 +161,7 @@ function DashboardPage() {
   const totalLikes = posts.reduce((acc, p) => acc + p.likesCount, 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 pt-20 md:pt-24">
+    <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 pt-28 md:pt-32">
       <Flex direction="column" gap="8">
         {/* Header */}
         <Flex justify="between" align="start" className="flex-col md:flex-row gap-4">
@@ -261,7 +273,7 @@ function DashboardPage() {
                         <Text size="2" weight="bold" className="block mb-1">{post.title}</Text>
                         <Flex gap="3" align="center">
                           <Text size="1" className="text-gray-500">
-                            {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                            {formatDate(post.publishedAt || post.createdAt)}
                           </Text>
                           <Badge color={post.status === 'published' ? 'green' : 'gray'} size="1">
                             {post.status}
@@ -369,7 +381,7 @@ function DashboardPage() {
                         </Table.Cell>
                         <Table.Cell>
                           <Text size="2" color="gray">
-                            {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                            {formatDate(post.publishedAt || post.createdAt)}
                           </Text>
                         </Table.Cell>
                         <Table.Cell>
