@@ -276,7 +276,7 @@ function PostPage() {
                     {readTime} min read
                   </Text>
                   <Text size="sm" color="tertiary">·</Text>
-                  <Flex align="center" gap="1">
+                  <Flex align="center" gap="2">
                     <Eye size={14} />
                     <Text size="sm" color="tertiary">
                       {post.views}
