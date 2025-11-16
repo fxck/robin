@@ -12,7 +12,8 @@ function AuthPage() {
   const matches = useMatches();
 
   // If there's a child route (like /auth/callback/google), render only the Outlet
-  const hasChildRoute = matches.length > 1 && matches[matches.length - 1].id !== '/auth';
+  // Check if the last match is a child of /auth by looking for /callback/google in the id
+  const hasChildRoute = matches.some(match => match.id === '/auth/callback/google');
 
   if (hasChildRoute) {
     return <Outlet />;
