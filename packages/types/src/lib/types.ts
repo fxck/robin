@@ -11,6 +11,7 @@ export interface Post {
   status: 'draft' | 'published';
   views: number;
   likesCount: number;
+  isLiked?: boolean; // Whether the current user has liked this post
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -33,6 +34,7 @@ export interface PostListItem {
   status: 'draft' | 'published';
   views: number;
   likesCount: number;
+  isLiked?: boolean; // Whether the current user has liked this post
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;

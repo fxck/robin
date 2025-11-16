@@ -37,30 +37,45 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   }, [content]);
 
   useEffect(() => {
-    // Intersection Observer for active heading
+    // Intersection Observer for active heading with improved settings
     const observer = new IntersectionObserver(
       (entries) => {
+        // Find the entry that's most visible
+        let mostVisibleEntry = entries[0];
+        let maxRatio = 0;
+
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            mostVisibleEntry = entry;
           }
         });
+
+        if (mostVisibleEntry && mostVisibleEntry.isIntersecting) {
+          setActiveId(mostVisibleEntry.target.id);
+        }
       },
       {
-        rootMargin: '-80px 0px -80% 0px',
-        threshold: 1.0,
+        // Track headings in the top 30% of viewport
+        rootMargin: '-10% 0px -70% 0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1.0],
       }
     );
 
-    // Observe all headings
-    headings.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      headings.forEach(({ id }) => {
+        const element = document.getElementById(id);
+        if (element) {
+          observer.observe(element);
+        }
+      });
+    }, 100);
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
   }, [headings]);
 
   useEffect(() => {
@@ -91,8 +106,17 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: 'smooth' });
+      // Set active immediately for instant feedback
+      setActiveId(id);
+
+      // Calculate position with offset for header/padding
+      const top = element.getBoundingClientRect().top + window.scrollY - 120;
+
+      // Smooth scroll to element
+      window.scrollTo({
+        top,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -103,20 +127,21 @@ export function TableOfContents({ content }: TableOfContentsProps) {
           On This Page
         </Text>
 
-        <nav className="space-y-2">
+        <nav className="space-y-1">
           {headings.map((heading) => (
             <button
               key={heading.id}
               onClick={() => handleClick(heading.id)}
               className={`
-                block w-full text-left py-1.5 px-3 rounded-lg transition-all text-sm
+                block w-full text-left py-2 px-3 rounded-lg transition-all duration-200 text-sm
                 ${heading.level === 2 ? 'pl-3' : ''}
                 ${heading.level === 3 ? 'pl-6' : ''}
                 ${
                   activeId === heading.id
-                    ? 'bg-amber-500/15 text-amber-400 border-l-2 border-amber-500'
-                    : 'text-gray-400 hover:text-gray-300 hover:bg-white/5 border-l-2 border-transparent'
+                    ? 'bg-amber-500/20 text-amber-400 font-medium border-l-2 border-amber-500 shadow-sm'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-white/10 border-l-2 border-transparent hover:border-gray-600'
                 }
+                cursor-pointer
               `}
             >
               {heading.text}

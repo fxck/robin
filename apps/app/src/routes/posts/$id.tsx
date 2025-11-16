@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
+import rehypeSlug from 'rehype-slug';
 import { api } from '../../lib/api-client';
 import { useSession } from '../../lib/auth';
 import { Image, TableOfContents, RelatedPosts } from '../../components';
@@ -119,7 +120,7 @@ function PostPage() {
   const data = Route.useLoaderData();
 
   const likeMutation = useMutation({
-    mutationFn: () => api.post<{ liked: boolean; message: string }>(`/posts/${id}/like`, {}),
+    mutationFn: () => api.post<{ liked: boolean; likesCount: number; message: string }>(`/posts/${id}/like`, {}),
     onMutate: async () => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['post', id] });
@@ -127,35 +128,39 @@ function PostPage() {
       // Snapshot the previous value
       const previousData = queryClient.getQueryData<PostResponse>(['post', id]);
 
-      // Optimistically toggle the like count
+      // Optimistically toggle the like state and count
       if (previousData) {
+        const currentlyLiked = previousData.post.isLiked || false;
         queryClient.setQueryData<PostResponse>(['post', id], {
           ...previousData,
           post: {
             ...previousData.post,
-            // Optimistically increment (we don't know if it's liked or not, so assume adding)
-            likesCount: (previousData.post.likesCount || 0) + 1,
+            isLiked: !currentlyLiked,
+            likesCount: currentlyLiked
+              ? Math.max(0, (previousData.post.likesCount || 0) - 1)
+              : (previousData.post.likesCount || 0) + 1,
           },
         });
       }
 
       return { previousData };
     },
-    onSuccess: (response, _variables, context) => {
-      // Correct the count based on server response
+    onSuccess: (response) => {
+      // Update with the actual server response
       const currentData = queryClient.getQueryData<PostResponse>(['post', id]);
-      const previousCount = context?.previousData?.post.likesCount || 0;
 
       if (currentData) {
         queryClient.setQueryData<PostResponse>(['post', id], {
           ...currentData,
           post: {
             ...currentData.post,
-            // Set to correct value: if liked, previous + 1, if unliked, previous - 1
-            likesCount: response.liked ? previousCount + 1 : Math.max(0, previousCount - 1),
+            isLiked: response.liked,
+            likesCount: response.likesCount,
           },
         });
       }
+
+      // Invalidate post lists to update like counts there too
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       toast.success(response.liked ? 'Post liked!' : 'Post unliked!');
     },
@@ -220,15 +225,18 @@ function PostPage() {
               alt={post.title}
               className="w-full h-full object-cover"
             />
-            {/* Gradient Overlay */}
+            {/* Gradient Overlay with smooth fade */}
             <div
-              className={cn(
-                'absolute inset-0',
-                'bg-gradient-to-t',
-                'from-bg-base via-bg-base/90 to-transparent'
-              )}
+              className="absolute inset-0"
               style={{
-                backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.3) 40%, rgba(10, 10, 10, 0.9) 80%, var(--color-bg-base) 100%)',
+                backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.1) 25%, rgba(10, 10, 10, 0.4) 50%, rgba(10, 10, 10, 0.7) 70%, rgba(10, 10, 10, 0.9) 85%, var(--color-bg-base) 100%)',
+              }}
+            />
+            {/* Additional black gradient strip at the bottom for extra smooth fade */}
+            <div
+              className="absolute bottom-0 left-0 right-0 h-32"
+              style={{
+                backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.6) 70%, rgba(0, 0, 0, 0.8) 100%)',
               }}
             />
           </div>
@@ -294,7 +302,7 @@ function PostPage() {
         <article className="prose prose-lg dark:prose-invert max-w-full prose-headings:font-serif prose-headings:font-bold prose-p:text-text-primary prose-p:leading-relaxed prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline prose-code:text-amber-300 prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw, rehypeSanitize]}
+            rehypePlugins={[rehypeSlug, rehypeRaw, rehypeSanitize]}
           >
             {post.content}
           </ReactMarkdown>
@@ -312,10 +320,17 @@ function PostPage() {
                   disabled={likeMutation.isPending}
                   className={cn(
                     'transition-all duration-200',
-                    likeMutation.isPending && 'animate-pulse'
+                    likeMutation.isPending && 'animate-pulse',
+                    post.isLiked && 'text-red-500'
                   )}
                 >
-                  <Heart size={18} />
+                  <Heart
+                    size={18}
+                    className={cn(
+                      'transition-all duration-200',
+                      post.isLiked && 'fill-red-500'
+                    )}
+                  />
                   {post.likesCount || 0}
                 </Button>
               ) : (

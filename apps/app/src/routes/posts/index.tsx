@@ -1,11 +1,15 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
-import { Container, Heading, Flex, Button, Card, Text, Box, Grid } from '@radix-ui/themes';
-import { TrendingUp, Heart, Eye } from 'lucide-react';
+import { Button } from '@radix-ui/themes';
+import { TrendingUp } from 'lucide-react';
 import { api } from '../../lib/api-client';
-import { Image, Avatar } from '../../components';
-import type { PostsListResponse } from '@robin/types';
+import { PostCard } from '../../components/posts/PostCard';
+import { Container } from '../../components/layout/Container';
+import { Section } from '../../components/layout/Section';
+import { Flex } from '../../components/layout/Flex';
+import { Text } from '../../components/typography/Text';
+import type { PostsListResponse, PostListItem } from '@robin/types';
 
 export const Route = createFileRoute('/posts/')({
   component: PublicPostsPage,
@@ -57,139 +61,71 @@ function PublicPostsPage() {
   const posts = data?.pages.flatMap((page) => page.posts) || [];
 
   return (
-    <Box style={{ minHeight: 'calc(100vh - 60px)' }} className="pt-20 md:pt-24">
-      <Container size="4" py="8">
-        <Flex direction="column" gap="6">
-          <Flex gap="2">
-            <Button
-              variant={view === 'all' ? 'solid' : 'soft'}
-              onClick={() => setView('all')}
-              size="2"
-            >
-              Latest
-            </Button>
-            <Button
-              variant={view === 'trending' ? 'solid' : 'soft'}
-              onClick={() => setView('trending')}
-              size="2"
-            >
-              <TrendingUp size={16} />
-              Trending
-            </Button>
-          </Flex>
+    <div className="min-h-screen pt-20 md:pt-24">
+      {/* Posts Section */}
+      <Section spacing="lg">
+        <Container size="standard">
+          <Flex direction="col" gap="8">
+            {/* Filter Tabs */}
+            <Flex gap="3">
+              <Button
+                variant={view === 'all' ? 'solid' : 'soft'}
+                onClick={() => setView('all')}
+                size="2"
+              >
+                Latest
+              </Button>
+              <Button
+                variant={view === 'trending' ? 'solid' : 'soft'}
+                onClick={() => setView('trending')}
+                size="2"
+              >
+                <TrendingUp size={16} />
+                Trending
+              </Button>
+            </Flex>
 
-          {/* Posts Grid */}
-          {isLoading ? (
-            <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="4">
-              {[...Array(6)].map((_, i) => (
-                <Card key={i} style={{ height: '300px' }}>
-                  <Box style={{ background: 'var(--gray-3)', height: '100%', borderRadius: 'var(--radius-2)' }} />
-                </Card>
-              ))}
-            </Grid>
-          ) : posts.length === 0 ? (
-            <Card>
-              <Flex direction="column" align="center" gap="4" py="9">
-                <Text size="5" color="gray">
+            {/* Posts Grid */}
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-96 rounded-2xl shimmer overflow-hidden"
+                  />
+                ))}
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="glass-surface p-12 text-center rounded-2xl">
+                <Text size="lg" color="tertiary">
                   No posts published yet
                 </Text>
-                <Text size="2" color="gray">
-                  Check back soon for new content!
-                </Text>
-              </Flex>
-            </Card>
-          ) : (
-            <>
-              <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="5">
-                {posts.map((post: PostListItem) => (
-                  <Link key={post.id} to={`/posts/${post.id}`} style={{ textDecoration: 'none' }}>
-                    <Card className="post-card">
-                      <Flex direction="column" gap="0">
-                        <Image
-                          src={post.coverImageThumb || post.coverImage}
-                          alt={post.title}
-                          placeholder="gradient"
-                          placeholderText={post.title}
-                          aspectRatio={16 / 9}
-                          style={{
-                            width: '100%',
-                            height: '200px',
-                            borderRadius: 'var(--radius-3) var(--radius-3) 0 0',
-                          }}
-                        />
-                        <Flex direction="column" gap="3" p="4">
-                          <Heading size="5">{post.title}</Heading>
-                          {post.excerpt && (
-                            <Text size="2" color="gray" style={{ lineHeight: '1.5' }}>
-                              {post.excerpt.length > 120
-                                ? `${post.excerpt.substring(0, 120)}...`
-                                : post.excerpt}
-                            </Text>
-                          )}
-                          <Flex justify="between" align="center" mt="2">
-                            <Flex gap="2" align="center">
-                              <Avatar
-                                src={post.author?.image}
-                                alt={post.author?.name || 'Author'}
-                                name={post.author?.name}
-                                size={28}
-                              />
-                              <Text size="2" color="gray">
-                                {post.author?.name}
-                              </Text>
-                            </Flex>
-                            <Flex gap="3" align="center">
-                              <Flex gap="1" align="center">
-                                <Heart size={14} style={{ color: 'var(--gray-9)' }} />
-                                <Text size="1" color="gray">
-                                  {post.likesCount}
-                                </Text>
-                              </Flex>
-                              <Flex gap="1" align="center">
-                                <Eye size={14} style={{ color: 'var(--gray-9)' }} />
-                                <Text size="1" color="gray">
-                                  {post.views}
-                                </Text>
-                              </Flex>
-                            </Flex>
-                          </Flex>
-                        </Flex>
-                      </Flex>
-                    </Card>
-                  </Link>
-                ))}
-              </Grid>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                  {posts.map((post: PostListItem) => (
+                    <PostCard key={post.id} post={post} />
+                  ))}
+                </div>
 
-              {/* Load More */}
-              {hasNextPage && (
-                <Flex justify="center" py="4">
-                  <Button
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                    variant="soft"
-                    size="3"
-                  >
-                    {isFetchingNextPage ? 'Loading...' : 'Load More'}
-                  </Button>
-                </Flex>
-              )}
-            </>
-          )}
-        </Flex>
-      </Container>
-
-      <style>{`
-        .post-card {
-          cursor: pointer;
-          transition: all 0.2s ease;
-          border: 1px solid var(--gray-a5);
-        }
-        .post-card:hover {
-          transform: translateY(-2px);
-          border-color: var(--accent-a7);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-      `}</style>
-    </Box>
+                {hasNextPage && (
+                  <Flex justify="center" className="pt-4">
+                    <Button
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetchingNextPage}
+                      variant="soft"
+                      size="3"
+                    >
+                      {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                    </Button>
+                  </Flex>
+                )}
+              </>
+            )}
+          </Flex>
+        </Container>
+      </Section>
+    </div>
   );
 }

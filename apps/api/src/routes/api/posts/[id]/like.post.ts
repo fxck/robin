@@ -84,6 +84,13 @@ export default defineEventHandler(async (event) => {
     log.debug(`Post liked: ${id} by user ${user.id}`);
   }
 
+  // Get the updated post to return the current like count
+  const [updatedPost] = await db
+    .select({ likesCount: schema.posts.likesCount })
+    .from(schema.posts)
+    .where(eq(schema.posts.id, id))
+    .limit(1);
+
   // Invalidate cache
   await deleteCache(`post:${id}`);
   await deleteCache('posts:list:*');
@@ -93,10 +100,12 @@ export default defineEventHandler(async (event) => {
     postId: id,
     userId: user.id,
     liked,
+    likesCount: updatedPost?.likesCount || 0,
   });
 
   return {
     liked,
+    likesCount: updatedPost?.likesCount || 0,
     message: liked ? 'Post liked' : 'Post unliked',
   };
 });

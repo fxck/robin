@@ -5,6 +5,7 @@ import { schema } from '@robin/database';
 import { getCache, setCache, incrementCounter, getCounter } from '../../../services/redis';
 import { log } from '../../../utils/logger';
 import { rewriteImageUrlsInObject } from '../../../utils/cdn';
+import { getAuth } from '../../../utils/auth-guard';
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
@@ -16,6 +17,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Check if user is authenticated (optional)
+  const user = await getAuth(event);
+
   // Try to get from cache
   const cacheKey = `post:${id}`;
   const cached = await getCache<any>(cacheKey);
@@ -24,6 +28,18 @@ export default defineEventHandler(async (event) => {
     // Still increment view count and get the updated value
     await incrementCounter(`post:${id}:views`);
     const currentViews = await getCounter(`post:${id}:views`);
+
+    // Check if current user has liked this post
+    let isLiked = false;
+    if (user) {
+      const [like] = await db
+        .select({ id: schema.postLikes.id })
+        .from(schema.postLikes)
+        .where(and(eq(schema.postLikes.postId, id), eq(schema.postLikes.userId, user.id)))
+        .limit(1);
+      isLiked = !!like;
+    }
+
     log.debug(`Cache hit for post: ${id}`);
 
     // Return cached post with real-time view count from Redis and CDN URLs
@@ -31,7 +47,8 @@ export default defineEventHandler(async (event) => {
       ...cached,
       post: {
         ...cached.post,
-        views: currentViews
+        views: currentViews,
+        isLiked,
       }
     });
   }
@@ -76,11 +93,23 @@ export default defineEventHandler(async (event) => {
   // Increment view counter in Redis and get the updated count
   const currentViews = await incrementCounter(`post:${id}:views`);
 
+  // Check if current user has liked this post
+  let isLiked = false;
+  if (user) {
+    const [like] = await db
+      .select({ id: schema.postLikes.id })
+      .from(schema.postLikes)
+      .where(and(eq(schema.postLikes.postId, id), eq(schema.postLikes.userId, user.id)))
+      .limit(1);
+    isLiked = !!like;
+  }
+
   // Return post with real-time view count from Redis
   const result = {
     post: {
       ...post,
-      views: currentViews
+      views: currentViews,
+      isLiked,
     }
   };
 

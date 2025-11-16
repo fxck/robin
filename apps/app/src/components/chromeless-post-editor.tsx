@@ -62,13 +62,22 @@ const parseAndInsertMarkdown = (editor: any, text: string, from: number, to: num
   // Build HTML from markdown
   let html = '';
   const lines = text.split('\n');
+  let i = 0;
 
-  for (let i = 0; i < lines.length; i++) {
+  while (i < lines.length) {
     const line = lines[i];
 
     // Skip empty lines
     if (line.trim() === '') {
       html += '<p></p>';
+      i++;
+      continue;
+    }
+
+    // Horizontal rule: ---, ***, or ___
+    if (/^(\*{3,}|-{3,}|_{3,})$/.test(line.trim())) {
+      html += '<hr />';
+      i++;
       continue;
     }
 
@@ -78,6 +87,7 @@ const parseAndInsertMarkdown = (editor: any, text: string, from: number, to: num
       const alt = imageMatch[1];
       const src = imageMatch[2];
       html += `<img src="${src}" alt="${alt}" />`;
+      i++;
       continue;
     }
 
@@ -87,12 +97,65 @@ const parseAndInsertMarkdown = (editor: any, text: string, from: number, to: num
       const level = headingMatch[1].length;
       const headingText = parseInlineMarkdown(headingMatch[2]);
       html += `<h${level}>${headingText}</h${level}>`;
+      i++;
+      continue;
+    }
+
+    // Check for unordered list items (-, *, +)
+    const unorderedListMatch = line.match(/^[\s]*[-*+]\s+(.+)$/);
+    if (unorderedListMatch) {
+      html += '<ul>';
+      while (i < lines.length) {
+        const listLine = lines[i];
+        const listItemMatch = listLine.match(/^[\s]*[-*+]\s+(.+)$/);
+        if (!listItemMatch) break;
+
+        const itemText = parseInlineMarkdown(listItemMatch[1]);
+        html += `<li>${itemText}</li>`;
+        i++;
+      }
+      html += '</ul>';
+      continue;
+    }
+
+    // Check for ordered list items (1., 2., etc.)
+    const orderedListMatch = line.match(/^[\s]*\d+\.\s+(.+)$/);
+    if (orderedListMatch) {
+      html += '<ol>';
+      while (i < lines.length) {
+        const listLine = lines[i];
+        const listItemMatch = listLine.match(/^[\s]*\d+\.\s+(.+)$/);
+        if (!listItemMatch) break;
+
+        const itemText = parseInlineMarkdown(listItemMatch[1]);
+        html += `<li>${itemText}</li>`;
+        i++;
+      }
+      html += '</ol>';
+      continue;
+    }
+
+    // Check for blockquotes
+    const blockquoteMatch = line.match(/^>\s+(.+)$/);
+    if (blockquoteMatch) {
+      html += '<blockquote>';
+      while (i < lines.length) {
+        const quoteLine = lines[i];
+        const quoteMatch = quoteLine.match(/^>\s+(.+)$/);
+        if (!quoteMatch) break;
+
+        const quoteText = parseInlineMarkdown(quoteMatch[1]);
+        html += `<p>${quoteText}</p>`;
+        i++;
+      }
+      html += '</blockquote>';
       continue;
     }
 
     // Regular paragraph with inline markdown
     const processedHTML = parseInlineMarkdown(line);
     html += `<p>${processedHTML}</p>`;
+    i++;
   }
 
   // Delete selection and insert the parsed HTML
@@ -585,7 +648,8 @@ export function ChromelessPostEditor({
                     if (!text) return false;
 
                     // Check if text contains markdown syntax (multiline flag for headings)
-                    const hasMarkdown = /^#{1,6}\s|!\[.+\]\(.+\)|\[.+\]\(.+\)|\*\*.+\*\*|\*[^*]+\*|`.+`/m.test(text);
+                    // Patterns: headings, images, links, bold, italic, code, lists, blockquotes, horizontal rules
+                    const hasMarkdown = /^#{1,6}\s|!\[.+\]\(.+\)|\[.+\]\(.+\)|\*\*.+\*\*|\*[^*]+\*|`.+`|^[\s]*[-*+]\s|^[\s]*\d+\.\s|^>\s|^(\*{3,}|-{3,}|_{3,})$/m.test(text);
 
                     if (hasMarkdown && editorRef.current) {
                       // Prevent default paste
