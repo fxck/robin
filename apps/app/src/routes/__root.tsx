@@ -58,7 +58,6 @@ function RootComponent() {
           <Box
             style={{
               minHeight: '100vh',
-              background: 'var(--color-bg-base)',
               position: 'relative'
             }}
           >

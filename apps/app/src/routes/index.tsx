@@ -91,23 +91,32 @@ function Index() {
       {/* Hero Section */}
       <Section spacing="xl" className="relative pt-64 md:pt-72 pb-24 md:pb-32">
         {/* Floating Lines Background */}
-        <div className="absolute inset-0 -z-10 opacity-80" style={{ minHeight: '100%' }}>
-          <FloatingLines
-            linesGradient={['#f59e0b', '#fbbf24', '#d97706']}
-            enabledWaves={['top', 'middle', 'bottom']}
-            lineCount={[4, 6, 5]}
-            lineDistance={[8, 5, 6]}
-            topWavePosition={{ x: 10, y: 0.6, rotate: -0.3 }}
-            middleWavePosition={{ x: 5, y: 0, rotate: 0.1 }}
-            bottomWavePosition={{ x: 2, y: -0.6, rotate: 0.4 }}
-            animationSpeed={0.8}
-            interactive={true}
-            bendRadius={3.0}
-            bendStrength={-0.8}
-            parallax={true}
-            parallaxStrength={0.15}
-            mixBlendMode="normal"
-          />
+        <div className="absolute inset-0 -z-10" style={{ minHeight: '100%' }}>
+          <div className="relative w-full h-full">
+            <FloatingLines
+              linesGradient={['#3a3a3a', '#2a2a2a', '#404040']}
+              enabledWaves={['middle', 'bottom']}
+              lineCount={[6, 4]}
+              lineDistance={[4, 5]}
+              middleWavePosition={{ x: 0, y: 0, rotate: 0 }}
+              bottomWavePosition={{ x: 0, y: -0.3, rotate: 0 }}
+              animationSpeed={0.6}
+              interactive={true}
+              bendRadius={5.0}
+              bendStrength={-0.5}
+              parallax={true}
+              parallaxStrength={0.2}
+              mixBlendMode="lighten"
+            />
+            {/* Gradient fade to black at bottom */}
+            <div
+              className="absolute bottom-0 left-0 right-0 pointer-events-none"
+              style={{
+                height: '100px',
+                background: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 100%)'
+              }}
+            />
+          </div>
         </div>
 
         <Container size="standard">

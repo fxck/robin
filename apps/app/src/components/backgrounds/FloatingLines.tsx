@@ -96,7 +96,7 @@ vec3 getLineColor(float t, vec3 baseColor) {
     gradientColor = mix(c1, c2, f);
   }
 
-  return gradientColor * 0.5;
+  return gradientColor * 2.0;
 }
 
   float wave(vec2 uv, float offset, vec2 screenUv, vec2 mouseUv, bool shouldBend) {
@@ -150,7 +150,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         baseUv,
         mouseUv,
         interactive
-      ) * 0.2;
+      ) * 1.5;
     }
   }
 
@@ -168,7 +168,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         baseUv,
         mouseUv,
         interactive
-      );
+      ) * 2.0;
     }
   }
 
@@ -299,20 +299,7 @@ export default function FloatingLines({
   const bottomLineDistance = enabledWaves.includes('bottom') ? getLineDistance('bottom') * 0.01 : 0.01;
 
   useEffect(() => {
-    console.log('[FloatingLines] useEffect started');
-    console.log('[FloatingLines] containerRef.current:', containerRef.current);
-
-    if (!containerRef.current) {
-      console.log('[FloatingLines] No container ref, returning early');
-      return;
-    }
-
-    console.log('[FloatingLines] Container dimensions:', {
-      width: containerRef.current.clientWidth,
-      height: containerRef.current.clientHeight,
-      offsetWidth: containerRef.current.offsetWidth,
-      offsetHeight: containerRef.current.offsetHeight
-    });
+    if (!containerRef.current) return;
 
     const scene = new Scene();
 
@@ -320,8 +307,6 @@ export default function FloatingLines({
     camera.position.z = 1;
 
     const renderer = new WebGLRenderer({ antialias: true, alpha: true });
-    console.log('[FloatingLines] WebGL renderer created');
-
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setClearColor(0x000000, 0);
     renderer.domElement.style.position = 'absolute';
@@ -330,9 +315,6 @@ export default function FloatingLines({
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     renderer.domElement.style.display = 'block';
-
-    console.log('[FloatingLines] Canvas element:', renderer.domElement);
-    console.log('[FloatingLines] Appending canvas to container');
     containerRef.current.appendChild(renderer.domElement);
 
     const uniforms = {
@@ -409,27 +391,19 @@ export default function FloatingLines({
     const clock = new Clock();
 
     const setSize = () => {
-      if (!containerRef.current) {
-        console.log('[FloatingLines] setSize - no container ref');
-        return;
-      }
+      if (!containerRef.current) return;
 
       const el = containerRef.current;
       const width = el.clientWidth || 1;
       const height = el.clientHeight || 1;
 
-      console.log('[FloatingLines] setSize called:', { width, height });
-
       renderer.setSize(width, height, false);
 
       const canvasWidth = renderer.domElement.width;
       const canvasHeight = renderer.domElement.height;
-      console.log('[FloatingLines] Canvas size set to:', { canvasWidth, canvasHeight });
-
       uniforms.iResolution.value.set(canvasWidth, canvasHeight, 1);
     };
 
-    console.log('[FloatingLines] Calling initial setSize');
     setSize();
 
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => {
@@ -470,7 +444,6 @@ export default function FloatingLines({
     }
 
     let raf = 0;
-    let frameCount = 0;
     const renderLoop = () => {
       uniforms.iTime.value = clock.getElapsedTime();
 
@@ -488,16 +461,9 @@ export default function FloatingLines({
       }
 
       renderer.render(scene, camera);
-
-      if (frameCount < 5) {
-        console.log('[FloatingLines] Render frame', frameCount, 'time:', uniforms.iTime.value);
-        frameCount++;
-      }
-
       raf = requestAnimationFrame(renderLoop);
     };
 
-    console.log('[FloatingLines] Starting render loop');
     renderLoop();
 
     return () => {
