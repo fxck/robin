@@ -119,14 +119,52 @@ function PostPage() {
   const data = Route.useLoaderData();
 
   const likeMutation = useMutation({
-    mutationFn: () => api.post(`/posts/${id}/like`, {}),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['post', id] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      toast.success('Post liked!');
+    mutationFn: () => api.post<{ liked: boolean; message: string }>(`/posts/${id}/like`, {}),
+    onMutate: async () => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['post', id] });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData<PostResponse>(['post', id]);
+
+      // Optimistically toggle the like count
+      if (previousData) {
+        queryClient.setQueryData<PostResponse>(['post', id], {
+          ...previousData,
+          post: {
+            ...previousData.post,
+            // Optimistically increment (we don't know if it's liked or not, so assume adding)
+            likesCount: (previousData.post.likesCount || 0) + 1,
+          },
+        });
+      }
+
+      return { previousData };
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to like post');
+    onSuccess: (response, _variables, context) => {
+      // Correct the count based on server response
+      const currentData = queryClient.getQueryData<PostResponse>(['post', id]);
+      const previousCount = context?.previousData?.post.likesCount || 0;
+
+      if (currentData) {
+        queryClient.setQueryData<PostResponse>(['post', id], {
+          ...currentData,
+          post: {
+            ...currentData.post,
+            // Set to correct value: if liked, previous + 1, if unliked, previous - 1
+            likesCount: response.liked ? previousCount + 1 : Math.max(0, previousCount - 1),
+          },
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast.success(response.liked ? 'Post liked!' : 'Post unliked!');
+    },
+    onError: (_error: Error, _variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(['post', id], context.previousData);
+      }
+      toast.error(_error.message || 'Failed to like post');
     },
   });
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { Card, TextField, Button, Text, Box, Flex, Container, Heading } from '@radix-ui/themes';
+import { Card, TextField, Button, Text, Box, Flex, Heading } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { forgetPassword } from '../lib/auth';
@@ -103,7 +103,7 @@ function ForgotPasswordPage() {
               </Flex>
             </Card>
           </Flex>
-        </Container>
+        </Box>
       </Box>
     );
   }
@@ -158,7 +158,7 @@ function ForgotPasswordPage() {
             </form>
           </Card>
         </Flex>
-      </Container>
+      </Box>
     </Box>
   );
 }
