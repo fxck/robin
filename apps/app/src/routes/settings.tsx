@@ -68,7 +68,7 @@ function SettingsPage() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: (data: UpdateProfileData) =>
-      api.patch<User>('/api/users/me', data),
+      api.patch<User>('/users/me', data),
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(['currentUser'], { user: updatedUser });
       queryClient.invalidateQueries({ queryKey: ['session'] });
@@ -87,7 +87,7 @@ function SettingsPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${API_BASE}/api/upload`, {
+      const response = await fetch(`${API_BASE}/upload`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -102,7 +102,7 @@ function SettingsPage() {
 
       // Update avatar
       setAvatarUrl(data.url);
-      const updatedUser = await api.patch<User>('/api/users/me', { image: data.url });
+      const updatedUser = await api.patch<User>('/users/me', { image: data.url });
       queryClient.setQueryData(['currentUser'], { user: updatedUser });
       queryClient.invalidateQueries({ queryKey: ['session'] });
       toast.success('Avatar updated successfully');

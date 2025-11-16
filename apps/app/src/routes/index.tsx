@@ -54,7 +54,7 @@ function Index() {
     queryKey: ['posts', view],
     queryFn: async ({ pageParam = 1 }) => {
       if (view === 'trending') {
-        return api.get<{ posts: PostListItem[] }>('/api/posts/trending?limit=20');
+        return api.get('/posts/trending?limit=20');
       }
       return api.get<PostsListResponse>(`/api/posts?page=${pageParam}&limit=20`);
     },

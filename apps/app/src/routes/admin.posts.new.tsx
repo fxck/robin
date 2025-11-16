@@ -32,7 +32,7 @@ function NewPostPage() {
 
   const createPostMutation = useMutation({
     mutationFn: async (data: CreatePostInput) => {
-      return api.post<PostResponse>('/api/posts', data);
+      return api.post('/posts', data);
     },
     onSuccess: (data) => {
       hasUnsavedChanges.current = false;
@@ -49,7 +49,7 @@ function NewPostPage() {
   // Auto-save mutation (silent)
   const autoSaveMutation = useMutation({
     mutationFn: async (data: CreatePostInput) => {
-      return api.post<PostResponse>('/api/posts', data);
+      return api.post('/posts', data);
     },
     onSuccess: () => {
       setLastSaved(new Date());

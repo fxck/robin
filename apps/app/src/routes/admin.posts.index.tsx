@@ -49,7 +49,7 @@ function AdminPostsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-posts'],
-    queryFn: () => api.get<PostsListResponse>('/api/posts?status=all&limit=100'),
+    queryFn: () => api.get('/posts?status=all&limit=100'),
   });
 
   const deleteMutation = useMutation({
