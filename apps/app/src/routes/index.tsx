@@ -88,7 +88,7 @@ function Index() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <Section spacing="xl" className="relative pt-45 md:pt-55">
+      <Section spacing="xl" className="relative pt-45 md:pt-32">
 
         <Container size="standard">
           <div className="text-center max-w-4xl mx-auto relative">

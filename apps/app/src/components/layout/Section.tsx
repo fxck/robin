@@ -18,7 +18,7 @@ export function Section({
         spacing === 'sm' && 'py-8',
         spacing === 'md' && 'py-12',
         spacing === 'lg' && 'py-16 md:py-24',
-        spacing === 'xl' && 'py-24 md:py-32',
+        spacing === 'xl' && 'py-36 md:py-40',
         spacing === 'none' && 'py-0',
         className
       )}
