@@ -76,3 +76,5 @@ zerops:
         - apps/app/node_modules
     run:
       base: static
+      routing:
+        cors: "*"
