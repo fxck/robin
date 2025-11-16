@@ -1,6 +1,7 @@
-import { defineEventHandler, getRouterParam } from 'h3';
+import { defineEventHandler, getRouterParam, createError } from 'h3';
 import { eq, and, desc, ne, sql } from 'drizzle-orm';
-import { posts } from '@robin/database';
+import { db } from '../../../../services/db';
+import { schema } from '@robin/database';
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
@@ -16,13 +17,13 @@ export default defineEventHandler(async (event) => {
     // Get the current post to find similar ones
     const currentPost = await db
       .select({
-        id: posts.id,
-        title: posts.title,
-        excerpt: posts.excerpt,
-        content: posts.content,
+        id: schema.posts.id,
+        title: schema.posts.title,
+        excerpt: schema.posts.excerpt,
+        content: schema.posts.content,
       })
-      .from(posts)
-      .where(and(eq(posts.id, id), eq(posts.status, 'published')))
+      .from(schema.posts)
+      .where(and(eq(schema.posts.id, id), eq(schema.posts.status, 'published')))
       .limit(1);
 
     if (currentPost.length === 0) {
@@ -48,30 +49,29 @@ export default defineEventHandler(async (event) => {
     // 3. Most recent posts if not enough matches
     const relatedPosts = await db
       .select({
-        id: posts.id,
-        title: posts.title,
-        excerpt: posts.excerpt,
-        slug: posts.slug,
-        coverImageUrl: posts.coverImageUrl,
-        publishedAt: posts.publishedAt,
-        createdAt: posts.createdAt,
-        readTime: posts.readTime,
-        views: posts.views,
-        likesCount: posts.likesCount,
+        id: schema.posts.id,
+        title: schema.posts.title,
+        excerpt: schema.posts.excerpt,
+        slug: schema.posts.slug,
+        coverImage: schema.posts.coverImage,
+        publishedAt: schema.posts.publishedAt,
+        createdAt: schema.posts.createdAt,
+        views: schema.posts.views,
+        likesCount: schema.posts.likesCount,
         author: {
-          id: posts.userId,
+          id: schema.posts.userId,
           name: sql<string>`'Author'`,
           image: sql<string | null>`null`,
         },
       })
-      .from(posts)
+      .from(schema.posts)
       .where(
         and(
-          ne(posts.id, id), // Exclude current post
-          eq(posts.status, 'published')
+          ne(schema.posts.id, id), // Exclude current post
+          eq(schema.posts.status, 'published')
         )
       )
-      .orderBy(desc(posts.publishedAt))
+      .orderBy(desc(schema.posts.publishedAt))
       .limit(3);
 
     return {

@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, redirect, Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box,
@@ -9,9 +9,10 @@ import {
   Table,
   Badge,
   AlertDialog,
+  Callout,
 } from '@radix-ui/themes';
-import { PlusCircle, Edit, Trash2, Eye, FileText, Clock, Heart } from 'lucide-react';
-import { useState } from 'react';
+import { PlusCircle, Edit, Trash2, Eye, FileText, Clock, Heart, Mail, CheckCircle, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useSession, authClient } from '../lib/auth';
 import { api } from '../lib/api-client';
@@ -24,6 +25,9 @@ export const Route = createFileRoute('/dashboard')({
       throw redirect({ to: '/auth' });
     }
   },
+  validateSearch: (search: Record<string, unknown>) => ({
+    verified: search.verified === 'true' || search.verified === true,
+  }),
   component: DashboardPage,
 });
 
@@ -61,8 +65,30 @@ function StatCard({ title, value, icon, gradient }: StatCardProps) {
 function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const search = useSearch({ from: '/dashboard' });
   const { data: session, isPending: isLoading, error } = useSession();
   const [deleteDialog, setDeleteDialog] = useState<{ id: string; title: string } | null>(null);
+  const [showVerificationBanner, setShowVerificationBanner] = useState(false);
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+
+  // Check for verified query param
+  useEffect(() => {
+    if (search.verified) {
+      setShowSuccessBanner(true);
+      toast.success('Email verified successfully!');
+      // Remove the query param from URL
+      navigate({ to: '/dashboard', replace: true });
+    }
+  }, [search.verified, navigate]);
+
+  // Check if email is verified
+  useEffect(() => {
+    if (session?.user?.emailVerified === false) {
+      setShowVerificationBanner(true);
+    } else {
+      setShowVerificationBanner(false);
+    }
+  }, [session]);
 
   const { data: postsData, isLoading: postsLoading } = useQuery({
     queryKey: ['admin-posts'],
@@ -142,6 +168,57 @@ function DashboardPage() {
             </Button>
           </Link>
         </Flex>
+
+        {/* Email Verification Success Banner */}
+        {showSuccessBanner && (
+          <div className="glass-surface p-4 rounded-xl border border-green-500/30 bg-green-500/10 animate-fade-in">
+            <Flex align="center" gap="3">
+              <div className="p-2 bg-green-500/20 rounded-lg">
+                <CheckCircle className="h-5 w-5 text-green-400" />
+              </div>
+              <div className="flex-1">
+                <Text size="3" weight="bold" className="text-green-400 block mb-1">
+                  Email Verified!
+                </Text>
+                <Text size="2" className="text-gray-300">
+                  Your email has been successfully verified. You now have full access to all features.
+                </Text>
+              </div>
+              <button
+                onClick={() => setShowSuccessBanner(false)}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+              >
+                <X className="h-4 w-4 text-gray-400" />
+              </button>
+            </Flex>
+          </div>
+        )}
+
+        {/* Email Verification Warning Banner */}
+        {showVerificationBanner && (
+          <div className="glass-surface p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 animate-fade-in">
+            <Flex align="center" gap="3">
+              <div className="p-2 bg-yellow-500/20 rounded-lg">
+                <Mail className="h-5 w-5 text-yellow-400" />
+              </div>
+              <div className="flex-1">
+                <Text size="3" weight="bold" className="text-yellow-400 block mb-1">
+                  Please verify your email
+                </Text>
+                <Text size="2" className="text-gray-300">
+                  We've sent a verification email to <strong>{session?.user?.email}</strong>.
+                  Please check your inbox and click the verification link to confirm your account.
+                </Text>
+              </div>
+              <button
+                onClick={() => setShowVerificationBanner(false)}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+              >
+                <X className="h-4 w-4 text-gray-400" />
+              </button>
+            </Flex>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">

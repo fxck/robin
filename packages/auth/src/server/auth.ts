@@ -33,6 +33,7 @@ export function createAuth(db: Database, config: {
   baseURL: string;
   secret: string;
   trustedOrigins?: string[];
+  appURL: string;
   redis?: Redis;
   emailConfig?: {
     host: string;
@@ -141,6 +142,7 @@ export function createAuth(db: Database, config: {
       },
       sendOnSignUp: true, // Automatically send verification email on signup
       autoSignInAfterVerification: false, // User is already signed in
+      callbackURL: `${config.appURL}/dashboard?verified=true`, // Redirect to app after verification
       // Send welcome email after verification
       async afterEmailVerification(user) {
         if (config.emailConfig) {

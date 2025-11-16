@@ -5,7 +5,8 @@
       "Bash(nx build:*)",
       "Bash(cat:*)",
       "Bash(tree:*)",
-      "Bash(nx run:*)"
+      "Bash(nx run:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

@@ -9,6 +9,7 @@ export const auth = createAuth(db, {
   baseURL: config.public.apiBase,
   secret: process.env.AUTH_SECRET || 'development-secret-change-in-production-make-it-at-least-32-chars',
   trustedOrigins: [config.public.appUrl],
+  appURL: config.public.appUrl,
   redis: getRedis(), // Use Redis for session storage
   emailConfig: process.env.SMTP_HOST ? {
     host: process.env.SMTP_HOST,

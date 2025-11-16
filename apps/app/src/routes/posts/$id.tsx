@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Avatar as RadixAvatar } from '@radix-ui/themes';
 import { Heart, Eye, ArrowLeft, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -16,13 +16,41 @@ import { cn } from '../../lib/utils';
 
 export const Route = createFileRoute('/posts/$id')({
   component: PostPage,
-  loader: async ({ params, context }) => {
-    try {
-      const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
-      return post;
-    } catch (error) {
-      return null;
-    }
+  loader: async ({ params }) => {
+    const post = await api.get<PostResponse>(`/api/posts/${params.id}`);
+    return post;
+  },
+  pendingComponent: () => (
+    <div className="min-h-screen">
+      <div className="h-[60vh] bg-bg-elevated animate-shimmer" />
+      <Container size="reading" className="py-12">
+        <div className="space-y-8">
+          <div className="h-12 bg-bg-elevated rounded animate-shimmer" />
+          <div className="h-4 bg-bg-elevated rounded animate-shimmer w-3/4" />
+          <div className="h-4 bg-bg-elevated rounded animate-shimmer w-5/6" />
+          <div className="h-4 bg-bg-elevated rounded animate-shimmer w-2/3" />
+        </div>
+      </Container>
+    </div>
+  ),
+  errorComponent: ({ error }) => {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Container size="narrow">
+          <div className="glass-surface p-12 text-center rounded-2xl">
+            <Text size="lg" className="mb-6">
+              Failed to load post
+            </Text>
+            <Link to="/">
+              <Button size="3">
+                <ArrowLeft size={16} />
+                Back to Home
+              </Button>
+            </Link>
+          </div>
+        </Container>
+      </div>
+    );
   },
   head: ({ loaderData }) => {
     if (!loaderData?.post) {
@@ -103,13 +131,7 @@ function PostPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: session } = useSession();
-  const loaderData = Route.useLoaderData();
-
-  const { data, isLoading } = useQuery({
-    queryKey: ['post', id],
-    queryFn: () => api.get<PostResponse>(`/api/posts/${id}`),
-    initialData: loaderData || undefined,
-  });
+  const data = Route.useLoaderData();
 
   const likeMutation = useMutation({
     mutationFn: () => api.post(`/api/posts/${id}/like`, {}),
@@ -138,22 +160,6 @@ function PostPage() {
       toast.success('Link copied to clipboard!');
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen">
-        <div className="h-[60vh] bg-bg-elevated animate-shimmer" />
-        <Container size="reading" className="py-12">
-          <div className="space-y-8">
-            <div className="h-12 bg-bg-elevated rounded animate-shimmer" />
-            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-3/4" />
-            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-5/6" />
-            <div className="h-4 bg-bg-elevated rounded animate-shimmer w-2/3" />
-          </div>
-        </Container>
-      </div>
-    );
-  }
 
   if (!data?.post) {
     return (

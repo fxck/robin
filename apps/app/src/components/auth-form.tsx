@@ -57,7 +57,9 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
             throw new Error(result.error.message || 'Sign up failed');
           }
 
-          toast.success('Account created successfully!');
+          toast.success('Account created successfully! Please check your email to verify your account.', {
+            duration: 5000,
+          });
         } else {
           const result = await signIn.email({
             email: value.email,

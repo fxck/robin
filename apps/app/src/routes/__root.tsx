@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Theme, Box } from '@radix-ui/themes';
 import { Toaster } from 'sonner';
+import { Suspense } from 'react';
 import { queryClient } from '../lib/api-client';
 import { ErrorBoundary } from '../components/error-boundary';
 import { AppBar } from '../components/navigation';
@@ -57,7 +58,9 @@ function RootComponent() {
         <Theme appearance="dark" accentColor="purple" radius="medium">
           <Box style={{ minHeight: '100vh', background: 'var(--color-bg-base)' }}>
             <AppBar />
-            <Outlet />
+            <Suspense fallback={null}>
+              <Outlet />
+            </Suspense>
           </Box>
           <Toaster position="top-right" richColors />
           {import.meta.env.DEV && (
