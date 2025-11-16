@@ -178,7 +178,7 @@ function DashboardPage() {
             </Text>
           </div>
           <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
-            <Button size="3" className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 transition-all shadow-accent">
+            <Button size="3" className="bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 transition-all shadow-accent hover:shadow-accent-hover text-black font-semibold">
               <PlusCircle size={18} />
               New Post
             </Button>
@@ -241,8 +241,8 @@ function DashboardPage() {
           <StatCard
             title="Published Posts"
             value={publishedPosts.length}
-            icon={<FileText className="h-6 w-6 text-purple-400" />}
-            gradient="bg-gradient-to-br from-purple-500 to-purple-700"
+            icon={<FileText className="h-6 w-6 text-amber-400" />}
+            gradient="bg-gradient-to-br from-amber-500/20 to-amber-600/20"
           />
           <StatCard
             title="Draft Posts"
@@ -307,7 +307,7 @@ function DashboardPage() {
             <Flex justify="between" align="center" className="p-6 border-b border-white/10">
               <Heading size="5">All Posts</Heading>
               <Link to="/admin/posts" style={{ textDecoration: 'none' }}>
-                <Button variant="ghost" size="2" className="text-purple-400 hover:text-purple-300">
+                <Button variant="ghost" size="2" className="text-amber-400 hover:text-amber-300">
                   View All →
                 </Button>
               </Link>
@@ -334,7 +334,7 @@ function DashboardPage() {
                   </Text>
                 </div>
                 <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
-                  <Button size="3" className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 mt-2">
+                  <Button size="3" className="bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 mt-2 text-black font-semibold shadow-accent hover:shadow-accent-hover">
                     <PlusCircle size={18} />
                     Create your first post
                   </Button>

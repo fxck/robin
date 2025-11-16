@@ -114,7 +114,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
                 ${heading.level === 3 ? 'pl-6' : ''}
                 ${
                   activeId === heading.id
-                    ? 'bg-purple-500/20 text-purple-400 border-l-2 border-purple-500'
+                    ? 'bg-amber-500/15 text-amber-400 border-l-2 border-amber-500'
                     : 'text-gray-400 hover:text-gray-300 hover:bg-white/5 border-l-2 border-transparent'
                 }
               `}
@@ -130,7 +130,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
         <div className="flex items-center gap-3">
           <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-purple-500 to-purple-600 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-300"
               style={{
                 width: `${scrollProgress}%`,
               }}

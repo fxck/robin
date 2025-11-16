@@ -285,7 +285,7 @@ export function ChromelessPostEditor({
     }),
     TiptapLink.configure({
       HTMLAttributes: {
-        class: 'text-purple-400 underline decoration-purple-400/30 hover:decoration-purple-400 transition-colors',
+        class: 'text-amber-400 underline decoration-amber-400/30 hover:decoration-amber-400 transition-colors',
       },
     }),
     TiptapUnderline,
@@ -411,24 +411,24 @@ export function ChromelessPostEditor({
                 className={cn(
                   'relative p-12 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer',
                   isDragActive
-                    ? 'border-purple-500 bg-purple-500/10'
-                    : 'border-white/20 bg-white/5 hover:border-purple-500/50 hover:bg-purple-500/5'
+                    ? 'border-amber-500 bg-amber-500/10'
+                    : 'border-white/20 bg-white/5 hover:border-amber-500/50 hover:bg-amber-500/5'
                 )}
               >
                 <input {...getCoverInputProps()} />
                 <div className="flex flex-col items-center gap-4">
                   {isUploadingCover ? (
                     <>
-                      <Loader2 size={48} className="text-purple-400 animate-spin" />
+                      <Loader2 size={48} className="text-amber-400 animate-spin" />
                       <p className="text-sm text-gray-400">Uploading cover image...</p>
                     </>
                   ) : (
                     <>
-                      <ImagePlus size={48} className={isDragActive ? 'text-purple-400' : 'text-gray-500'} />
+                      <ImagePlus size={48} className={isDragActive ? 'text-amber-400' : 'text-gray-500'} />
                       <div className="text-center">
                         <p className={cn(
                           'text-sm font-medium',
-                          isDragActive ? 'text-purple-400' : 'text-gray-400'
+                          isDragActive ? 'text-amber-400' : 'text-gray-400'
                         )}>
                           {isDragActive ? 'Drop your image here' : 'Drag & drop your cover image'}
                         </p>
@@ -478,12 +478,12 @@ export function ChromelessPostEditor({
                       'prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4',
                       'prose-h3:text-2xl prose-h3:mt-6 prose-h3:mb-3',
                       'prose-p:text-gray-300 prose-p:leading-relaxed prose-p:my-4',
-                      'prose-a:text-purple-400 prose-a:no-underline hover:prose-a:underline',
+                      'prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline',
                       'prose-strong:text-white prose-strong:font-semibold',
                       'prose-em:text-gray-300',
-                      'prose-code:text-purple-400 prose-code:bg-purple-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded',
+                      'prose-code:text-amber-400 prose-code:bg-amber-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded',
                       'prose-pre:bg-gray-900/50 prose-pre:border prose-pre:border-white/10',
-                      'prose-blockquote:border-l-purple-500 prose-blockquote:border-l-4 prose-blockquote:pl-6 prose-blockquote:text-gray-400 prose-blockquote:italic',
+                      'prose-blockquote:border-l-amber-500 prose-blockquote:border-l-3 prose-blockquote:pl-6 prose-blockquote:text-gray-400 prose-blockquote:italic',
                       'prose-ul:text-gray-300 prose-ol:text-gray-300',
                       'prose-li:my-2',
                       'prose-img:rounded-lg prose-img:my-8',
@@ -521,7 +521,7 @@ export function ChromelessPostEditor({
                           'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left',
                           'text-gray-400 hover:text-white',
                           'hover:bg-white/5',
-                          'aria-selected:bg-purple-500/10 aria-selected:text-purple-400',
+                          'aria-selected:bg-amber-500/10 aria-selected:text-amber-400',
                           'transition-colors cursor-pointer'
                         )}
                       >
@@ -618,7 +618,7 @@ export function ChromelessPostEditor({
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
             {isSaving ? (
               <>
-                <Loader2 size={14} className="text-purple-400 animate-spin" />
+                <Loader2 size={14} className="text-amber-400 animate-spin" />
                 <span className="text-xs text-gray-400">Saving...</span>
               </>
             ) : lastSaved ? (
@@ -722,13 +722,13 @@ export function ChromelessPostEditor({
               onClick={onPublish}
               disabled={isPublishing}
               className={cn(
-                'group relative px-6 py-2 rounded-full text-sm font-medium',
-                'bg-gradient-to-r from-purple-500 to-pink-500',
-                'hover:from-purple-600 hover:to-pink-600',
-                'text-white',
+                'group relative px-6 py-2 rounded-lg text-sm font-semibold',
+                'bg-gradient-to-br from-amber-400 to-amber-500',
+                'hover:from-amber-500 hover:to-amber-600',
+                'text-black',
                 'transition-all duration-200',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
-                'shadow-lg shadow-purple-500/25',
+                'shadow-accent hover:shadow-accent-hover hover:-translate-y-0.5',
                 'overflow-hidden'
               )}
             >

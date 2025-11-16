@@ -61,7 +61,7 @@ export function AppBar() {
           <Flex align="center" gap="3" className="hidden lg:flex">
             <Link
               to="/posts"
-              className="no-underline px-4 py-2 rounded-xl text-[15px] font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+              className="no-underline px-4 py-2 rounded-lg text-[15px] font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200"
             >
               Explore
             </Link>
@@ -69,15 +69,15 @@ export function AppBar() {
             {session?.user && (
               <>
                 <Link to="/admin/posts/new" className="no-underline">
-                  <button className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-[15px] font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200 border border-purple-400/30">
-                    <PenLine size={17} strokeWidth={2.5} />
+                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] font-semibold bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black shadow-accent hover:shadow-accent-hover transition-all duration-200 hover:-translate-y-0.5">
+                    <PenLine size={16} strokeWidth={2.5} />
                     Write
                   </button>
                 </Link>
 
                 <Link to="/dashboard" className="no-underline" search={{ verified: false }}>
-                  <button className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-[15px] font-semibold text-gray-200 hover:text-white hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-200">
-                    <LayoutDashboard size={17} strokeWidth={2.5} />
+                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] font-medium text-gray-200 hover:text-white hover:bg-white/5 border border-white/8 hover:border-white/12 transition-all duration-200">
+                    <LayoutDashboard size={16} strokeWidth={2.5} />
                     Dashboard
                   </button>
                 </Link>
@@ -85,11 +85,11 @@ export function AppBar() {
                 <div className="ml-2">
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger>
-                      <button className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-[15px] font-semibold bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-200 cursor-pointer text-gray-100">
+                      <button className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-white/4 hover:bg-white/7 border border-white/8 hover:border-white/12 transition-all duration-200 cursor-pointer text-gray-100">
                         <Avatar
                           size="1"
                           src={session.user.image || undefined}
-                          fallback={<User size={16} strokeWidth={2.5} />}
+                          fallback={<User size={15} strokeWidth={2.5} />}
                           radius="full"
                         />
                         <span className="max-w-[100px] truncate">
@@ -124,7 +124,7 @@ export function AppBar() {
 
             {!session?.user && (
               <Link to="/auth" className="no-underline">
-                <button className="px-6 py-2 rounded-xl text-[15px] font-semibold bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200 border border-purple-400/30">
+                <button className="px-6 py-2.5 rounded-lg text-[15px] font-semibold bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black shadow-accent hover:shadow-accent-hover transition-all duration-200 hover:-translate-y-0.5">
                   Sign In
                 </button>
               </Link>
@@ -164,7 +164,7 @@ export function AppBar() {
                   <Button
                     variant="soft"
                     size="2"
-                    className="w-full justify-start font-medium text-[15px] h-10 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:border-purple-500/30"
+                    className="w-full justify-start font-medium text-[15px] h-10 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/20 hover:border-amber-500/30"
                   >
                     <PenLine size={16} strokeWidth={2} />
                     Write
@@ -227,7 +227,7 @@ export function AppBar() {
                 <Button
                   variant="soft"
                   size="2"
-                  className="w-full justify-center font-medium text-[15px] h-10 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:border-purple-500/30"
+                  className="w-full justify-center font-medium text-[15px] h-10 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/20 hover:border-amber-500/30"
                 >
                   Sign In
                 </Button>

@@ -282,7 +282,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                   type="submit"
                   size="3"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 transition-all shadow-accent"
+                  className="w-full bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 transition-all shadow-accent hover:shadow-accent-hover text-black font-semibold"
                 >
                   {isSubmitting
                     ? 'Loading...'
@@ -298,7 +298,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
         {!isSignUp && (
           <Flex justify="end">
             <Link to="/forgot-password">
-              <Text size="2" className="cursor-pointer text-purple-400 hover:text-purple-300 transition-colors">
+              <Text size="2" className="cursor-pointer text-amber-400 hover:text-amber-300 transition-colors">
                 Forgot password?
               </Text>
             </Link>
@@ -313,7 +313,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
             <button
               type="button"
               onClick={onToggleMode}
-              className="text-purple-400 hover:text-purple-300 transition-colors font-medium"
+              className="text-amber-400 hover:text-amber-300 transition-colors font-medium"
             >
               {isSignUp ? 'Sign In' : 'Sign Up'}
             </button>

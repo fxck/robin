@@ -72,7 +72,7 @@ export function RelatedPosts({ postId }: RelatedPostsProps) {
             <article className="glass-surface rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
               {/* Cover Image */}
               {post.coverImageUrl && (
-                <div className="relative w-full aspect-video overflow-hidden bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                <div className="relative w-full aspect-video overflow-hidden bg-gradient-to-br from-amber-500/10 to-blue-500/10">
                   <img
                     src={post.coverImageUrl}
                     alt={post.title}
@@ -84,7 +84,7 @@ export function RelatedPosts({ postId }: RelatedPostsProps) {
 
               {/* Content */}
               <div className="p-6 space-y-3">
-                <Heading size="4" className="group-hover:text-purple-400 transition-colors line-clamp-2">
+                <Heading size="4" className="group-hover:text-amber-400 transition-colors line-clamp-2">
                   {post.title}
                 </Heading>
 

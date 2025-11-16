@@ -277,7 +277,7 @@ function AdminPostsPage() {
               {selectedPosts.size > 0 && (
                 <Flex gap="2" align="center" style={{
                   padding: '12px',
-                  background: 'var(--purple-3)',
+                  background: 'var(--amber-3)',
                   borderRadius: 'var(--radius-3)',
                 }}>
                   <Text size="2" weight="medium">
