@@ -482,22 +482,6 @@
     transform: scale(0.95);
   }
 
-  /* Spotlight effect on hover (jheyy-style) */
-  @media (hover: hover) {
-    .glass-appbar {
-      background-image:
-        radial-gradient(
-          circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-          rgba(255, 255, 255, 0.06) 0%,
-          transparent 20%
-        ),
-        linear-gradient(
-          135deg,
-          rgba(20, 20, 22, 0.65) 0%,
-          rgba(15, 15, 17, 0.55) 100%
-        );
-    }
-  }
 
   /* Gradient Backgrounds - Sophisticated */
   .mesh-gradient {

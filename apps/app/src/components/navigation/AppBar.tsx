@@ -31,22 +31,6 @@ export function AppBar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // Spotlight effect - track mouse position for jheyy-style interaction
-  useEffect(() => {
-    const nav = navRef.current;
-    if (!nav) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = nav.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      nav.style.setProperty('--mouse-x', `${x}%`);
-      nav.style.setProperty('--mouse-y', `${y}%`);
-    };
-
-    nav.addEventListener('mousemove', handleMouseMove);
-    return () => nav.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -63,7 +47,6 @@ export function AppBar() {
       )}
     >
       <nav ref={navRef} className="glass-appbar relative py-5 px-8 mx-auto max-w-7xl">
-        <div className="glass-appbar-glow" aria-hidden="true"></div>
         <div className="glass-appbar-noise" aria-hidden="true"></div>
         <Flex align="center" justify="between">
           {/* Logo - Refined & Elegant */}

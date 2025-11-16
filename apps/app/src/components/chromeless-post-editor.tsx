@@ -620,17 +620,13 @@ export function ChromelessPostEditor({
                 className={cn(
                   'w-full resize-none overflow-hidden',
                   'bg-transparent border-none outline-none focus:outline-none focus:ring-0',
-                  'text-white font-bold',
+                  'font-serif font-bold text-text-primary',
                   'placeholder:text-gray-700',
-                  'leading-tight',
-                  // Match EXACT display typography from post detail
-                  'text-[clamp(2.5rem,5vw,4rem)]',
-                  'tracking-[-0.02em]'
+                  // Match EXACT display typography from Heading component
+                  'text-display leading-display tracking-display'
                 )}
                 style={{
-                  fontFamily: 'Georgia, Charter, Cambria, "Times New Roman", serif',
-                  textShadow: '0 2px 20px rgba(0, 0, 0, 0.8)',
-                  lineHeight: '1.1'
+                  textShadow: '0 2px 20px rgba(0, 0, 0, 0.8)'
                 }}
               />
 
@@ -851,7 +847,7 @@ export function ChromelessPostEditor({
 
       {/* Bottom Control Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 pb-6 px-6">
-        <div className="max-w-reading mx-auto flex items-center justify-between px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10">
+        <div className="max-w-4xl mx-auto flex items-center justify-between px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10">
           {/* Left: Exit */}
           <button
             onClick={onExit}

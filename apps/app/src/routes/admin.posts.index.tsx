@@ -162,11 +162,11 @@ function AdminPostsPage() {
   };
 
   return (
-    <Box style={{ minHeight: 'calc(100vh - 60px)', paddingTop: '100px' }}>
-      <Container size="4" py="8">
-        <Flex direction="column" gap="20">
-          {/* Header */}
-          <Flex justify="between" align="start" className="mb-4">
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-base)' }}>
+      <div className="max-w-[1800px] mx-auto px-8 py-16 pt-32 md:pt-40">
+        {/* Header */}
+        <div className="mb-20">
+          <Flex justify="between" align="start" className="flex-col md:flex-row gap-8">
             <div className="space-y-4">
               <h1 className="text-admin-page-title text-white">
                 Posts
@@ -182,60 +182,12 @@ function AdminPostsPage() {
               </Button>
             </Link>
           </Flex>
+        </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
-            {/* TOTAL POSTS */}
-            <div className="glass-surface rounded-2xl p-12 transition-all duration-200 hover:bg-white/[0.07]">
-              <Flex direction="column" gap="6">
-                <div className="w-fit rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/30 p-5">
-                  <FileText className="h-8 w-8 text-purple-400" />
-                </div>
-                <div className="space-y-3">
-                  <div className="text-admin-stat-label uppercase tracking-wider" style={{ color: 'var(--color-text-tertiary)' }}>
-                    Total Posts
-                  </div>
-                  <div className="text-admin-stat-value text-white">
-                    {allPosts.length}
-                  </div>
-                </div>
-              </Flex>
-            </div>
-
-            {/* PUBLISHED */}
-            <div className="glass-surface rounded-2xl p-12 transition-all duration-200 hover:bg-white/[0.07]">
-              <Flex direction="column" gap="6">
-                <div className="w-fit rounded-xl bg-gradient-to-br from-green-500/30 to-emerald-600/30 p-5">
-                  <CheckCircle className="h-8 w-8 text-green-400" />
-                </div>
-                <div className="space-y-3">
-                  <div className="text-admin-stat-label uppercase tracking-wider" style={{ color: 'var(--color-text-tertiary)' }}>
-                    Published
-                  </div>
-                  <div className="text-admin-stat-value text-white">
-                    {allPosts.filter(p => p.status === 'published').length}
-                  </div>
-                </div>
-              </Flex>
-            </div>
-
-            {/* DRAFTS */}
-            <div className="glass-surface rounded-2xl p-12 transition-all duration-200 hover:bg-white/[0.07]">
-              <Flex direction="column" gap="6">
-                <div className="w-fit rounded-xl bg-gradient-to-br from-blue-500/30 to-blue-600/30 p-5">
-                  <Clock className="h-8 w-8 text-blue-400" />
-                </div>
-                <div className="space-y-3">
-                  <div className="text-admin-stat-label uppercase tracking-wider" style={{ color: 'var(--color-text-tertiary)' }}>
-                    Drafts
-                  </div>
-                  <div className="text-admin-stat-value text-white">
-                    {allPosts.filter(p => p.status === 'draft').length}
-                  </div>
-                </div>
-              </Flex>
-            </div>
-          </div>
+        {/* MAIN LAYOUT: Table + Sidebar Stats */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-12">
+          {/* LEFT: Posts Table + Filters (PRIMARY) */}
+          <div className="space-y-8">
 
           {/* Search and Filters */}
           <div className="glass-surface rounded-2xl">
@@ -340,7 +292,7 @@ function AdminPostsPage() {
           </div>
 
           {/* Posts Table */}
-          <Card>
+          <div className="glass-surface rounded-2xl overflow-hidden">
             {isLoading ? (
               <Box py="9">
                 <Text align="center" color="gray">Loading...</Text>
@@ -469,9 +421,57 @@ function AdminPostsPage() {
                 </Table.Body>
               </Table.Root>
             )}
-          </Card>
-        </Flex>
-      </Container>
+          </div>
+        </div>
+
+        {/* RIGHT: Stats Sidebar (SECONDARY) */}
+        <div className="space-y-8">
+          <div className="glass-surface rounded-2xl p-10">
+            <div className="space-y-8">
+              <div className="text-admin-section-title text-white mb-8">
+                Overview
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <FileText className="h-5 w-5 text-purple-400 opacity-60" />
+                  <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+                    Total Posts
+                  </div>
+                </div>
+                <div className="text-admin-stat-value text-white">
+                  {allPosts.length}
+                </div>
+              </div>
+
+              <div className="border-t border-white/10 pt-8 space-y-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-green-400 opacity-60" />
+                  <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+                    Published
+                  </div>
+                </div>
+                <div className="text-admin-stat-value text-white">
+                  {allPosts.filter(p => p.status === 'published').length}
+                </div>
+              </div>
+
+              <div className="border-t border-white/10 pt-8 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-blue-400 opacity-60" />
+                  <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+                    Drafts
+                  </div>
+                </div>
+                <div className="text-admin-stat-value text-white">
+                  {allPosts.filter(p => p.status === 'draft').length}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog.Root open={!!deleteDialog} onOpenChange={(open) => !open && setDeleteDialog(null)}>
@@ -523,6 +523,5 @@ function AdminPostsPage() {
           </Flex>
         </AlertDialog.Content>
       </AlertDialog.Root>
-    </Box>
   );
 }

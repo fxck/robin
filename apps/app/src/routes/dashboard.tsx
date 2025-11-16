@@ -37,22 +37,18 @@ interface StatCardProps {
   gradient: string;
 }
 
-function StatCard({ title, value, icon, gradient }: StatCardProps) {
+function StatCard({ title, value, icon }: Omit<StatCardProps, 'gradient'>) {
   return (
-    <div className="glass-surface rounded-2xl p-12 transition-all duration-200 hover:bg-white/[0.07]">
-      <Flex direction="column" gap="6">
-        <div className={`w-fit rounded-xl ${gradient} p-5`}>
-          {icon}
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="opacity-60">{icon}</div>
+        <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+          {title}
         </div>
-        <div className="space-y-3">
-          <div className="text-admin-stat-label uppercase tracking-wider" style={{ color: 'var(--color-text-tertiary)' }}>
-            {title}
-          </div>
-          <div className="text-admin-stat-value text-white">
-            {value.toLocaleString()}
-          </div>
-        </div>
-      </Flex>
+      </div>
+      <div className="text-admin-stat-value text-white">
+        {value.toLocaleString()}
+      </div>
     </div>
   );
 }
@@ -161,161 +157,98 @@ function DashboardPage() {
   const totalLikes = posts.reduce((acc, p) => acc + p.likesCount, 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 md:px-8 py-16 pt-32 md:pt-36">
-      <Flex direction="column" gap="20">
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-base)' }}>
+      <div className="max-w-[1800px] mx-auto px-8 py-16 pt-32 md:pt-40">
         {/* Header */}
-        <Flex justify="between" align="start" className="flex-col md:flex-row gap-8 md:items-start">
-          <div className="space-y-4">
-            <h1 className="text-admin-page-title text-white">
-              Dashboard
-            </h1>
-            <div className="text-admin-page-subtitle" style={{ color: 'var(--color-text-tertiary)' }}>
-              Welcome back, {session?.user?.name || session?.user?.email}
+        <div className="mb-20">
+          <Flex justify="between" align="start" className="flex-col md:flex-row gap-8">
+            <div className="space-y-4">
+              <h1 className="text-admin-page-title text-white">
+                Dashboard
+              </h1>
+              <div className="text-admin-page-subtitle" style={{ color: 'var(--color-text-tertiary)' }}>
+                Welcome back, {session?.user?.name || session?.user?.email}
+              </div>
             </div>
-          </div>
-          <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
-            <Button size="3" className="bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-semibold shadow-accent hover:shadow-accent-hover">
-              <PlusCircle size={18} />
-              New Post
-            </Button>
-          </Link>
-        </Flex>
-
-        {/* Email Verification Success Banner */}
-        {showSuccessBanner && (
-          <div className="glass-surface p-5 rounded-xl border border-green-500/30 bg-green-500/10">
-            <Flex align="center" gap="3">
-              <div className="p-2 bg-green-500/20 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-400" />
-              </div>
-              <div className="flex-1">
-                <Text size="3" weight="bold" className="text-green-400 block mb-1">
-                  Email Verified!
-                </Text>
-                <Text size="2" className="text-gray-300">
-                  Your email has been successfully verified. You now have full access to all features.
-                </Text>
-              </div>
-              <button
-                onClick={() => setShowSuccessBanner(false)}
-                className="p-1 hover:bg-white/10 rounded transition-colors"
-              >
-                <X className="h-4 w-4 text-gray-400" />
-              </button>
-            </Flex>
-          </div>
-        )}
-
-        {/* Email Verification Warning Banner */}
-        {showVerificationBanner && (
-          <div className="glass-surface p-5 rounded-xl border border-yellow-500/30 bg-yellow-500/10">
-            <Flex align="center" gap="3">
-              <div className="p-2 bg-yellow-500/20 rounded-lg">
-                <Mail className="h-5 w-5 text-yellow-400" />
-              </div>
-              <div className="flex-1">
-                <Text size="3" weight="bold" className="text-yellow-400 block mb-1">
-                  Please verify your email
-                </Text>
-                <Text size="2" className="text-gray-300">
-                  We've sent a verification email to <strong>{session?.user?.email}</strong>.
-                  Please check your inbox and click the verification link to confirm your account.
-                </Text>
-              </div>
-              <button
-                onClick={() => setShowVerificationBanner(false)}
-                className="p-1 hover:bg-white/10 rounded transition-colors"
-              >
-                <X className="h-4 w-4 text-gray-400" />
-              </button>
-            </Flex>
-          </div>
-        )}
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          <StatCard
-            title="Published Posts"
-            value={publishedPosts.length}
-            icon={<FileText className="h-8 w-8 text-amber-400" />}
-            gradient="bg-gradient-to-br from-amber-500/30 to-amber-600/30"
-          />
-          <StatCard
-            title="Draft Posts"
-            value={draftPosts.length}
-            icon={<Clock className="h-8 w-8 text-blue-400" />}
-            gradient="bg-gradient-to-br from-blue-500/30 to-blue-600/30"
-          />
-          <StatCard
-            title="Total Views"
-            value={totalViews}
-            icon={<Eye className="h-8 w-8 text-green-400" />}
-            gradient="bg-gradient-to-br from-green-500/30 to-emerald-600/30"
-          />
-          <StatCard
-            title="Total Likes"
-            value={totalLikes}
-            icon={<Heart className="h-8 w-8 text-pink-400" />}
-            gradient="bg-gradient-to-br from-pink-500/30 to-rose-600/30"
-          />
+            <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
+              <Button size="3" className="bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-semibold shadow-accent hover:shadow-accent-hover">
+                <PlusCircle size={18} />
+                New Post
+              </Button>
+            </Link>
+          </Flex>
         </div>
 
-        {/* Activity Section - Only show if there are posts */}
-        {posts.length > 0 && (
-          <div className="glass-surface p-12 rounded-2xl">
-            <Flex direction="column" gap="8">
-              <div className="text-admin-section-title text-white">
-                Recent Activity
-              </div>
-
-              <div className="space-y-4">
-                {posts.slice(0, 4).map((post) => (
-                  <div key={post.id} className="p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-all duration-200 cursor-pointer">
-                    <Flex justify="between" align="start" gap="8">
-                      <div className="flex-1 min-w-0 space-y-3">
-                        <div className="text-admin-table-cell-title block text-white">
-                          {post.title}
-                        </div>
-                        <Flex gap="4" align="center">
-                          <div className="text-admin-meta" style={{ color: 'var(--color-text-tertiary)' }}>
-                            {formatDate(post.publishedAt || post.createdAt)}
-                          </div>
-                          <Badge color={post.status === 'published' ? 'green' : 'gray'} size="1">
-                            {post.status}
-                          </Badge>
-                        </Flex>
-                      </div>
-                      <Flex gap="6" align="center" className="flex-shrink-0">
-                        <Flex gap="2" align="center">
-                          <Eye size={16} style={{ color: 'var(--color-text-tertiary)' }} />
-                          <div className="text-admin-meta font-medium text-white">{post.views}</div>
-                        </Flex>
-                        <Flex gap="2" align="center">
-                          <Heart size={16} style={{ color: 'var(--color-text-tertiary)' }} />
-                          <div className="text-admin-meta font-medium text-white">{post.likesCount}</div>
-                        </Flex>
-                      </Flex>
-                    </Flex>
+        {/* Banners */}
+        {(showSuccessBanner || showVerificationBanner) && (
+          <div className="mb-16">
+            {showSuccessBanner && (
+              <div className="glass-surface p-5 rounded-xl border border-green-500/30 bg-green-500/10 mb-4">
+                <Flex align="center" gap="3">
+                  <div className="p-2 bg-green-500/20 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-400" />
                   </div>
-                ))}
+                  <div className="flex-1">
+                    <Text size="3" weight="bold" className="text-green-400 block mb-1">
+                      Email Verified!
+                    </Text>
+                    <Text size="2" className="text-gray-300">
+                      Your email has been successfully verified. You now have full access to all features.
+                    </Text>
+                  </div>
+                  <button
+                    onClick={() => setShowSuccessBanner(false)}
+                    className="p-1 hover:bg-white/10 rounded transition-colors"
+                  >
+                    <X className="h-4 w-4 text-gray-400" />
+                  </button>
+                </Flex>
               </div>
-            </Flex>
+            )}
+
+            {showVerificationBanner && (
+              <div className="glass-surface p-5 rounded-xl border border-yellow-500/30 bg-yellow-500/10">
+                <Flex align="center" gap="3">
+                  <div className="p-2 bg-yellow-500/20 rounded-lg">
+                    <Mail className="h-5 w-5 text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <Text size="3" weight="bold" className="text-yellow-400 block mb-1">
+                      Please verify your email
+                    </Text>
+                    <Text size="2" className="text-gray-300">
+                      We've sent a verification email to <strong>{session?.user?.email}</strong>.
+                      Please check your inbox and click the verification link to confirm your account.
+                    </Text>
+                  </div>
+                  <button
+                    onClick={() => setShowVerificationBanner(false)}
+                    className="p-1 hover:bg-white/10 rounded transition-colors"
+                  >
+                    <X className="h-4 w-4 text-gray-400" />
+                  </button>
+                </Flex>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Posts Table */}
-        <div className="glass-surface rounded-2xl overflow-hidden">
-          <Flex direction="column">
-            <Flex justify="between" align="center" className="px-12 py-8 border-b border-white/10">
-              <div className="text-admin-section-title text-white">
-                All Posts
-              </div>
-              <Link to="/admin/posts" style={{ textDecoration: 'none' }}>
-                <Button variant="ghost" size="2" className="text-amber-400 hover:text-amber-300 transition-colors">
-                  View All →
-                </Button>
-              </Link>
-            </Flex>
+        {/* MAIN LAYOUT: Table + Sidebar Stats */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-12">
+          {/* LEFT: Posts Table (PRIMARY) */}
+          <div>
+            <div className="glass-surface rounded-2xl overflow-hidden">
+              <Flex direction="column">
+                <Flex justify="between" align="center" className="px-12 py-8 border-b border-white/10">
+                  <div className="text-admin-section-title text-white">
+                    Your Posts
+                  </div>
+                  <Link to="/admin/posts" style={{ textDecoration: 'none' }}>
+                    <Button variant="ghost" size="2" className="text-amber-400 hover:text-amber-300 transition-colors">
+                      View All →
+                    </Button>
+                  </Link>
+                </Flex>
 
             {postsLoading ? (
               <Box py="9">
@@ -440,11 +373,54 @@ function DashboardPage() {
                     ))}
                   </Table.Body>
                 </Table.Root>
-              </div>
-            )}
-          </Flex>
+                </div>
+              )}
+            </Flex>
+          </div>
         </div>
-      </Flex>
+
+        {/* RIGHT: Stats Sidebar (SECONDARY) */}
+        <div className="space-y-8">
+          <div className="glass-surface rounded-2xl p-10">
+            <div className="space-y-8">
+              <div className="text-admin-section-title text-white mb-8">
+                Overview
+              </div>
+
+              <StatCard
+                title="Published Posts"
+                value={publishedPosts.length}
+                icon={<FileText className="h-5 w-5 text-amber-400" />}
+              />
+
+              <div className="border-t border-white/10 pt-8">
+                <StatCard
+                  title="Draft Posts"
+                  value={draftPosts.length}
+                  icon={<Clock className="h-5 w-5 text-blue-400" />}
+                />
+              </div>
+
+              <div className="border-t border-white/10 pt-8">
+                <StatCard
+                  title="Total Views"
+                  value={totalViews}
+                  icon={<Eye className="h-5 w-5 text-green-400" />}
+                />
+              </div>
+
+              <div className="border-t border-white/10 pt-8">
+                <StatCard
+                  title="Total Likes"
+                  value={totalLikes}
+                  icon={<Heart className="h-5 w-5 text-pink-400" />}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog.Root open={!!deleteDialog} onOpenChange={(open) => !open && setDeleteDialog(null)}>
@@ -468,6 +444,5 @@ function DashboardPage() {
           </Flex>
         </AlertDialog.Content>
       </AlertDialog.Root>
-    </div>
   );
 }
