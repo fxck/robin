@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from '@tanstack/react-router';
 import { LayoutDashboard, LogOut, Settings, User, Menu, X, PenLine } from 'lucide-react';
 import { Button, Avatar, DropdownMenu } from '@radix-ui/themes';
@@ -11,6 +11,7 @@ export function AppBar() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +31,23 @@ export function AppBar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
+  // Spotlight effect - track mouse position for jheyy-style interaction
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = nav.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      nav.style.setProperty('--mouse-x', `${x}%`);
+      nav.style.setProperty('--mouse-y', `${y}%`);
+    };
+
+    nav.addEventListener('mousemove', handleMouseMove);
+    return () => nav.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   const handleSignOut = async () => {
     await signOut();
     window.location.href = '/';
@@ -44,15 +62,16 @@ export function AppBar() {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       )}
     >
-      <nav className="glass-appbar relative py-5 px-8 mx-auto max-w-7xl">
+      <nav ref={navRef} className="glass-appbar relative py-5 px-8 mx-auto max-w-7xl">
+        <div className="glass-appbar-glow" aria-hidden="true"></div>
+        <div className="glass-appbar-noise" aria-hidden="true"></div>
         <Flex align="center" justify="between">
           {/* Logo - Refined & Elegant */}
-          <Link to="/" className="flex items-center gap-3 no-underline group">
-            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/15 transition-all duration-200 group-hover:shadow-lg group-hover:shadow-amber-500/25 overflow-hidden">
+          <Link to="/" className="logo-container no-underline">
+            <div className="logo-icon">
               <span className="text-black font-bold text-lg tracking-tight select-none relative z-10">R</span>
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/15"></div>
             </div>
-            <span className="text-[17px] font-semibold tracking-tight text-white/95 transition-colors duration-200 group-hover:text-white">
+            <span className="text-[17px] font-semibold tracking-tight text-white/95 transition-colors duration-200">
               Robin
             </span>
           </Link>
@@ -61,22 +80,24 @@ export function AppBar() {
           <Flex align="center" gap="3" className="hidden lg:flex">
             <Link
               to="/posts"
-              className="no-underline px-4 py-2 rounded-lg text-[15px] font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200"
+              className="no-underline"
             >
-              Explore
+              <span className="nav-btn">
+                Explore
+              </span>
             </Link>
 
             {session?.user && (
               <>
                 <Link to="/admin/posts/new" className="no-underline">
-                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] font-semibold bg-amber-500 hover:bg-amber-600 text-black transition-colors duration-200">
+                  <button className="nav-btn-primary">
                     <PenLine size={16} strokeWidth={2.5} />
                     Write
                   </button>
                 </Link>
 
                 <Link to="/dashboard" className="no-underline" search={{ verified: false }}>
-                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] font-medium text-gray-200 hover:text-white hover:bg-white/5 border border-white/8 hover:border-white/12 transition-all duration-200">
+                  <button className="nav-btn">
                     <LayoutDashboard size={16} strokeWidth={2.5} />
                     Dashboard
                   </button>
@@ -85,7 +106,7 @@ export function AppBar() {
                 <div className="ml-2">
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger>
-                      <button className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-white/4 hover:bg-white/7 border border-white/8 hover:border-white/12 transition-all duration-200 cursor-pointer text-gray-100">
+                      <button className="profile-btn">
                         <Avatar
                           size="1"
                           src={session.user.image || undefined}
@@ -124,7 +145,7 @@ export function AppBar() {
 
             {!session?.user && (
               <Link to="/auth" className="no-underline">
-                <button className="px-6 py-2.5 rounded-lg text-[15px] font-semibold bg-amber-500 hover:bg-amber-600 text-black transition-colors duration-200">
+                <button className="nav-btn-primary">
                   Sign In
                 </button>
               </Link>
@@ -133,7 +154,7 @@ export function AppBar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-200"
+            className="lg:hidden mobile-menu-btn"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
