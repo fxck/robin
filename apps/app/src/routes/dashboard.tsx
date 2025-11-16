@@ -165,7 +165,7 @@ function DashboardPage() {
   const totalLikes = posts.reduce((acc, p) => acc + p.likesCount, 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 pt-32 md:pt-36">
+    <div className="max-w-7xl mx-auto px-5 md:px-8 py-16 pt-40 md:pt-44">
       <Flex direction="column" gap="8">
         {/* Header */}
         <Flex justify="between" align="start" className="flex-col md:flex-row gap-4">
