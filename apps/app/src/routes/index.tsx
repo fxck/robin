@@ -56,7 +56,7 @@ function Index() {
       if (view === 'trending') {
         return api.get('/posts/trending?limit=20');
       }
-      return api.get<PostsListResponse>(`/api/posts?page=${pageParam}&limit=20`);
+      return api.get<PostsListResponse>(`/posts?page=${pageParam}&limit=20`);
     },
     getNextPageParam: (lastPage: PostsListResponse | { posts: PostListItem[] }) => {
       if ('pagination' in lastPage) {
