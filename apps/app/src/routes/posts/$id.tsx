@@ -229,15 +229,15 @@ function PostPage() {
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: 'linear-gradient(to bottom, transparent 0%, #0a0a0a 100%)',
+                backgroundImage: 'linear-gradient(to bottom, transparent -30%, #111110 93%)',
               }}
             />
             {/* Extended gradient below cover: background color (top) → transparent (bottom) */}
             <div
-              className="absolute left-0 right-0 h-[100px] pointer-events-none"
+              className="absolute left-0 right-0 h-[60px] pointer-events-none"
               style={{
                 bottom: '-100px',
-                backgroundImage: 'linear-gradient(to bottom, #0a0a0a 0%, transparent 100%)',
+                backgroundImage: 'linear-gradient(to bottom, #111110 0%, transparent 100%)',
               }}
             />
           </div>
