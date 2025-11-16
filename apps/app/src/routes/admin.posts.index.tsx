@@ -157,18 +157,23 @@ function AdminPostsPage() {
     setDateFilter('all');
   };
 
+  const publishedPosts = allPosts.filter(p => p.status === 'published');
+  const draftPosts = allPosts.filter(p => p.status === 'draft');
+  const totalViews = allPosts.reduce((acc, p) => acc + p.views, 0);
+  const totalLikes = allPosts.reduce((acc, p) => acc + p.likesCount, 0);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg-base)' }}>
-      <div className="max-w-[1800px] mx-auto px-8 py-16 pt-42 md:pt-55">
+      <div className="max-w-[1400px] mx-auto px-8 pt-32 md:pt-36 pb-20">
         {/* Header */}
-        <div className="mb-20">
-          <Flex justify="between" align="start" className="flex-col md:flex-row gap-8">
-            <div className="space-y-4">
+        <div className="mb-12">
+          <Flex justify="between" align="start" className="flex-col md:flex-row gap-6">
+            <div className="space-y-3">
               <h1 className="text-admin-page-title text-white">
-                Posts
+                Content Manager
               </h1>
               <div className="text-admin-page-subtitle" style={{ color: 'var(--color-text-tertiary)' }}>
-                Manage your blog posts and drafts
+                Manage and monitor your blog posts
               </div>
             </div>
             <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
@@ -180,294 +185,288 @@ function AdminPostsPage() {
           </Flex>
         </div>
 
-        {/* MAIN LAYOUT: Table + Sidebar Stats */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-12">
-          {/* LEFT: Posts Table + Filters (PRIMARY) */}
-          <div className="space-y-8">
-
-          {/* Search and Filters */}
-          <div className="glass-surface rounded-2xl">
-            <Flex direction="column" gap="6" className="p-10">
-              <Flex gap="2.5" wrap="wrap" align="center">
-                {/* Search */}
-                <Box style={{ flex: '1', minWidth: '280px' }}>
-                  <TextField.Root
-                    placeholder="Search posts..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    size="2"
-                    style={{ height: '36px' }}
-                  >
-                    <TextField.Slot>
-                      <Search size={15} style={{ color: 'var(--color-text-tertiary)' }} />
-                    </TextField.Slot>
-                    {searchQuery && (
-                      <TextField.Slot>
-                        <button
-                          onClick={() => setSearchQuery('')}
-                          className="hover:bg-white/10 rounded p-0.5 transition-colors"
-                        >
-                          <X size={14} />
-                        </button>
-                      </TextField.Slot>
-                    )}
-                  </TextField.Root>
-                </Box>
-
-                {/* Status Filter */}
-                <Select.Root value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-                  <Select.Trigger style={{ minWidth: '140px', height: '36px' }}>
-                    <Flex align="center" gap="2">
-                      <Filter size={14} style={{ color: 'var(--color-text-tertiary)' }} />
-                      <Text size="2">Status</Text>
-                    </Flex>
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="all">All Status</Select.Item>
-                    <Select.Item value="published">Published</Select.Item>
-                    <Select.Item value="draft">Draft</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-
-                {/* Date Filter */}
-                <Select.Root value={dateFilter} onValueChange={(v) => setDateFilter(v as any)}>
-                  <Select.Trigger style={{ minWidth: '140px', height: '36px' }}>
-                    <Flex align="center" gap="2">
-                      <Filter size={14} style={{ color: 'var(--color-text-tertiary)' }} />
-                      <Text size="2">Date</Text>
-                    </Flex>
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="all">All Time</Select.Item>
-                    <Select.Item value="today">Today</Select.Item>
-                    <Select.Item value="week">Past Week</Select.Item>
-                    <Select.Item value="month">Past Month</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-
-                {/* Clear Filters */}
-                {hasActiveFilters && (
-                  <Button variant="soft" size="2" onClick={clearFilters} className="transition-all duration-200">
-                    <X size={14} />
-                    Clear Filters
-                  </Button>
-                )}
-              </Flex>
-
-              {/* Bulk Actions */}
-              {selectedPosts.size > 0 && (
-                <Flex
-                  gap="3"
-                  align="center"
-                  className="p-3 rounded-lg transition-all duration-200"
-                  style={{
-                    background: 'rgba(245, 158, 11, 0.1)',
-                    border: '1px solid rgba(245, 158, 11, 0.2)',
-                  }}
-                >
-                  <Text size="2" weight="medium" style={{ color: 'var(--color-text-primary)' }}>
-                    {selectedPosts.size} selected
-                  </Text>
-                  <Button size="2" variant="soft" color="red" onClick={() => setBulkDeleteDialog(true)}>
-                    <Trash2 size={14} />
-                    Delete Selected
-                  </Button>
-                  <Button size="2" variant="ghost" onClick={() => setSelectedPosts(new Set())}>
-                    Clear Selection
-                  </Button>
-                </Flex>
-              )}
-
-              {/* Results info */}
-              {hasActiveFilters && (
-                <Text size="1" style={{ color: 'var(--color-text-tertiary)' }}>
-                  Showing {filteredPosts.length} of {allPosts.length} posts
-                </Text>
-              )}
-            </Flex>
-          </div>
-
-          {/* Posts Table */}
-          <div className="glass-surface rounded-2xl overflow-hidden">
-            {isLoading ? (
-              <Box py="9">
-                <Text align="center" color="gray">Loading...</Text>
-              </Box>
-            ) : filteredPosts.length === 0 ? (
-              <Flex direction="column" align="center" gap="4" py="9">
-                <Text size="5" color="gray">
-                  {hasActiveFilters ? 'No posts match your filters' : 'No posts yet'}
-                </Text>
-                {hasActiveFilters ? (
-                  <Button variant="soft" onClick={clearFilters}>
-                    Clear Filters
-                  </Button>
-                ) : (
-                  <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
-                    <Button size="3">
-                      <PlusCircle size={18} />
-                      Create your first post
-                    </Button>
-                  </Link>
-                )}
-              </Flex>
-            ) : (
-              <Table.Root variant="surface">
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '50px' }}>
-                      <Checkbox
-                        checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
-                        onCheckedChange={() => toggleSelectAll(filteredPosts)}
-                      />
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '42%' }}>
-                      <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Title</div>
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '12%' }}>
-                      <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Status</div>
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '10%' }}>
-                      <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Views</div>
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '10%' }}>
-                      <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Likes</div>
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '13%' }}>
-                      <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Date</div>
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '13%' }}>
-                      <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Actions</div>
-                    </Table.ColumnHeaderCell>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {filteredPosts.map((post) => (
-                    <Table.Row key={post.id} className="admin-table-row hover:bg-white/[0.08] transition-colors duration-150">
-                      <Table.Cell className="admin-table-cell">
-                        <Checkbox
-                          checked={selectedPosts.has(post.id)}
-                          onCheckedChange={() => togglePostSelection(post.id)}
-                        />
-                      </Table.Cell>
-                      <Table.Cell className="admin-table-cell">
-                        <Flex direction="column" gap="3">
-                          <div className="text-admin-table-cell-title text-white">
-                            {post.title}
-                          </div>
-                          {post.excerpt && (
-                            <div className="text-admin-meta line-clamp-2" style={{ color: 'var(--color-text-tertiary)' }}>
-                              {post.excerpt}
-                            </div>
-                          )}
-                        </Flex>
-                      </Table.Cell>
-                      <Table.Cell className="admin-table-cell">
-                        <Badge color={post.status === 'published' ? 'green' : 'gray'} size="2">
-                          {post.status}
-                        </Badge>
-                      </Table.Cell>
-                      <Table.Cell className="admin-table-cell">
-                        <Flex gap="2" align="center">
-                          <Eye size={16} style={{ color: 'var(--color-text-tertiary)' }} />
-                          <div className="text-admin-table-cell font-medium text-white">{post.views}</div>
-                        </Flex>
-                      </Table.Cell>
-                      <Table.Cell className="admin-table-cell">
-                        <Flex gap="2" align="center">
-                          <Heart size={16} style={{ color: 'var(--color-text-tertiary)' }} />
-                          <div className="text-admin-table-cell font-medium text-white">{post.likesCount}</div>
-                        </Flex>
-                      </Table.Cell>
-                      <Table.Cell className="admin-table-cell">
-                        <div className="text-admin-meta" style={{ color: 'var(--color-text-tertiary)' }}>
-                          {new Date(post.createdAt).toLocaleDateString()}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className="admin-table-cell">
-                        <Flex gap="2">
-                          <Button
-                            size="2"
-                            variant="soft"
-                            onClick={() => navigate({ to: `/posts/${post.id}` })}
-                          >
-                            <Eye size={16} />
-                          </Button>
-                          <Button
-                            size="2"
-                            variant="soft"
-                            color="blue"
-                            onClick={() => navigate({ to: `/admin/posts/${post.id}/edit` })}
-                          >
-                            <Edit size={16} />
-                          </Button>
-                          <Button
-                            size="2"
-                            variant="soft"
-                            color="red"
-                            onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </Flex>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            )}
-          </div>
-        </div>
-
-        {/* RIGHT: Stats Sidebar (SECONDARY) */}
-        <div className="space-y-8">
-          <div className="glass-surface rounded-2xl p-10">
-            <div className="space-y-8">
-              <div className="text-admin-section-title text-white mb-8">
-                Overview
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-purple-400 opacity-60" />
-                  <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
-                    Total Posts
-                  </div>
-                </div>
-                <div className="text-admin-stat-value text-white">
-                  {allPosts.length}
+        {/* Stats Row */}
+        <div className="glass-surface rounded-2xl p-8 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {/* Total Posts */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4" style={{ color: 'var(--color-text-tertiary)' }} />
+                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+                  Total Posts
                 </div>
               </div>
+              <div className="text-admin-stat-value text-white">
+                {allPosts.length}
+              </div>
+            </div>
 
-              <div className="border-t border-white/10 pt-8 space-y-4">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-400 opacity-60" />
-                  <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
-                    Published
-                  </div>
-                </div>
-                <div className="text-admin-stat-value text-white">
-                  {allPosts.filter(p => p.status === 'published').length}
+            {/* Published */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-green-400" />
+                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+                  Published
                 </div>
               </div>
+              <div className="text-admin-stat-value text-white">
+                {publishedPosts.length}
+              </div>
+            </div>
 
-              <div className="border-t border-white/10 pt-8 space-y-4">
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-blue-400 opacity-60" />
-                  <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
-                    Drafts
-                  </div>
+            {/* Total Views */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-blue-400" />
+                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+                  Total Views
                 </div>
-                <div className="text-admin-stat-value text-white">
-                  {allPosts.filter(p => p.status === 'draft').length}
+              </div>
+              <div className="text-admin-stat-value text-white">
+                {totalViews.toLocaleString()}
+              </div>
+            </div>
+
+            {/* Total Likes */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Heart className="h-4 w-4 text-pink-400" />
+                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
+                  Total Likes
                 </div>
+              </div>
+              <div className="text-admin-stat-value text-white">
+                {totalLikes.toLocaleString()}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Search and Filters */}
+        <div className="glass-surface rounded-2xl p-6 mb-8">
+          <Flex gap="3" wrap="wrap" align="center">
+            {/* Search */}
+            <Box style={{ flex: '1', minWidth: '280px' }}>
+              <TextField.Root
+                placeholder="Search posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                size="2"
+              >
+                <TextField.Slot>
+                  <Search size={15} style={{ color: 'var(--color-text-tertiary)' }} />
+                </TextField.Slot>
+                {searchQuery && (
+                  <TextField.Slot>
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="hover:bg-white/10 rounded p-0.5 transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </TextField.Slot>
+                )}
+              </TextField.Root>
+            </Box>
+
+            {/* Status Filter */}
+            <Select.Root value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+              <Select.Trigger style={{ minWidth: '140px' }}>
+                <Text size="2">Status: {statusFilter === 'all' ? 'All' : statusFilter === 'published' ? 'Published' : 'Draft'}</Text>
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="all">All Status</Select.Item>
+                <Select.Item value="published">Published</Select.Item>
+                <Select.Item value="draft">Draft</Select.Item>
+              </Select.Content>
+            </Select.Root>
+
+            {/* Date Filter */}
+            <Select.Root value={dateFilter} onValueChange={(v) => setDateFilter(v as any)}>
+              <Select.Trigger style={{ minWidth: '140px' }}>
+                <Text size="2">Date: {dateFilter === 'all' ? 'All Time' : dateFilter === 'today' ? 'Today' : dateFilter === 'week' ? 'Past Week' : 'Past Month'}</Text>
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="all">All Time</Select.Item>
+                <Select.Item value="today">Today</Select.Item>
+                <Select.Item value="week">Past Week</Select.Item>
+                <Select.Item value="month">Past Month</Select.Item>
+              </Select.Content>
+            </Select.Root>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <Button variant="soft" size="2" onClick={clearFilters}>
+                <X size={14} />
+                Clear
+              </Button>
+            )}
+          </Flex>
+
+          {/* Bulk Actions */}
+          {selectedPosts.size > 0 && (
+            <Flex
+              gap="3"
+              align="center"
+              className="mt-4 p-3 rounded-lg"
+              style={{
+                background: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid rgba(245, 158, 11, 0.2)',
+              }}
+            >
+              <Text size="2" weight="medium" style={{ color: 'var(--color-text-primary)' }}>
+                {selectedPosts.size} selected
+              </Text>
+              <Button size="2" variant="soft" color="red" onClick={() => setBulkDeleteDialog(true)}>
+                <Trash2 size={14} />
+                Delete
+              </Button>
+              <Button size="2" variant="ghost" onClick={() => setSelectedPosts(new Set())}>
+                Clear
+              </Button>
+            </Flex>
+          )}
+
+          {/* Results info */}
+          {hasActiveFilters && (
+            <Text size="1" className="mt-3 block" style={{ color: 'var(--color-text-tertiary)' }}>
+              Showing {filteredPosts.length} of {allPosts.length} posts
+            </Text>
+          )}
+        </div>
+
+        {/* Posts Table */}
+        <div className="glass-surface rounded-2xl overflow-hidden">
+          {isLoading ? (
+            <Box py="9">
+              <Text align="center" color="gray">Loading...</Text>
+            </Box>
+          ) : filteredPosts.length === 0 ? (
+            <Flex direction="column" align="center" gap="4" py="9">
+              <Text size="5" color="gray">
+                {hasActiveFilters ? 'No posts match your filters' : 'No posts yet'}
+              </Text>
+              {hasActiveFilters ? (
+                <Button variant="soft" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              ) : (
+                <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
+                  <Button size="3">
+                    <PlusCircle size={18} />
+                    Create your first post
+                  </Button>
+                </Link>
+              )}
+            </Flex>
+          ) : (
+            <Table.Root variant="surface">
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '50px' }}>
+                    <Checkbox
+                      checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
+                      onCheckedChange={() => toggleSelectAll(filteredPosts)}
+                    />
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '42%' }}>
+                    <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Title</div>
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '12%' }}>
+                    <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Status</div>
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '10%' }}>
+                    <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Views</div>
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '10%' }}>
+                    <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Likes</div>
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '13%' }}>
+                    <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Date</div>
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="admin-table-header-cell" style={{ width: '13%' }}>
+                    <div className="text-admin-table-header" style={{ color: 'var(--color-text-tertiary)' }}>Actions</div>
+                  </Table.ColumnHeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {filteredPosts.map((post) => (
+                  <Table.Row key={post.id} className="admin-table-row hover:bg-white/[0.08] transition-colors duration-150">
+                    <Table.Cell className="admin-table-cell">
+                      <Checkbox
+                        checked={selectedPosts.has(post.id)}
+                        onCheckedChange={() => togglePostSelection(post.id)}
+                      />
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <Flex direction="column" gap="3">
+                        <div className="text-admin-table-cell-title text-white">
+                          {post.title}
+                        </div>
+                        {post.excerpt && (
+                          <div className="text-admin-meta line-clamp-2" style={{ color: 'var(--color-text-tertiary)' }}>
+                            {post.excerpt}
+                          </div>
+                        )}
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <Badge color={post.status === 'published' ? 'green' : 'gray'} size="2">
+                        {post.status}
+                      </Badge>
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <Flex gap="2" align="center">
+                        <Eye size={16} style={{ color: 'var(--color-text-tertiary)' }} />
+                        <div className="text-admin-table-cell font-medium text-white">{post.views}</div>
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <Flex gap="2" align="center">
+                        <Heart size={16} style={{ color: 'var(--color-text-tertiary)' }} />
+                        <div className="text-admin-table-cell font-medium text-white">{post.likesCount}</div>
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <div className="text-admin-meta" style={{ color: 'var(--color-text-tertiary)' }}>
+                        {new Date(post.createdAt).toLocaleDateString()}
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell className="admin-table-cell">
+                      <Flex gap="2">
+                        <Button
+                          size="2"
+                          variant="soft"
+                          onClick={() => navigate({ to: `/posts/${post.id}` })}
+                        >
+                          <Eye size={16} />
+                        </Button>
+                        <Button
+                          size="2"
+                          variant="soft"
+                          color="blue"
+                          onClick={() => navigate({ to: `/admin/posts/${post.id}/edit` })}
+                        >
+                          <Edit size={16} />
+                        </Button>
+                        <Button
+                          size="2"
+                          variant="soft"
+                          color="red"
+                          onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </Flex>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          )}
+        </div>
       </div>
-    </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog.Root open={!!deleteDialog} onOpenChange={(open) => !open && setDeleteDialog(null)}>

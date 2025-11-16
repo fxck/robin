@@ -82,10 +82,10 @@ export function AppBar() {
                   </button>
                 </Link>
 
-                <Link to="/dashboard" className="no-underline" search={{ verified: false }}>
+                <Link to="/admin/posts" className="no-underline">
                   <button className="nav-btn">
                     <LayoutDashboard size={16} strokeWidth={2.5} />
-                    Dashboard
+                    Content Manager
                   </button>
                 </Link>
 
@@ -179,10 +179,9 @@ export function AppBar() {
                 </Link>
 
                 <Link
-                  to="/dashboard"
+                  to="/admin/posts"
                   className="no-underline"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  search={{ verified: false }}
                 >
                   <Button
                     variant="ghost"
@@ -190,7 +189,7 @@ export function AppBar() {
                     className="w-full justify-start font-medium text-[15px] h-10 text-gray-300 hover:text-gray-100 hover:bg-white/5"
                   >
                     <LayoutDashboard size={16} strokeWidth={2} />
-                    Dashboard
+                    Content Manager
                   </Button>
                 </Link>
 

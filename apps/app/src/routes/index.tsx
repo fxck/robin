@@ -91,21 +91,28 @@ function Index() {
       {/* Hero Section */}
       <Section spacing="xl" className="relative pt-64 md:pt-72 pb-24 md:pb-32">
         {/* Floating Lines Background */}
-        <div className="absolute inset-0 -z-10" style={{ minHeight: '100%' }}>
+        <div
+          className="absolute inset-0 -z-10"
+          style={{
+            minHeight: '100%',
+            background: 'var(--color-bg-base)'
+          }}
+        >
           <div className="relative w-full h-full">
             <FloatingLines
               linesGradient={['#1a1a1a', '#151515', '#1f1f1f']}
-              enabledWaves={['middle', 'bottom']}
-              lineCount={[6, 4]}
-              lineDistance={[4, 5]}
-              middleWavePosition={{ x: 0, y: 0, rotate: 0 }}
-              bottomWavePosition={{ x: 0, y: -0.3, rotate: 0 }}
-              animationSpeed={0.6}
+              enabledWaves={['top', 'middle', 'bottom']}
+              lineCount={[12, 16, 10]}
+              lineDistance={[2.5, 2, 2.8]}
+              topWavePosition={{ x: 15, y: 0.8, rotate: -0.5 }}
+              middleWavePosition={{ x: 8, y: 0.1, rotate: 0.3 }}
+              bottomWavePosition={{ x: 3, y: -0.5, rotate: 0.6 }}
+              animationSpeed={0.4}
               interactive={true}
-              bendRadius={5.0}
-              bendStrength={-0.5}
+              bendRadius={4.0}
+              bendStrength={-0.4}
               parallax={true}
-              parallaxStrength={0.2}
+              parallaxStrength={0.15}
               mixBlendMode="lighten"
             />
             {/* Gradient fade to background color at bottom */}
@@ -114,6 +121,14 @@ function Index() {
               style={{
                 height: '100px',
                 background: 'linear-gradient(to bottom, transparent 0%, var(--color-bg-base) 100%)'
+              }}
+            />
+            {/* Gradient fade at top to blend with navbar */}
+            <div
+              className="absolute top-0 left-0 right-0 pointer-events-none"
+              style={{
+                height: '200px',
+                background: 'linear-gradient(to top, transparent 50%, var(--color-bg-base) 100%)'
               }}
             />
           </div>
