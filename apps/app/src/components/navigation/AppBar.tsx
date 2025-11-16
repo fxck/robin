@@ -46,13 +46,13 @@ export function AppBar() {
     >
       <nav className="glass-appbar relative py-5 px-8 mx-auto max-w-7xl">
         <Flex align="center" justify="between">
-          {/* Logo - World-class design */}
-          <Link to="/" className="flex items-center gap-3.5 no-underline group">
-            <div className="relative h-10 w-10 rounded-2xl bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center shadow-xl shadow-purple-500/30 ring-1 ring-purple-400/20 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-purple-500/50 group-hover:scale-110 group-hover:rotate-3">
-              <span className="text-white font-bold text-xl tracking-tight select-none">R</span>
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-transparent to-white/20"></div>
+          {/* Logo - Refined & Elegant */}
+          <Link to="/" className="flex items-center gap-3 no-underline group">
+            <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-amber-500/30 group-hover:scale-105">
+              <span className="text-black font-bold text-lg tracking-tight select-none">R</span>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/15"></div>
             </div>
-            <span className="text-lg font-bold tracking-tight text-white transition-all duration-300 group-hover:text-purple-300">
+            <span className="text-[17px] font-semibold tracking-tight text-white/95 transition-all duration-300 group-hover:text-white">
               Robin
             </span>
           </Link>
