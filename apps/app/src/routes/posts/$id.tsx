@@ -45,11 +45,8 @@ export const Route = createFileRoute('/posts/$id')({
   head: ({ loaderData }) => {
     if (!loaderData?.post) {
       return {
-        meta: [
-          {
-            title: 'Post Not Found - Robin',
-          },
-        ],
+        title: 'Post Not Found - Robin',
+        meta: [],
       };
     }
 
@@ -59,10 +56,8 @@ export const Route = createFileRoute('/posts/$id')({
     const publishedDate = new Date(post.publishedAt || post.createdAt).toISOString();
 
     return {
+      title: `${post.title} - Robin`,
       meta: [
-        {
-          title: `${post.title} - Robin`,
-        },
         {
           name: 'description',
           content: description,

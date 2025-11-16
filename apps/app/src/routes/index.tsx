@@ -15,10 +15,8 @@ import { PostCard } from '../components/posts/PostCard';
 export const Route = createFileRoute('/')({
   component: Index,
   head: () => ({
+    title: 'Robin - Discover Stories and Ideas',
     meta: [
-      {
-        title: 'Robin - Discover Stories and Ideas',
-      },
       {
         name: 'description',
         content: 'Explore trending stories, articles, and ideas from our community. Join Robin to share your thoughts and discover engaging content.',
