@@ -102,6 +102,7 @@
     outline: 2px solid var(--color-accent-primary);
     outline-offset: 2px;
     border-radius: 6px;
+    transition: outline-color 0.2s ease;
   }
 }
 
