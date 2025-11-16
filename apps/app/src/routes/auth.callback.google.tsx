@@ -12,7 +12,10 @@ function GoogleCallback() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('Connecting to Google...');
 
+  console.log('[GoogleCallback] Component rendered');
+
   useEffect(() => {
+    console.log('[GoogleCallback] useEffect running');
     const handleCallback = async () => {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
