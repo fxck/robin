@@ -5,6 +5,7 @@ import type { Database } from '@robin/database';
 import { users, sessions, accounts, verifications } from '@robin/database';
 import nodemailer from 'nodemailer';
 import type { Redis } from 'ioredis';
+import { emailVerification } from 'better-auth/plugins/email-verification';
 
 // Email sending utility
 async function sendEmail(
@@ -114,66 +115,6 @@ export function createAuth(db: Database, config: {
       },
     },
 
-    // Email verification configuration
-    emailVerification: {
-      sendVerificationEmail: async ({ user, url, token }) => {
-        // Email verification - Replace API URL with frontend app URL
-        // Better Auth generates url pointing to API (e.g., https://api.robin.app/api/auth/verify-email?token=...)
-        // We want users to visit the frontend app instead
-        const verificationUrl = `${config.appURL}/verify-email?token=${token}`;
-
-        if (config.emailConfig) {
-          await sendEmail({
-            to: user.email,
-            subject: 'Verify your email - Robin',
-            html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #8b5cf6;">Verify your email</h1>
-                <p>Hi ${user.name || 'there'},</p>
-                <p>Thanks for signing up! Please verify your email address by clicking the button below:</p>
-                <a href="${verificationUrl}" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Verify Email</a>
-                <p>Or copy and paste this link into your browser:</p>
-                <p style="color: #6b7280; word-break: break-all;">${verificationUrl}</p>
-                <p>This link will expire in 24 hours.</p>
-                <p>If you didn't create an account, please ignore this email.</p>
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
-                <p style="color: #6b7280; font-size: 12px;">Sent from Robin App</p>
-              </div>
-            `,
-          }, config.emailConfig);
-        }
-      },
-      sendOnSignUp: true, // Automatically send verification email on signup
-      autoSignInAfterVerification: false, // User is already signed in
-      callbackURL: `${config.appURL}/dashboard?verified=true`, // Redirect to app after verification
-      // Send welcome email after verification
-      async afterEmailVerification(user) {
-        if (config.emailConfig) {
-          await sendEmail({
-            to: user.email,
-            subject: 'Welcome to Robin!',
-            html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #8b5cf6;">Welcome to Robin!</h1>
-                <p>Hi ${user.name || 'there'},</p>
-                <p>Thanks for verifying your email and joining Robin! We're excited to have you on board.</p>
-                <p>You can now start creating and sharing your blog posts with the world.</p>
-                <h2 style="color: #6b7280; font-size: 18px;">Getting Started</h2>
-                <ul style="line-height: 1.8;">
-                  <li>Create your first post from the dashboard</li>
-                  <li>Explore trending posts from other writers</li>
-                  <li>Customize your profile</li>
-                </ul>
-                <p>If you have any questions or feedback, feel free to reach out!</p>
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
-                <p style="color: #6b7280; font-size: 12px;">Sent from Robin App</p>
-              </div>
-            `,
-          }, config.emailConfig);
-        }
-      },
-    },
-
     socialProviders: {
       github: {
         clientId: process.env['GITHUB_CLIENT_ID'] || '',
@@ -193,6 +134,34 @@ export function createAuth(db: Database, config: {
 
     plugins: [
       openAPI(),
+      emailVerification({
+        sendOnSignUp: true,
+        autoSignInAfterVerification: false,
+        sendVerificationEmail: async ({ user, url, token }) => {
+          const verificationUrl = `${config.appURL}/verify-email?token=${token}`;
+
+          if (config.emailConfig) {
+            await sendEmail({
+              to: user.email,
+              subject: 'Verify your email - Robin',
+              html: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h1 style="color: #8b5cf6;">Verify your email</h1>
+                  <p>Hi ${user.name || 'there'},</p>
+                  <p>Thanks for signing up! Please verify your email address by clicking the button below:</p>
+                  <a href="${verificationUrl}" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Verify Email</a>
+                  <p>Or copy and paste this link into your browser:</p>
+                  <p style="color: #6b7280; word-break: break-all;">${verificationUrl}</p>
+                  <p>This link will expire in 24 hours.</p>
+                  <p>If you didn't create an account, please ignore this email.</p>
+                  <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                  <p style="color: #6b7280; font-size: 12px;">Sent from Robin App</p>
+                </div>
+              `,
+            }, config.emailConfig);
+          }
+        },
+      }),
     ],
 
     session: {
