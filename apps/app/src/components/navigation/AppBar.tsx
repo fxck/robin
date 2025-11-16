@@ -42,21 +42,24 @@ export function AppBar() {
       className={cn(
         'fixed top-0 left-0 right-0 z-50',
         'transition-transform duration-300 ease-out',
-        'px-4 pt-5',
+        'px-4 pt-4',
         isVisible ? 'translate-y-0' : '-translate-y-full'
       )}
     >
-      <nav ref={navRef} className="glass-appbar relative py-5 px-8 mx-auto max-w-7xl">
-        <div className="glass-appbar-noise" aria-hidden="true"></div>
+      <nav ref={navRef} className="glass-appbar relative py-3 px-6 mx-auto max-w-7xl">
         <Flex align="center" justify="between">
-          {/* Logo - Refined & Elegant */}
-          <Link to="/" className="logo-container no-underline">
-            <div className="logo-icon">
-              <span className="text-black font-bold text-lg tracking-tight select-none relative z-10">R</span>
+          {/* Logo - 3D Cube */}
+          <Link to="/" className="logo-link no-underline">
+            <div className="logo-cube">
+              <div className="cube-inner">
+                <div className="cube-face cube-front">R</div>
+                <div className="cube-face cube-back">R</div>
+                <div className="cube-face cube-left">R</div>
+                <div className="cube-face cube-right">R</div>
+                <div className="cube-face cube-top">R</div>
+                <div className="cube-face cube-bottom">R</div>
+              </div>
             </div>
-            <span className="text-[17px] font-semibold tracking-tight text-white/95 transition-colors duration-200">
-              Robin
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
