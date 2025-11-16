@@ -7,18 +7,21 @@ import path from 'path';
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps-app',
-  
+
+  // Use CDN host for static assets if provided
+  base: process.env.CDN_HOST || '/',
+
   server: {
     port: 5173,
     host: 'localhost',
     strictPort: true, // Fail if port is already in use
   },
-  
+
   preview: {
     port: 4173,
     host: 'localhost',
   },
-  
+
   plugins: [
     react(),
     TanStackRouterPlugin({
@@ -27,13 +30,13 @@ export default defineConfig({
     }),
     nxViteTsPaths(),
   ],
-  
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-  
+
   build: {
     outDir: '../../dist/apps/app',
     emptyOutDir: true,

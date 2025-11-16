@@ -68,6 +68,7 @@ zerops:
       envVariables:
         CI: true
         VITE_API_URL: ${RUNTIME_VITE_API_URL}
+        CDN_HOST: https://static.cdn.zerops.app/robin.fxck.dev/
       deployFiles:
         - dist/apps/app/~
       cache:
