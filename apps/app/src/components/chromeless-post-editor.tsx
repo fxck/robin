@@ -570,10 +570,10 @@ export function ChromelessPostEditor({
           )}
 
           {/* Hero Content - Title and Author Meta - EXACT MATCH to post detail */}
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12">
+          <div className="relative z-10 w-full mx-auto px-5 md:px-8 max-w-reading">
             {/* Cover Controls - Subtle and positioned above title */}
             {coverImage && (
-              <div className="max-w-4xl mb-6 flex items-center gap-3">
+              <div className="mb-6 flex items-center gap-3">
                 <div
                   {...getCoverRootProps()}
                   className={cn(
@@ -609,7 +609,7 @@ export function ChromelessPostEditor({
               </div>
             )}
 
-            <div className="max-w-4xl space-y-6">
+            <div className="space-y-6 max-w-full">
               {/* Title Input - Styled exactly like display title */}
               <textarea
                 ref={titleInputRef}
@@ -667,20 +667,19 @@ export function ChromelessPostEditor({
         </section>
 
         {/* Article Content - EXACT match to post detail */}
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12">
-          <div className="w-full max-w-4xl py-12">
-            <article
-              id="article-content"
-              className={cn(
-                // EXACT prose classes from post detail
-                'prose prose-lg dark:prose-invert max-w-full',
-                'prose-headings:font-serif prose-headings:font-bold prose-headings:scroll-mt-32',
-                'prose-p:text-text-primary prose-p:leading-relaxed',
-                'prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline',
-                'prose-code:text-amber-300',
-                'prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10'
-              )}
-            >
+        <div className="mx-auto px-5 md:px-8 max-w-reading py-12">
+          <article
+            id="article-content"
+            className={cn(
+              // EXACT prose classes from post detail
+              'prose prose-lg dark:prose-invert max-w-full',
+              'prose-headings:font-serif prose-headings:font-bold prose-headings:scroll-mt-32',
+              'prose-p:text-text-primary prose-p:leading-relaxed',
+              'prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline',
+              'prose-code:text-amber-300',
+              'prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10'
+            )}
+          >
               <EditorRoot>
                 <EditorContent
                   extensions={extensions}
@@ -843,17 +842,16 @@ export function ChromelessPostEditor({
                   <ImageResizer />
                 </EditorContent>
               </EditorRoot>
-            </article>
+          </article>
 
-            {/* Bottom spacing to match post detail */}
-            <div className="h-32" />
-          </div>
+          {/* Bottom spacing to match post detail */}
+          <div className="h-32" />
         </div>
       </div>
 
       {/* Bottom Control Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 pb-6 px-6">
-        <div className="max-w-4xl mx-auto flex items-center justify-between px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10">
+        <div className="max-w-reading mx-auto flex items-center justify-between px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10">
           {/* Left: Exit */}
           <button
             onClick={onExit}
