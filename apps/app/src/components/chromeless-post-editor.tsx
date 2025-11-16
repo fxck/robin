@@ -648,8 +648,7 @@ export function ChromelessPostEditor({
                     if (!text) return false;
 
                     // Check if text contains markdown syntax (multiline flag for headings)
-                    // Patterns: headings, images, links, bold, italic, code, lists, blockquotes, horizontal rules
-                    const hasMarkdown = /^#{1,6}\s|!\[.+\]\(.+\)|\[.+\]\(.+\)|\*\*.+\*\*|\*[^*]+\*|`.+`|^[\s]*[-*+]\s|^[\s]*\d+\.\s|^>\s|^(\*{3,}|-{3,}|_{3,})$/m.test(text);
+                    const hasMarkdown = /^#{1,6}\s|!\[.+\]\(.+\)|\[.+\]\(.+\)|\*\*.+\*\*|\*[^*]+\*|`.+`/m.test(text);
 
                     if (hasMarkdown && editorRef.current) {
                       // Prevent default paste

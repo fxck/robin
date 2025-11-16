@@ -5,6 +5,7 @@ interface Heading {
   id: string;
   text: string;
   level: number;
+  element: HTMLElement;
 }
 
 interface TableOfContentsProps {
@@ -17,66 +18,86 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    // Extract headings from markdown content
-    const headingRegex = /^(#{1,3})\s+(.+)$/gm;
-    const extractedHeadings: Heading[] = [];
-    let match;
+    // Extract headings from the ACTUAL rendered DOM
+    const extractHeadingsFromDOM = () => {
+      const articleContent = document.getElementById('article-content');
+      if (!articleContent) return;
 
-    while ((match = headingRegex.exec(content)) !== null) {
-      const level = match[1].length;
-      const text = match[2];
-      const id = text
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-');
+      const headingElements = articleContent.querySelectorAll('h1, h2, h3');
+      const extractedHeadings: Heading[] = [];
 
-      extractedHeadings.push({ id, text, level });
-    }
+      headingElements.forEach((element) => {
+        const htmlElement = element as HTMLElement;
+        const id = htmlElement.id;
+        const text = htmlElement.textContent || '';
+        const level = parseInt(element.tagName.substring(1));
 
-    setHeadings(extractedHeadings);
+        if (id && text) {
+          extractedHeadings.push({
+            id,
+            text,
+            level,
+            element: htmlElement,
+          });
+        }
+      });
+
+      setHeadings(extractedHeadings);
+    };
+
+    // Wait for ReactMarkdown to render
+    const timeoutId = setTimeout(extractHeadingsFromDOM, 500);
+    return () => clearTimeout(timeoutId);
   }, [content]);
 
   useEffect(() => {
-    // Intersection Observer for active heading with improved settings
+    if (headings.length === 0) return;
+
+    // Set first heading as active initially
+    if (!activeId && headings.length > 0) {
+      setActiveId(headings[0].id);
+    }
+
+    // Intersection Observer for active heading tracking
     const observer = new IntersectionObserver(
       (entries) => {
-        // Find the entry that's most visible
-        let mostVisibleEntry = entries[0];
-        let maxRatio = 0;
+        // Sort entries by their position in viewport
+        const visibleEntries = entries.filter((entry) => entry.isIntersecting);
 
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-            maxRatio = entry.intersectionRatio;
-            mostVisibleEntry = entry;
+        if (visibleEntries.length === 0) return;
+
+        // Find the topmost visible heading
+        let topMostEntry = visibleEntries[0];
+        let minTop = Infinity;
+
+        visibleEntries.forEach((entry) => {
+          const rect = entry.boundingClientRect;
+          if (rect.top < minTop && rect.top >= 0) {
+            minTop = rect.top;
+            topMostEntry = entry;
           }
         });
 
-        if (mostVisibleEntry && mostVisibleEntry.isIntersecting) {
-          setActiveId(mostVisibleEntry.target.id);
+        if (topMostEntry) {
+          setActiveId(topMostEntry.target.id);
         }
       },
       {
-        // Track headings in the top 30% of viewport
-        rootMargin: '-10% 0px -70% 0px',
-        threshold: [0, 0.25, 0.5, 0.75, 1.0],
+        // Track headings when they enter the top 20% of viewport
+        rootMargin: '-20% 0px -75% 0px',
+        threshold: [0, 0.1, 0.5, 1.0],
       }
     );
 
-    // Small delay to ensure DOM is ready
-    const timeoutId = setTimeout(() => {
-      headings.forEach(({ id }) => {
-        const element = document.getElementById(id);
-        if (element) {
-          observer.observe(element);
-        }
-      });
-    }, 100);
+    // Observe all heading elements directly
+    headings.forEach(({ element }) => {
+      observer.observe(element);
+    });
 
     return () => {
-      clearTimeout(timeoutId);
       observer.disconnect();
     };
-  }, [headings]);
+  }, [headings, activeId]);
 
   useEffect(() => {
     // Update scroll progress on scroll
@@ -103,21 +124,18 @@ export function TableOfContents({ content }: TableOfContentsProps) {
     return null;
   }
 
-  const handleClick = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      // Set active immediately for instant feedback
-      setActiveId(id);
+  const handleClick = (heading: Heading) => {
+    // Set active immediately for instant feedback
+    setActiveId(heading.id);
 
-      // Calculate position with offset for header/padding
-      const top = element.getBoundingClientRect().top + window.scrollY - 120;
+    // Use the direct element reference for reliable scrolling
+    const yOffset = -100; // Offset for fixed header/spacing
+    const y = heading.element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
-      // Smooth scroll to element
-      window.scrollTo({
-        top,
-        behavior: 'smooth'
-      });
-    }
+    window.scrollTo({
+      top: y,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -131,11 +149,12 @@ export function TableOfContents({ content }: TableOfContentsProps) {
           {headings.map((heading) => (
             <button
               key={heading.id}
-              onClick={() => handleClick(heading.id)}
+              onClick={() => handleClick(heading)}
               className={`
                 block w-full text-left py-2 px-3 rounded-lg transition-all duration-200 text-sm
-                ${heading.level === 2 ? 'pl-3' : ''}
-                ${heading.level === 3 ? 'pl-6' : ''}
+                ${heading.level === 1 ? 'pl-2 font-semibold' : ''}
+                ${heading.level === 2 ? 'pl-4' : ''}
+                ${heading.level === 3 ? 'pl-6 text-xs' : ''}
                 ${
                   activeId === heading.id
                     ? 'bg-amber-500/20 text-amber-400 font-medium border-l-2 border-amber-500 shadow-sm'

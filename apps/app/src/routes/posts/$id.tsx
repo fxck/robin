@@ -215,7 +215,7 @@ function PostPage() {
       {/* Table of Contents (Desktop only - fixed position) */}
       <TableOfContents content={post.content} />
 
-      {/* Hero Section */}
+      {/* Hero Section with Cover Image */}
       <section className="relative min-h-[70vh] flex items-end pb-12 md:pb-16">
         {/* Hero Background Image */}
         {post.coverImage && (
@@ -224,20 +224,6 @@ function PostPage() {
               src={post.coverImage}
               alt={post.title}
               className="w-full h-full object-cover"
-            />
-            {/* Gradient Overlay with smooth fade */}
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.1) 25%, rgba(10, 10, 10, 0.4) 50%, rgba(10, 10, 10, 0.7) 70%, rgba(10, 10, 10, 0.9) 85%, var(--color-bg-base) 100%)',
-              }}
-            />
-            {/* Additional black gradient strip at the bottom for extra smooth fade */}
-            <div
-              className="absolute bottom-0 left-0 right-0 h-32"
-              style={{
-                backgroundImage: 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.6) 70%, rgba(0, 0, 0, 0.8) 100%)',
-              }}
             />
           </div>
         )}
@@ -297,9 +283,22 @@ function PostPage() {
         </Container>
       </section>
 
+      {/* Gradient Fade Overlay - positioned BELOW cover, ABOVE content */}
+      {post.coverImage && (
+        <div
+          className="relative -mt-48 h-48 pointer-events-none z-20"
+          style={{
+            backgroundImage: 'linear-gradient(0deg, var(--color-bg-base) 0%, rgba(10, 10, 10, 0.95) 20%, rgba(10, 10, 10, 0.8) 40%, rgba(10, 10, 10, 0.5) 60%, rgba(10, 10, 10, 0.2) 80%, transparent 100%)',
+          }}
+        />
+      )}
+
       {/* Article Content */}
       <Container size="reading" className="py-12">
-        <article className="prose prose-lg dark:prose-invert max-w-full prose-headings:font-serif prose-headings:font-bold prose-p:text-text-primary prose-p:leading-relaxed prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline prose-code:text-amber-300 prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10">
+        <article
+          id="article-content"
+          className="prose prose-lg dark:prose-invert max-w-full prose-headings:font-serif prose-headings:font-bold prose-headings:scroll-mt-32 prose-p:text-text-primary prose-p:leading-relaxed prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline prose-code:text-amber-300 prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10"
+        >
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeSlug, rehypeRaw, rehypeSanitize]}
@@ -358,8 +357,10 @@ function PostPage() {
             </Link>
           </Flex>
         </div>
+      </Container>
 
-        {/* Related Posts */}
+      {/* Related Posts - Full Width */}
+      <Container size="standard" className="pb-12">
         <RelatedPosts postId={post.id} />
       </Container>
     </div>
