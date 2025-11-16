@@ -126,7 +126,7 @@ function Index() {
                 color: '#e8e8e8'
               }}
             >
-              Welcome to Robin
+              Welcome to Robn
             </Heading>
 
             {/* Hero Subtitle */}

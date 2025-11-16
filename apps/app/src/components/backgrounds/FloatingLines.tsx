@@ -386,7 +386,9 @@ export default function FloatingLines({
     const clock = new Clock();
 
     const setSize = () => {
-      const el = containerRef.current!;
+      if (!containerRef.current) return;
+
+      const el = containerRef.current;
       const width = el.clientWidth || 1;
       const height = el.clientHeight || 1;
 
@@ -399,7 +401,11 @@ export default function FloatingLines({
 
     setSize();
 
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(setSize) : null;
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => {
+      if (containerRef.current) {
+        setSize();
+      }
+    }) : null;
 
     if (ro && containerRef.current) {
       ro.observe(containerRef.current);
