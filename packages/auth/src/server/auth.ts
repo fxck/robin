@@ -135,6 +135,8 @@ export function createAuth(db: Database, config: {
       sendOnSignUp: true,
       autoSignInAfterVerification: false,
       sendVerificationEmail: async ({ user, url, token }) => {
+        console.log('[Better Auth] Verification URL generated:', url);
+        console.log('[Better Auth] Token:', token);
         const verificationUrl = `${config.appURL}/verify-email?token=${token}`;
 
         if (config.emailConfig) {

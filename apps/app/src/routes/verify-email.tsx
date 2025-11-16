@@ -26,16 +26,12 @@ function VerifyEmailPage() {
 
       try {
         // Call Better Auth verify endpoint via fetch
-        // We use fetch directly because Better Auth client might not expose verifyEmail method
+        // Better Auth uses GET with query parameter for token-based verification
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/verify-email`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/verify-email?token=${encodeURIComponent(token)}`,
           {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            method: 'GET',
             credentials: 'include',
-            body: JSON.stringify({ token }),
           }
         );
 
