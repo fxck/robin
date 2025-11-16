@@ -45,9 +45,9 @@ function VerifyEmailPage() {
         setStatus('success');
         toast.success('Email verified successfully!');
 
-        // Redirect to dashboard after 2 seconds
+        // Redirect to content manager after 2 seconds
         setTimeout(() => {
-          navigate({ to: '/dashboard', search: { verified: true } });
+          navigate({ to: '/admin/posts' });
         }, 2000);
       } catch (error) {
         setStatus('error');
@@ -91,7 +91,7 @@ function VerifyEmailPage() {
                     Email Verified!
                   </Heading>
                   <Text size="3" color="gray" align="center">
-                    Your email has been successfully verified. Redirecting you to the dashboard...
+                    Your email has been successfully verified. Redirecting you to Content Manager...
                   </Text>
                 </>
               )}

@@ -116,7 +116,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                     try {
                       await signIn.social({
                         provider: 'github',
-                        callbackURL: '/dashboard',
+                        callbackURL: '/admin/posts',
                       });
                     } catch (error) {
                       toast.error('GitHub sign in failed');
@@ -142,7 +142,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                     try {
                       await signIn.social({
                         provider: 'google',
-                        callbackURL: '/dashboard',
+                        callbackURL: '/admin/posts',
                       });
                     } catch (error) {
                       toast.error('Google sign in failed');
