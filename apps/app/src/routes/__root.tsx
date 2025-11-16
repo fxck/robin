@@ -54,12 +54,18 @@ function RootComponent() {
     <ErrorBoundary>
       <HeadContent />
       <QueryClientProvider client={queryClient}>
-        <Theme appearance="dark" accentColor="amber" radius="medium">
-          <Box style={{ minHeight: '100vh', background: 'var(--color-bg-base)' }}>
+        <Theme appearance="dark" accentColor="amber" radius="medium" scaling="100%">
+          <Box
+            style={{
+              minHeight: '100vh',
+              background: 'var(--color-bg-base)',
+              position: 'relative'
+            }}
+          >
             <AppBar />
             <Outlet />
           </Box>
-          <Toaster position="bottom-left" richColors closeButton />
+          <Toaster position="bottom-left" richColors closeButton expand={true} />
           {import.meta.env.DEV && (
             <>
               <TanStackRouterDevtools position="bottom-right" />
