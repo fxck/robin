@@ -264,8 +264,9 @@ function DashboardPage() {
           />
         </div>
 
-        {/* Activity Section */}
-        <div className="glass-surface p-6 rounded-2xl">
+        {/* Activity Section - Only show if there are posts */}
+        {posts.length > 0 && (
+          <div className="glass-surface p-6 rounded-2xl">
             <Flex direction="column" gap="4">
               <Heading size="5">Recent Activity</Heading>
 
@@ -299,7 +300,8 @@ function DashboardPage() {
                 ))}
               </div>
             </Flex>
-        </div>
+          </div>
+        )}
 
         {/* Posts Table */}
         <div className="glass-surface rounded-2xl overflow-hidden">
@@ -321,7 +323,7 @@ function DashboardPage() {
                 </div>
               </Box>
             ) : posts.length === 0 ? (
-              <Flex direction="column" align="center" gap="6" py="20">
+              <Flex direction="column" align="center" gap="6" className="py-32">
                 <div className="p-4 bg-white/5 rounded-full">
                   <FileText size={32} className="text-gray-500" />
                 </div>

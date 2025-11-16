@@ -73,7 +73,7 @@ export function FileUpload({
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch(`${API_BASE}/api/upload`, {
+        const response = await fetch(`${API_BASE}/upload`, {
           method: 'POST',
           body: formData,
           credentials: 'include',
