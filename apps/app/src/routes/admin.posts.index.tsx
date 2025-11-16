@@ -47,9 +47,9 @@ function AdminPostsPage() {
   // Bulk selection state
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<PostsListResponse>({
     queryKey: ['admin-posts'],
-    queryFn: () => api.get('/posts?status=all&limit=100'),
+    queryFn: () => api.get<PostsListResponse>('/posts?status=all&limit=100'),
   });
 
   const deleteMutation = useMutation({
@@ -191,7 +191,7 @@ function AdminPostsPage() {
                 <Text size="2" color="gray">
                   Published
                 </Text>
-                <Heading size="7">{allPosts.filter((p) => p.status === 'published').length}</Heading>
+                <Heading size="7">{allPosts.filter(p => p.status === 'published').length}</Heading>
               </Flex>
             </Card>
             <Card>
@@ -199,7 +199,7 @@ function AdminPostsPage() {
                 <Text size="2" color="gray">
                   Drafts
                 </Text>
-                <Heading size="7">{allPosts.filter((p) => p.status === 'draft').length}</Heading>
+                <Heading size="7">{allPosts.filter(p => p.status === 'draft').length}</Heading>
               </Flex>
             </Card>
           </Grid>

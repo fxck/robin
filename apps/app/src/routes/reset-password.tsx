@@ -12,7 +12,7 @@ import {
   Heading,
 } from '@radix-ui/themes';
 import { toast } from 'sonner';
-import { Lock, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { resetPassword } from '../lib/auth';
 
 export const Route = createFileRoute('/reset-password')({

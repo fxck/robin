@@ -25,7 +25,6 @@ import {
 import { Markdown } from 'tiptap-markdown';
 import { Box } from '@radix-ui/themes';
 import { toast } from 'sonner';
-import { useState } from 'react';
 import {
   Bold,
   Italic,
@@ -174,8 +173,6 @@ const suggestionItems = [
 ];
 
 export function NovelEditor({ value, onChange, placeholder = "Press '/' for commands...", className }: NovelEditorProps) {
-  // Only set initial content once when component mounts
-  const [initialContent] = useState<string | undefined>(value);
 
   const extensions = [
     StarterKit.configure({
@@ -239,7 +236,6 @@ export function NovelEditor({ value, onChange, placeholder = "Press '/' for comm
     <Box className={className}>
       <EditorRoot>
         <EditorContent
-          initialContent={initialContent}
           extensions={extensions}
           editorProps={{
             attributes: {

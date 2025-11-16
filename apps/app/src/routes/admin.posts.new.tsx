@@ -6,7 +6,7 @@ import { api } from '../lib/api-client';
 import { authClient } from '../lib/auth';
 import { ChromelessPostEditor } from '../components/chromeless-post-editor';
 import { useAutosave } from '../hooks/use-autosave';
-import { DraftManager } from '../lib/draft-manager';
+import { DraftManager, type DraftData } from '../lib/draft-manager';
 import type { CreatePostInput, UpdatePostInput, PostResponse } from '@robin/types';
 
 export const Route = createFileRoute('/admin/posts/new')({
@@ -133,11 +133,11 @@ function NewPostPage() {
       return;
     }
 
-    const draftData = {
+    const draftData: DraftData = {
       title,
       content,
       coverImage: coverImage || undefined,
-      status: 'draft', // Always draft for autosave
+      status: 'draft' as const, // Always draft for autosave
       version,
       postId: createdPostId || undefined,
       lastModified: Date.now(),
@@ -148,17 +148,17 @@ function NewPostPage() {
         title: title.trim() || 'Untitled',
         content,
         coverImage: coverImage || undefined,
-        status: 'draft',
+        status: 'draft' as const,
       },
       draftData
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     // Intentionally exclude: autosave (stable ref), version (don't autosave on version sync), initialized
   }, [title, content, coverImage]);
 
   // Create/Update mutation for manual saves (Publish / Save Draft)
   const saveMutation = useMutation({
-    mutationFn: async (data: CreatePostInput | UpdatePostInput & { publish?: boolean }) => {
+    mutationFn: async (data: (CreatePostInput | UpdatePostInput) & { publish?: boolean }) => {
       const saveData = {
         title: data.title,
         content: data.content,

@@ -25,7 +25,6 @@ import {
 import { Markdown } from 'tiptap-markdown';
 import { Box } from '@radix-ui/themes';
 import { toast } from 'sonner';
-import { useState } from 'react';
 import {
   Bold,
   Italic,
@@ -176,8 +175,6 @@ export function AdvancedEditor({
   placeholder = "Press '/' for commands...",
   className,
 }: AdvancedEditorProps) {
-  // Only set initial content once when component mounts
-  const [initialContent] = useState<string | undefined>(value);
 
   const extensions = [
     StarterKit.configure({
@@ -241,7 +238,6 @@ export function AdvancedEditor({
     <Box className={className}>
       <EditorRoot>
         <EditorContent
-          initialContent={initialContent}
           extensions={extensions}
           editorProps={{
             attributes: {

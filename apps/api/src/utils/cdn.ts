@@ -37,7 +37,7 @@ export function rewriteUrlToCdn(url: string | null | undefined): string | null {
     urlObj.protocol = cdnUrl.protocol;
 
     return urlObj.toString();
-  } catch (error) {
+  } catch {
     // If URL parsing fails, return original URL
     return url;
   }

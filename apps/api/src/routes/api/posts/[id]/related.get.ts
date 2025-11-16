@@ -33,16 +33,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const post = currentPost[0];
-
-    // Extract keywords from title and excerpt for similarity matching
-    const keywords = [
-      ...(post.title?.toLowerCase().split(/\s+/) || []),
-      ...(post.excerpt?.toLowerCase().split(/\s+/) || []),
-    ]
-      .filter((word) => word.length > 3) // Filter out short words
-      .slice(0, 10); // Take top 10 keywords
-
     // Get related posts based on:
     // 1. Posts from the same author
     // 2. Posts with similar keywords in title/excerpt

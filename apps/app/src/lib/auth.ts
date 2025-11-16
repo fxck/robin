@@ -12,9 +12,9 @@ export const authClient = createAuthClient({
       }
     },
     retry: {
+      type: 'linear',
       attempts: 3,
       delay: 1000,
-      statusCodes: [429, 500, 502, 503, 504],
     },
   },
 });

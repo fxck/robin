@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { db } from '~/services/db';
 import { schema } from '@robin/database';
-import { desc, count, like, or, sql } from 'drizzle-orm';
+import { desc, count, like, or } from 'drizzle-orm';
 import { log } from '~/utils/logger';
 
 const querySchema = z.object({

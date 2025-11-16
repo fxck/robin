@@ -1,6 +1,6 @@
 export { AuthForm } from './auth-form';
 export { ErrorBoundary } from './error-boundary';
-export { Navigation } from './navigation';
+export { AppBar } from './navigation';
 export { FileUpload } from './file-upload';
 export { FileUploadExample } from './file-upload-example';
 export { Image, Avatar } from './image';

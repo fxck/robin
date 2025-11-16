@@ -26,11 +26,11 @@ interface FormData {
 }
 
 export function FileUploadExample() {
-  const form = useForm<FormData>({
+  const form = useForm({
     defaultValues: {
       title: '',
       imageUrl: '',
-    },
+    } as FormData,
     onSubmit: async ({ value }) => {
       // Your form submission logic here
       console.log('Form submitted:', value);

@@ -1,7 +1,7 @@
 import { getRedis } from '../services/redis';
 import { db } from '../services/db';
 import { schema } from '@robin/database';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { log } from '../utils/logger';
 
 /**
@@ -94,7 +94,7 @@ export async function syncViewCounts() {
     await db.transaction(async (tx) => {
       for (const { postId, views } of updates) {
         try {
-          const result = await tx
+          await tx
             .update(schema.posts)
             .set({ views })
             .where(eq(schema.posts.id, postId))

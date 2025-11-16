@@ -25,7 +25,7 @@ export function stripMarkdown(text: string): string {
     // Remove horizontal rules (---, ***, ___)
     .replace(/^(-{3,}|\*{3,}|_{3,})$/gm, '')
     // Remove list markers (-, *, +, 1.)
-    .replace(/^[\s-]*[\*\-\+]\s+/gm, '')
+    .replace(/^[\s-]*[*+-]\s+/gm, '')
     .replace(/^\s*\d+\.\s+/gm, '')
     // Remove extra whitespace and newlines
     .replace(/\s+/g, ' ')
@@ -35,7 +35,7 @@ export function stripMarkdown(text: string): string {
 /**
  * Generate excerpt from content by stripping markdown and truncating
  */
-export function generateExcerpt(content: string, maxLength: number = 200): string {
+export function generateExcerpt(content: string, maxLength = 200): string {
   const plainText = stripMarkdown(content);
   return plainText.length > maxLength
     ? `${plainText.substring(0, maxLength).trim()}...`

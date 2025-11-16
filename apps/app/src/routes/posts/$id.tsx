@@ -180,7 +180,7 @@ function PostPage() {
           title: data?.post.title,
           url: window.location.href,
         });
-      } catch (err) {
+      } catch {
         // User cancelled or error
       }
     } else {
