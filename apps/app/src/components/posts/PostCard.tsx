@@ -40,18 +40,6 @@ export function PostCard({ post }: PostCardProps) {
             aspectRatio={16 / 9}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
-          {/* Gradient overlay: transparent to black */}
-          <div className={cn(
-            'absolute inset-0',
-            'bg-gradient-to-b from-transparent to-black',
-            'pointer-events-none'
-          )} />
-          {/* Extended gradient below cover: black to transparent */}
-          <div className={cn(
-            'absolute left-0 right-0 h-[100px] -bottom-[100px]',
-            'bg-gradient-to-b from-black to-transparent',
-            'pointer-events-none'
-          )} />
         </div>
 
         {/* Content */}

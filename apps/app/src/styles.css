@@ -293,7 +293,7 @@
   @keyframes fade-in-up {
     from {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(6px);
     }
     to {
       opacity: 1;
