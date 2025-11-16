@@ -15,8 +15,8 @@ function AuthPage() {
   console.log('[Auth Route] Matches:', matches.map(m => ({ id: m.id, pathname: m.pathname })));
 
   // If there's a child route (like /auth/callback/google), render only the Outlet
-  // Check if the last match is a child of /auth by looking for /callback/google in the id
-  const hasChildRoute = matches.some(match => match.id === '/auth/callback/google');
+  // Check if any match contains 'callback/google' in the id (handles malformed route IDs)
+  const hasChildRoute = matches.some(match => match.id.includes('callback/google'));
   console.log('[Auth Route] Has child route:', hasChildRoute);
 
   if (hasChildRoute) {
