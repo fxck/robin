@@ -39,16 +39,16 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon, gradient }: StatCardProps) {
   return (
-    <div className="glass-surface rounded-xl p-6 transition-all hover:bg-white/[0.07]">
-      <Flex direction="column" gap="3">
+    <div className="glass-surface rounded-xl p-7 transition-all hover:bg-white/[0.07]">
+      <Flex direction="column" gap="4">
         <div className={`w-fit rounded-lg ${gradient} p-3`}>
           {icon}
         </div>
         <div>
-          <Text size="2" className="text-gray-400 mb-1 block">
+          <Text size="2" weight="medium" className="text-gray-400 mb-2 block uppercase tracking-wide">
             {title}
           </Text>
-          <Heading size="7" className="text-white font-bold">
+          <Heading size="8" className="text-white font-bold">
             {value.toLocaleString()}
           </Heading>
         </div>
@@ -162,14 +162,14 @@ function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-8 py-16 pt-32 md:pt-36">
-      <Flex direction="column" gap="8">
+      <Flex direction="column" gap="10">
         {/* Header */}
-        <Flex justify="between" align="start" className="flex-col md:flex-row gap-4 md:items-center">
+        <Flex justify="between" align="start" className="flex-col md:flex-row gap-6 md:items-center">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white">
+            <h1 className="text-5xl md:text-6xl font-bold mb-3 text-white">
               Dashboard
             </h1>
-            <Text size="3" className="text-gray-400">
+            <Text size="4" className="text-gray-400">
               Welcome back, {session?.user?.name || session?.user?.email}
             </Text>
           </div>
@@ -233,7 +233,7 @@ function DashboardPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <StatCard
             title="Published Posts"
             value={publishedPosts.length}
@@ -262,33 +262,33 @@ function DashboardPage() {
 
         {/* Activity Section - Only show if there are posts */}
         {posts.length > 0 && (
-          <div className="glass-surface p-6 rounded-xl">
-            <Flex direction="column" gap="4">
-              <Heading size="5">Recent Activity</Heading>
+          <div className="glass-surface p-8 rounded-xl">
+            <Flex direction="column" gap="6">
+              <Heading size="6" weight="bold">Recent Activity</Heading>
 
               <div className="space-y-3">
                 {posts.slice(0, 4).map((post) => (
-                  <div key={post.id} className="p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
-                    <Flex justify="between" align="start" gap="3">
-                      <div className="flex-1">
-                        <Text size="2" weight="bold" className="block mb-1 text-white">{post.title}</Text>
+                  <div key={post.id} className="p-5 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
+                    <Flex justify="between" align="start" gap="4">
+                      <div className="flex-1 min-w-0">
+                        <Text size="3" weight="bold" className="block mb-2 text-white">{post.title}</Text>
                         <Flex gap="3" align="center">
-                          <Text size="1" className="text-gray-500">
+                          <Text size="2" className="text-gray-500">
                             {formatDate(post.publishedAt || post.createdAt)}
                           </Text>
-                          <Badge color={post.status === 'published' ? 'green' : 'gray'} size="1">
+                          <Badge color={post.status === 'published' ? 'green' : 'gray'} size="2">
                             {post.status}
                           </Badge>
                         </Flex>
                       </div>
-                      <Flex gap="4" align="center" className="text-gray-400">
-                        <Flex gap="1" align="center">
-                          <Eye size={14} />
-                          <Text size="1">{post.views}</Text>
+                      <Flex gap="5" align="center" className="text-gray-400 flex-shrink-0">
+                        <Flex gap="2" align="center">
+                          <Eye size={16} />
+                          <Text size="2" weight="medium">{post.views}</Text>
                         </Flex>
-                        <Flex gap="1" align="center">
-                          <Heart size={14} />
-                          <Text size="1">{post.likesCount}</Text>
+                        <Flex gap="2" align="center">
+                          <Heart size={16} />
+                          <Text size="2" weight="medium">{post.likesCount}</Text>
                         </Flex>
                       </Flex>
                     </Flex>
@@ -302,8 +302,8 @@ function DashboardPage() {
         {/* Posts Table */}
         <div className="glass-surface rounded-xl overflow-hidden">
           <Flex direction="column">
-            <Flex justify="between" align="center" className="p-6 border-b border-white/10">
-              <Heading size="5">All Posts</Heading>
+            <Flex justify="between" align="center" className="px-8 py-6 border-b border-white/10">
+              <Heading size="6" weight="bold">All Posts</Heading>
               <Link to="/admin/posts" style={{ textDecoration: 'none' }}>
                 <Button variant="ghost" size="2" className="text-amber-400 hover:text-amber-300">
                   View All →
@@ -340,79 +340,91 @@ function DashboardPage() {
               </Flex>
             ) : (
               <div className="overflow-x-auto">
-                <Table.Root>
+                <Table.Root variant="surface">
                   <Table.Header>
                     <Table.Row>
-                      <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>Views</Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>Likes</Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>Date</Table.ColumnHeaderCell>
-                      <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell className="py-4 px-6">
+                        <Text size="2" weight="bold" className="text-gray-400 uppercase tracking-wide">Title</Text>
+                      </Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell className="py-4 px-6">
+                        <Text size="2" weight="bold" className="text-gray-400 uppercase tracking-wide">Status</Text>
+                      </Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell className="py-4 px-6">
+                        <Text size="2" weight="bold" className="text-gray-400 uppercase tracking-wide">Views</Text>
+                      </Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell className="py-4 px-6">
+                        <Text size="2" weight="bold" className="text-gray-400 uppercase tracking-wide">Likes</Text>
+                      </Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell className="py-4 px-6">
+                        <Text size="2" weight="bold" className="text-gray-400 uppercase tracking-wide">Date</Text>
+                      </Table.ColumnHeaderCell>
+                      <Table.ColumnHeaderCell className="py-4 px-6">
+                        <Text size="2" weight="bold" className="text-gray-400 uppercase tracking-wide">Actions</Text>
+                      </Table.ColumnHeaderCell>
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
                     {posts.slice(0, 10).map((post) => (
                       <Table.Row key={post.id} className="hover:bg-white/5 transition-colors">
-                        <Table.Cell>
-                          <Flex direction="column" gap="1">
-                            <Text weight="medium" className="text-white">{post.title}</Text>
+                        <Table.Cell className="py-5 px-6">
+                          <Flex direction="column" gap="2">
+                            <Text size="3" weight="medium" className="text-white">{post.title}</Text>
                             {post.excerpt && (
-                              <Text size="1" color="gray">
-                                {post.excerpt.substring(0, 60)}...
+                              <Text size="2" color="gray" className="line-clamp-1">
+                                {post.excerpt.substring(0, 80)}...
                               </Text>
                             )}
                           </Flex>
                         </Table.Cell>
-                        <Table.Cell>
-                          <Badge color={post.status === 'published' ? 'green' : 'gray'}>
+                        <Table.Cell className="py-5 px-6">
+                          <Badge color={post.status === 'published' ? 'green' : 'gray'} size="2">
                             {post.status}
                           </Badge>
                         </Table.Cell>
-                        <Table.Cell>
-                          <Flex gap="1" align="center">
-                            <Eye size={14} style={{ color: 'var(--gray-9)' }} />
-                            <Text size="2">{post.views}</Text>
+                        <Table.Cell className="py-5 px-6">
+                          <Flex gap="2" align="center">
+                            <Eye size={16} style={{ color: 'var(--gray-9)' }} />
+                            <Text size="3" weight="medium">{post.views}</Text>
                           </Flex>
                         </Table.Cell>
-                        <Table.Cell>
-                          <Flex gap="1" align="center">
-                            <Heart size={14} style={{ color: 'var(--gray-9)' }} />
-                            <Text size="2">{post.likesCount}</Text>
+                        <Table.Cell className="py-5 px-6">
+                          <Flex gap="2" align="center">
+                            <Heart size={16} style={{ color: 'var(--gray-9)' }} />
+                            <Text size="3" weight="medium">{post.likesCount}</Text>
                           </Flex>
                         </Table.Cell>
-                        <Table.Cell>
+                        <Table.Cell className="py-5 px-6">
                           <Text size="2" color="gray">
                             {formatDate(post.publishedAt || post.createdAt)}
                           </Text>
                         </Table.Cell>
-                        <Table.Cell>
+                        <Table.Cell className="py-5 px-6">
                           <Flex gap="2">
                             <Button
-                              size="1"
+                              size="2"
                               variant="soft"
                               onClick={() => navigate({ to: '/posts/$id', params: { id: post.id } })}
                             >
-                              <Eye size={14} />
+                              <Eye size={16} />
                             </Button>
                             <Button
-                              size="1"
+                              size="2"
                               variant="soft"
                               color="blue"
                               onClick={() =>
                                 navigate({ to: '/admin/posts/$id/edit', params: { id: post.id } })
                               }
                             >
-                              <Edit size={14} />
+                              <Edit size={16} />
                             </Button>
                             <Button
-                              size="1"
+                              size="2"
                               variant="soft"
                               color="red"
                               onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
                               disabled={deleteMutation.isPending}
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={16} />
                             </Button>
                           </Flex>
                         </Table.Cell>

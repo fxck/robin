@@ -46,8 +46,10 @@ interface AutosaveOptions {
 
 interface AutosaveState {
   isSaving: boolean;
+  isPending: boolean;
   lastSaved: Date | null;
   hasUnsavedChanges: boolean;
+  hasLocalBackup: boolean;
   error: Error | null;
   retryCount: number;
 }
@@ -72,10 +74,14 @@ export function useAutosave<TData = any, TResponse = any>(
   } = options;
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const localStorageTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const latestDataRef = useRef<TData | null>(null);
   const [state, setState] = useState<AutosaveState>({
     isSaving: false,
+    isPending: false,
     lastSaved: null,
     hasUnsavedChanges: false,
+    hasLocalBackup: false,
     error: null,
     retryCount: 0,
   });
@@ -84,14 +90,16 @@ export function useAutosave<TData = any, TResponse = any>(
   const saveMutation = useMutation({
     mutationFn: saveFn,
     onMutate: () => {
-      setState(prev => ({ ...prev, isSaving: true, error: null }));
+      setState(prev => ({ ...prev, isSaving: true, isPending: false, error: null }));
     },
     onSuccess: (data) => {
       setState(prev => ({
         ...prev,
         isSaving: false,
+        isPending: false,
         lastSaved: new Date(),
         hasUnsavedChanges: false,
+        hasLocalBackup: true,
         error: null,
         retryCount: 0,
       }));
@@ -113,14 +121,17 @@ export function useAutosave<TData = any, TResponse = any>(
         return;
       }
 
-      // Retry with exponential backoff
+      // Retry with exponential backoff using latest data
       if (state.retryCount < maxRetries) {
         const backoffDelay = Math.min(1000 * Math.pow(2, state.retryCount), 10000);
         setState(prev => ({ ...prev, retryCount: prev.retryCount + 1 }));
 
         retryTimeoutRef.current = setTimeout(() => {
           console.log(`Retrying autosave (attempt ${state.retryCount + 1}/${maxRetries})`);
-          saveMutation.mutate(saveMutation.variables as TData);
+          // Use latest data from ref instead of stale closure
+          if (latestDataRef.current) {
+            saveMutation.mutate(latestDataRef.current);
+          }
         }, backoffDelay);
       } else {
         toast.error('Autosave failed. Your changes are saved locally.');
@@ -132,20 +143,34 @@ export function useAutosave<TData = any, TResponse = any>(
    * Schedule autosave with debouncing
    */
   const scheduleAutosave = useCallback((data: TData, draftData?: DraftData) => {
-    // Clear existing timer
+    // Store latest data in ref for retry logic
+    latestDataRef.current = data;
+
+    // Clear existing timers
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-
-    // Mark as unsaved
-    setState(prev => ({ ...prev, hasUnsavedChanges: true }));
-
-    // Save to localStorage immediately for backup
-    if (draftData) {
-      DraftManager.save(storageKey, draftData);
+    if (localStorageTimerRef.current) {
+      clearTimeout(localStorageTimerRef.current);
     }
 
-    // Schedule server save
+    // Mark as pending and unsaved
+    setState(prev => ({ ...prev, hasUnsavedChanges: true, isPending: true }));
+
+    // Debounce localStorage writes (500ms) to prevent main thread blocking
+    if (draftData) {
+      localStorageTimerRef.current = setTimeout(() => {
+        try {
+          DraftManager.save(storageKey, draftData);
+          setState(prev => ({ ...prev, hasLocalBackup: true }));
+        } catch (error) {
+          console.error('localStorage save failed:', error);
+          setState(prev => ({ ...prev, hasLocalBackup: false }));
+        }
+      }, 500);
+    }
+
+    // Schedule server save (3s default)
     timerRef.current = setTimeout(() => {
       saveMutation.mutate(data);
     }, debounceMs);
@@ -178,7 +203,11 @@ export function useAutosave<TData = any, TResponse = any>(
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
     }
-    setState(prev => ({ ...prev, hasUnsavedChanges: false }));
+    if (localStorageTimerRef.current) {
+      clearTimeout(localStorageTimerRef.current);
+      localStorageTimerRef.current = null;
+    }
+    setState(prev => ({ ...prev, hasUnsavedChanges: false, isPending: false }));
   }, []);
 
   /**
@@ -205,6 +234,9 @@ export function useAutosave<TData = any, TResponse = any>(
       }
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
+      }
+      if (localStorageTimerRef.current) {
+        clearTimeout(localStorageTimerRef.current);
       }
     };
   }, []);

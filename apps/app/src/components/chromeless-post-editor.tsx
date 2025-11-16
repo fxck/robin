@@ -202,6 +202,7 @@ interface ChromelessPostEditorProps {
   onExit: () => void;
   isPublishing: boolean;
   isSaving: boolean;
+  isPending?: boolean;
   lastSaved: Date | null;
   isNewPost?: boolean;
 }
@@ -338,6 +339,7 @@ export function ChromelessPostEditor({
   onExit,
   isPublishing,
   isSaving,
+  isPending = false,
   lastSaved,
   isNewPost = false,
 }: ChromelessPostEditorProps) {
@@ -786,6 +788,11 @@ export function ChromelessPostEditor({
               <>
                 <Loader2 size={14} className="text-amber-400 animate-spin" />
                 <span className="text-xs text-gray-400">Saving...</span>
+              </>
+            ) : isPending ? (
+              <>
+                <Clock size={14} className="text-amber-400 animate-pulse" />
+                <span className="text-xs text-gray-400">Pending...</span>
               </>
             ) : lastSaved ? (
               <>

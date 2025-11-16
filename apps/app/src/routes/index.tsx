@@ -92,13 +92,6 @@ function Index() {
 
         <Container size="standard">
           <div className="text-center max-w-4xl mx-auto relative">
-            {/* Hero Badge */}
-            <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] mb-12 backdrop-blur-sm cursor-default group hover:bg-white/[0.04] hover:border-amber-500/20 transition-all duration-300">
-              <Sparkles size={15} className="text-amber-400/80 group-hover:text-amber-400 transition-colors" />
-              <Text size="sm" className="text-gray-400 group-hover:text-gray-300 transition-colors font-medium">
-                Discover stories that matter
-              </Text>
-            </div>
 
             {/* Hero Title */}
             <Heading

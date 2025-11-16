@@ -164,10 +164,10 @@ function AdminPostsPage() {
   return (
     <Box style={{ minHeight: 'calc(100vh - 60px)', paddingTop: '100px' }}>
       <Container size="4" py="8">
-        <Flex direction="column" gap="6">
+        <Flex direction="column" gap="8">
           {/* Header */}
-          <Flex justify="between" align="center">
-            <Heading size="8">Posts</Heading>
+          <Flex justify="between" align="center" mb="2">
+            <Heading size="9" weight="bold">Posts</Heading>
             <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
               <Button size="3">
                 <PlusCircle size={18} />
@@ -177,36 +177,36 @@ function AdminPostsPage() {
           </Flex>
 
           {/* Stats */}
-          <Grid columns={{ initial: '1', sm: '3' }} gap="4">
+          <Grid columns={{ initial: '1', sm: '3' }} gap="5">
             <Card>
-              <Flex direction="column" gap="2" p="3">
-                <Text size="2" color="gray">
+              <Flex direction="column" gap="3" p="5">
+                <Text size="2" weight="medium" color="gray" className="uppercase tracking-wide">
                   Total Posts
                 </Text>
-                <Heading size="7">{allPosts.length}</Heading>
+                <Heading size="8">{allPosts.length}</Heading>
               </Flex>
             </Card>
             <Card>
-              <Flex direction="column" gap="2" p="3">
-                <Text size="2" color="gray">
+              <Flex direction="column" gap="3" p="5">
+                <Text size="2" weight="medium" color="gray" className="uppercase tracking-wide">
                   Published
                 </Text>
-                <Heading size="7">{allPosts.filter(p => p.status === 'published').length}</Heading>
+                <Heading size="8">{allPosts.filter(p => p.status === 'published').length}</Heading>
               </Flex>
             </Card>
             <Card>
-              <Flex direction="column" gap="2" p="3">
-                <Text size="2" color="gray">
+              <Flex direction="column" gap="3" p="5">
+                <Text size="2" weight="medium" color="gray" className="uppercase tracking-wide">
                   Drafts
                 </Text>
-                <Heading size="7">{allPosts.filter(p => p.status === 'draft').length}</Heading>
+                <Heading size="8">{allPosts.filter(p => p.status === 'draft').length}</Heading>
               </Flex>
             </Card>
           </Grid>
 
           {/* Search and Filters */}
           <Card>
-            <Flex direction="column" gap="4" p="4">
+            <Flex direction="column" gap="5" p="6">
               <Flex gap="3" wrap="wrap" align="center">
                 {/* Search */}
                 <Box style={{ flex: '1', minWidth: '250px' }}>
@@ -336,79 +336,97 @@ function AdminPostsPage() {
                 )}
               </Flex>
             ) : (
-              <Table.Root>
+              <Table.Root variant="surface">
                 <Table.Header>
                   <Table.Row>
-                    <Table.ColumnHeaderCell style={{ width: '40px' }}>
+                    <Table.ColumnHeaderCell className="py-4 px-4" style={{ width: '50px' }}>
                       <Checkbox
                         checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
                         onCheckedChange={() => toggleSelectAll(filteredPosts)}
                       />
                     </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>Views</Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>Likes</Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>Created</Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell className="py-4 px-6">
+                      <Text size="2" weight="bold" className="uppercase tracking-wide">Title</Text>
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell className="py-4 px-6">
+                      <Text size="2" weight="bold" className="uppercase tracking-wide">Status</Text>
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell className="py-4 px-6">
+                      <Text size="2" weight="bold" className="uppercase tracking-wide">Views</Text>
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell className="py-4 px-6">
+                      <Text size="2" weight="bold" className="uppercase tracking-wide">Likes</Text>
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell className="py-4 px-6">
+                      <Text size="2" weight="bold" className="uppercase tracking-wide">Created</Text>
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell className="py-4 px-6">
+                      <Text size="2" weight="bold" className="uppercase tracking-wide">Actions</Text>
+                    </Table.ColumnHeaderCell>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
                   {filteredPosts.map((post) => (
-                    <Table.Row key={post.id}>
-                      <Table.Cell>
+                    <Table.Row key={post.id} className="hover:bg-white/5 transition-colors">
+                      <Table.Cell className="py-5 px-4">
                         <Checkbox
                           checked={selectedPosts.has(post.id)}
                           onCheckedChange={() => togglePostSelection(post.id)}
                         />
                       </Table.Cell>
-                      <Table.Cell>
-                        <Flex direction="column" gap="1">
-                          <Text weight="medium">{post.title}</Text>
+                      <Table.Cell className="py-5 px-6">
+                        <Flex direction="column" gap="2">
+                          <Text size="3" weight="medium">{post.title}</Text>
                           {post.excerpt && (
-                            <Text size="1" color="gray">{post.excerpt.substring(0, 60)}...</Text>
+                            <Text size="2" color="gray" className="line-clamp-1">{post.excerpt.substring(0, 80)}...</Text>
                           )}
                         </Flex>
                       </Table.Cell>
-                      <Table.Cell>
-                        <Badge color={post.status === 'published' ? 'green' : 'gray'}>
+                      <Table.Cell className="py-5 px-6">
+                        <Badge color={post.status === 'published' ? 'green' : 'gray'} size="2">
                           {post.status}
                         </Badge>
                       </Table.Cell>
-                      <Table.Cell>
-                        <Text size="2">{post.views}</Text>
+                      <Table.Cell className="py-5 px-6">
+                        <Flex gap="2" align="center">
+                          <Eye size={16} style={{ color: 'var(--gray-9)' }} />
+                          <Text size="3" weight="medium">{post.views}</Text>
+                        </Flex>
                       </Table.Cell>
-                      <Table.Cell>
-                        <Text size="2">{post.likesCount}</Text>
+                      <Table.Cell className="py-5 px-6">
+                        <Flex gap="2" align="center">
+                          <Heart size={16} style={{ color: 'var(--gray-9)' }} />
+                          <Text size="3" weight="medium">{post.likesCount}</Text>
+                        </Flex>
                       </Table.Cell>
-                      <Table.Cell>
-                        <Text size="2">{new Date(post.createdAt).toLocaleDateString()}</Text>
+                      <Table.Cell className="py-5 px-6">
+                        <Text size="2" color="gray">{new Date(post.createdAt).toLocaleDateString()}</Text>
                       </Table.Cell>
-                      <Table.Cell>
+                      <Table.Cell className="py-5 px-6">
                         <Flex gap="2">
                           <Button
-                            size="1"
+                            size="2"
                             variant="soft"
                             onClick={() => navigate({ to: `/posts/${post.id}` })}
                           >
-                            <Eye size={14} />
+                            <Eye size={16} />
                           </Button>
                           <Button
-                            size="1"
+                            size="2"
                             variant="soft"
                             color="blue"
                             onClick={() => navigate({ to: `/admin/posts/${post.id}/edit` })}
                           >
-                            <Edit size={14} />
+                            <Edit size={16} />
                           </Button>
                           <Button
-                            size="1"
+                            size="2"
                             variant="soft"
                             color="red"
                             onClick={() => setDeleteDialog({ id: post.id, title: post.title })}
                             disabled={deleteMutation.isPending}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </Button>
                         </Flex>
                       </Table.Cell>

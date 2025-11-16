@@ -29,8 +29,9 @@ function EditPostPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['post', id],
     queryFn: () => api.get<PostResponse>(`/posts/${id}`),
-    refetchOnMount: 'always', // Always get fresh data
-    staleTime: 0, // Consider data immediately stale
+    refetchOnMount: 'always', // Always get fresh data on mount
+    staleTime: Infinity, // Don't auto-refetch during editing - we update cache manually
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
   // State - controlled by local edits
@@ -39,13 +40,15 @@ function EditPostPage() {
   const [coverImage, setCoverImage] = useState<string>('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
   const [version, setVersion] = useState(1);
+  const [showDraftBanner, setShowDraftBanner] = useState(false);
+  const [pendingDraft, setPendingDraft] = useState<any>(null);
 
   // Track initialization to prevent overwriting user edits
   const [initialized, setInitialized] = useState(false);
   const storageKey = `post_${id}`;
   const hasCheckedDraftRef = useRef(false);
 
-  // Initialize form from server data OR localStorage draft
+  // Initialize form from server data OR localStorage draft (non-blocking)
   useEffect(() => {
     if (!data?.post || initialized) return;
 
@@ -57,22 +60,17 @@ function EditPostPage() {
       const serverTimestamp = new Date(data.post.updatedAt).getTime();
 
       if (localDraft && DraftManager.hasNewerDraft(storageKey, serverTimestamp)) {
-        const shouldRestore = window.confirm(
-          'Found local changes that are newer than the server version. Do you want to restore them?'
-        );
-
-        if (shouldRestore) {
-          setTitle(localDraft.title);
-          setContent(localDraft.content);
-          setCoverImage(localDraft.coverImage || '');
-          setStatus(localDraft.status);
-          setVersion(localDraft.version);
-          setInitialized(true);
-          toast.success('Local draft restored');
-          return;
-        } else {
-          DraftManager.remove(storageKey);
-        }
+        // Non-blocking: Show banner instead of modal
+        setPendingDraft(localDraft);
+        setShowDraftBanner(true);
+        // Still initialize with server data so user can continue
+        setTitle(data.post.title);
+        setContent(data.post.content);
+        setCoverImage(data.post.coverImage || '');
+        setStatus(data.post.status);
+        setVersion(data.post.version);
+        setInitialized(true);
+        return;
       }
     }
 
@@ -85,17 +83,28 @@ function EditPostPage() {
     setInitialized(true);
   }, [data, initialized, storageKey]);
 
-  // CRITICAL: Sync version from server after each save
-  // This prevents 409 conflicts on subsequent autosaves
-  useEffect(() => {
-    if (data?.post && initialized) {
-      // Only update version if it's newer (server incremented it)
-      if (data.post.version > version) {
-        console.log(`Syncing version: ${version} → ${data.post.version}`);
-        setVersion(data.post.version);
-      }
+  // Handler for restoring draft from banner
+  const handleRestoreDraft = useCallback(() => {
+    if (pendingDraft) {
+      setTitle(pendingDraft.title);
+      setContent(pendingDraft.content);
+      setCoverImage(pendingDraft.coverImage || '');
+      setStatus(pendingDraft.status);
+      setVersion(pendingDraft.version);
+      setShowDraftBanner(false);
+      setPendingDraft(null);
     }
-  }, [data?.post?.version, initialized]);
+  }, [pendingDraft]);
+
+  // Handler for dismissing draft banner
+  const handleDismissDraft = useCallback(() => {
+    DraftManager.remove(storageKey);
+    setShowDraftBanner(false);
+    setPendingDraft(null);
+  }, [storageKey]);
+
+  // Version is now updated directly in autosave onSaveSuccess callback
+  // No need for this effect - it was causing extra renders
 
   // Autosave with proper version tracking
   const autosave = useAutosave<UpdatePostInput, PostResponse>(
@@ -206,6 +215,9 @@ function EditPostPage() {
       return;
     }
 
+    // Cancel pending autosave to prevent double save
+    autosave.cancelSave();
+
     updatePostMutation.mutate({
       title,
       content,
@@ -214,13 +226,16 @@ function EditPostPage() {
       version,
       finalStatus: 'published',
     });
-  }, [title, content, coverImage, status, version, updatePostMutation]);
+  }, [title, content, coverImage, status, version, updatePostMutation, autosave]);
 
   const handleSaveDraft = useCallback(() => {
     if (!title.trim() && !content.trim()) {
       toast.error('Post is empty');
       return;
     }
+
+    // Cancel pending autosave to prevent double save
+    autosave.cancelSave();
 
     updatePostMutation.mutate({
       title: title.trim() || 'Untitled',
@@ -230,7 +245,7 @@ function EditPostPage() {
       version,
       finalStatus: 'draft',
     });
-  }, [title, content, coverImage, status, version, updatePostMutation]);
+  }, [title, content, coverImage, status, version, updatePostMutation, autosave]);
 
   const handleExit = useCallback(() => {
     if (autosave.hasUnsavedChanges) {
@@ -242,10 +257,11 @@ function EditPostPage() {
     }
   }, [autosave.hasUnsavedChanges, navigate]);
 
-  // Warn before leaving with unsaved changes
+  // Warn before leaving ONLY if no local backup exists
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (autosave.hasUnsavedChanges) {
+      // Only warn if changes aren't backed up to localStorage
+      if (autosave.hasUnsavedChanges && !autosave.hasLocalBackup) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -253,7 +269,7 @@ function EditPostPage() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [autosave.hasUnsavedChanges]);
+  }, [autosave.hasUnsavedChanges, autosave.hasLocalBackup]);
 
   // Loading state
   if (isLoading || !initialized) {
@@ -291,23 +307,58 @@ function EditPostPage() {
   }
 
   return (
-    <ChromelessPostEditor
-      key={id} // Force remount when editing different post
-      title={title}
-      content={content}
-      coverImage={coverImage}
-      status={status}
-      onTitleChange={setTitle}
-      onContentChange={setContent}
-      onCoverImageChange={setCoverImage}
-      onStatusChange={setStatus}
-      onPublish={handlePublish}
-      onSaveDraft={handleSaveDraft}
-      onExit={handleExit}
-      isPublishing={updatePostMutation.isPending}
-      isSaving={autosave.isSaving}
-      lastSaved={autosave.lastSaved}
-      isNewPost={false}
-    />
+    <>
+      {/* Non-blocking draft restore banner */}
+      {showDraftBanner && pendingDraft && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-md">
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 backdrop-blur-xl shadow-2xl">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-amber-400 mb-1">
+                  Newer local changes found
+                </h3>
+                <p className="text-xs text-gray-400">
+                  You have unsaved changes that are newer than the server version
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRestoreDraft}
+                  className="px-3 py-1.5 text-xs font-medium bg-amber-500 hover:bg-amber-600 text-black rounded-lg transition-colors"
+                >
+                  Restore
+                </button>
+                <button
+                  onClick={handleDismissDraft}
+                  className="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors"
+                >
+                  Discard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ChromelessPostEditor
+        key={id} // Force remount when editing different post
+        title={title}
+        content={content}
+        coverImage={coverImage}
+        status={status}
+        onTitleChange={setTitle}
+        onContentChange={setContent}
+        onCoverImageChange={setCoverImage}
+        onStatusChange={setStatus}
+        onPublish={handlePublish}
+        onSaveDraft={handleSaveDraft}
+        onExit={handleExit}
+        isPublishing={updatePostMutation.isPending}
+        isSaving={autosave.isSaving}
+        isPending={autosave.isPending}
+        lastSaved={autosave.lastSaved}
+        isNewPost={false}
+      />
+    </>
   );
 }

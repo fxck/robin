@@ -28,6 +28,8 @@ function NewPostPage() {
   const [content, setContent] = useState('');
   const [coverImage, setCoverImage] = useState<string>('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [showDraftBanner, setShowDraftBanner] = useState(false);
+  const [pendingDraft, setPendingDraft] = useState<DraftData | null>(null);
 
   // Track created post ID - this is the key to preventing duplicates!
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
@@ -40,33 +42,44 @@ function NewPostPage() {
   const storageKeyRef = useRef(DraftManager.generateTempKey());
   const hasLoadedDraftRef = useRef(false);
 
-  // Load draft from localStorage on mount
+  // Load draft from localStorage on mount (non-blocking)
   useEffect(() => {
     if (hasLoadedDraftRef.current) return;
     hasLoadedDraftRef.current = true;
 
     const draft = DraftManager.load(storageKeyRef.current);
     if (draft) {
-      const shouldRestore = window.confirm(
-        'Found unsaved changes from a previous session. Do you want to restore them?'
-      );
-
-      if (shouldRestore) {
-        setTitle(draft.title);
-        setContent(draft.content);
-        setCoverImage(draft.coverImage || '');
-        setStatus(draft.status);
-        if (draft.postId) {
-          setCreatedPostId(draft.postId);
-          createdPostIdRef.current = draft.postId;
-          setVersion(draft.version);
-        }
-        toast.success('Draft restored from local storage');
-      } else {
-        DraftManager.remove(storageKeyRef.current);
-      }
+      // Non-blocking: Show banner instead of modal
+      setPendingDraft(draft);
+      setShowDraftBanner(true);
     }
   }, []);
+
+  // Handler for restoring draft from banner
+  const handleRestoreDraft = useCallback(() => {
+    if (pendingDraft) {
+      setTitle(pendingDraft.title);
+      setContent(pendingDraft.content);
+      setCoverImage(pendingDraft.coverImage || '');
+      setStatus(pendingDraft.status);
+      if (pendingDraft.postId) {
+        setCreatedPostId(pendingDraft.postId);
+        createdPostIdRef.current = pendingDraft.postId;
+        setVersion(pendingDraft.version);
+      }
+      setShowDraftBanner(false);
+      setPendingDraft(null);
+    }
+  }, [pendingDraft]);
+
+  // Handler for dismissing draft banner
+  const handleDismissDraft = useCallback(() => {
+    if (pendingDraft) {
+      DraftManager.remove(storageKeyRef.current);
+      setShowDraftBanner(false);
+      setPendingDraft(null);
+    }
+  }, [pendingDraft]);
 
   // Autosave logic with proper create/update flow
   const autosave = useAutosave<CreatePostInput | UpdatePostInput, PostResponse>(
@@ -90,26 +103,30 @@ function NewPostPage() {
       onSaveSuccess: (response) => {
         const post = response.post;
 
-        // First time creating? Store the ID and navigate to edit page
+        // First time creating? Store the ID but STAY on current page
         if (!createdPostIdRef.current && post.id) {
           // Update ref immediately (prevents race condition)
           createdPostIdRef.current = post.id;
           setCreatedPostId(post.id);
           setVersion(post.version);
 
-          // Update storage key to use real post ID (before navigation)
+          // Update storage key to use real post ID
           const newKey = `post_${post.id}`;
+          // Save current state to new key before removing old key
+          DraftManager.save(newKey, {
+            title,
+            content,
+            coverImage: coverImage || undefined,
+            status: 'draft',
+            version: post.version,
+            postId: post.id,
+            lastModified: Date.now(),
+          });
           DraftManager.remove(storageKeyRef.current);
           storageKeyRef.current = newKey;
 
-          // Navigate to edit page with the new post ID
-          // Use replace to avoid back button issues
-          navigate({
-            to: `/admin/posts/${post.id}/edit`,
-            replace: true,
-          });
-
-          toast.success('Draft created! Now editing...');
+          // NO navigation - keep user in flow
+          // NO toast spam - autosave should be silent
         } else {
           // Subsequent saves - update version from server
           setVersion(post.version);
@@ -203,13 +220,16 @@ function NewPostPage() {
       return;
     }
 
+    // Cancel pending autosave to prevent double save
+    autosave.cancelSave();
+
     saveMutation.mutate({
       title,
       content,
       coverImage: coverImage || undefined,
       publish: true,
     });
-  }, [title, content, coverImage, saveMutation]);
+  }, [title, content, coverImage, saveMutation, autosave]);
 
   const handleSaveDraft = useCallback(() => {
     if (!title.trim() && !content.trim()) {
@@ -217,13 +237,16 @@ function NewPostPage() {
       return;
     }
 
+    // Cancel pending autosave to prevent double save
+    autosave.cancelSave();
+
     saveMutation.mutate({
       title: title.trim() || 'Untitled',
       content,
       coverImage: coverImage || undefined,
       publish: false,
     });
-  }, [title, content, coverImage, saveMutation]);
+  }, [title, content, coverImage, saveMutation, autosave]);
 
   const handleExit = useCallback(() => {
     if (autosave.hasUnsavedChanges) {
@@ -237,10 +260,11 @@ function NewPostPage() {
     }
   }, [autosave.hasUnsavedChanges, navigate]);
 
-  // Warn before leaving with unsaved changes
+  // Warn before leaving ONLY if no local backup exists
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (autosave.hasUnsavedChanges) {
+      // Only warn if changes aren't backed up to localStorage
+      if (autosave.hasUnsavedChanges && !autosave.hasLocalBackup) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -248,25 +272,60 @@ function NewPostPage() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [autosave.hasUnsavedChanges]);
+  }, [autosave.hasUnsavedChanges, autosave.hasLocalBackup]);
 
   return (
-    <ChromelessPostEditor
-      title={title}
-      content={content}
-      coverImage={coverImage}
-      status={status}
-      onTitleChange={setTitle}
-      onContentChange={setContent}
-      onCoverImageChange={setCoverImage}
-      onStatusChange={setStatus}
-      onPublish={handlePublish}
-      onSaveDraft={handleSaveDraft}
-      onExit={handleExit}
-      isPublishing={saveMutation.isPending}
-      isSaving={autosave.isSaving}
-      lastSaved={autosave.lastSaved}
-      isNewPost={true}
-    />
+    <>
+      {/* Non-blocking draft restore banner */}
+      {showDraftBanner && pendingDraft && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-md">
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 backdrop-blur-xl shadow-2xl">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-amber-400 mb-1">
+                  Unsaved draft found
+                </h3>
+                <p className="text-xs text-gray-400">
+                  Continue where you left off or start fresh
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRestoreDraft}
+                  className="px-3 py-1.5 text-xs font-medium bg-amber-500 hover:bg-amber-600 text-black rounded-lg transition-colors"
+                >
+                  Restore
+                </button>
+                <button
+                  onClick={handleDismissDraft}
+                  className="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors"
+                >
+                  Discard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ChromelessPostEditor
+        title={title}
+        content={content}
+        coverImage={coverImage}
+        status={status}
+        onTitleChange={setTitle}
+        onContentChange={setContent}
+        onCoverImageChange={setCoverImage}
+        onStatusChange={setStatus}
+        onPublish={handlePublish}
+        onSaveDraft={handleSaveDraft}
+        onExit={handleExit}
+        isPublishing={saveMutation.isPending}
+        isSaving={autosave.isSaving}
+        isPending={autosave.isPending}
+        lastSaved={autosave.lastSaved}
+        isNewPost={true}
+      />
+    </>
   );
 }

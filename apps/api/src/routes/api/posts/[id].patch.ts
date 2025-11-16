@@ -71,8 +71,11 @@ export default defineEventHandler(async (event) => {
 
   if (data.title !== undefined) {
     updateData.title = data.title;
-    // Regenerate slug if title changed
-    updateData.slug = generateSlug(data.title);
+    // Only regenerate slug if post is still a draft
+    // This prevents breaking published post URLs
+    if (existingPost.status === 'draft') {
+      updateData.slug = generateSlug(data.title);
+    }
   }
 
   if (data.content !== undefined) {
