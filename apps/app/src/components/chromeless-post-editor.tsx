@@ -57,6 +57,85 @@ import { cn } from '../lib/utils';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Parse markdown text and insert as rich content
+const parseAndInsertMarkdown = (editor: any, text: string, from: number, to: number) => {
+  // Delete the selection first
+  editor.chain().focus().deleteRange({ from, to }).run();
+
+  // Parse the markdown text line by line
+  const lines = text.split('\n');
+
+  lines.forEach((line, index) => {
+    // Skip empty lines (they'll become paragraph breaks)
+    if (line.trim() === '') {
+      if (index < lines.length - 1) {
+        editor.chain().focus().insertContent({ type: 'paragraph' }).run();
+      }
+      return;
+    }
+
+    // Check for headings first (must be at start of line)
+    const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length as 1 | 2 | 3 | 4 | 5 | 6;
+      const headingText = headingMatch[2];
+
+      // Parse inline markdown in heading text
+      const headingHTML = parseInlineMarkdown(headingText);
+
+      editor.chain().focus().insertContent({
+        type: 'heading',
+        attrs: { level },
+        content: headingHTML ? [{ type: 'text', text: headingHTML }] : [{ type: 'text', text: headingText }],
+      }).run();
+
+      if (index < lines.length - 1) {
+        editor.chain().focus().insertContent({ type: 'paragraph' }).run();
+      }
+      return;
+    }
+
+    // For regular text lines, parse inline markdown
+    const processedHTML = parseInlineMarkdown(line);
+
+    if (processedHTML !== line && processedHTML.includes('<')) {
+      // Insert as HTML if markdown was found and converted
+      editor.chain().focus().insertContent(processedHTML).run();
+    } else {
+      // Insert as plain text
+      editor.chain().focus().insertContent(line).run();
+    }
+
+    // Add paragraph break if not the last line
+    if (index < lines.length - 1) {
+      editor.chain().focus().insertContent({ type: 'paragraph' }).run();
+    }
+  });
+};
+
+// Helper to parse inline markdown (bold, italic, links, code)
+const parseInlineMarkdown = (text: string): string => {
+  let result = text;
+
+  // Inline code: `code` - do this first to protect code content from other replacements
+  result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Links: [text](url)
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+  // Bold: **text** - non-greedy match
+  result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  // Italic: *text* - only single asterisks (not part of double)
+  // Use a more compatible regex without lookbehind
+  result = result.replace(/\b\*([^*\s][^*]*?)\*\b/g, '<em>$1</em>');
+
+  // Italic: _text_
+  result = result.replace(/\b_([^_\s][^_]*?)_\b/g, '<em>$1</em>');
+
+  return result;
+};
+
 interface ChromelessPostEditorProps {
   title: string;
   content: string;
@@ -282,6 +361,7 @@ export function ChromelessPostEditor({
       html: true,
       transformPastedText: true,
       transformCopiedText: true,
+      breaks: true,
     }),
     Placeholder.configure({
       placeholder: "Start writing your story... Press '/' for commands",
@@ -473,7 +553,7 @@ export function ChromelessPostEditor({
                 onCreate={({ editor }) => {
                   // Set initial content as markdown
                   if (content) {
-                    editor.commands.setContent(content, false, { preserveWhitespace: 'full' });
+                    editor.commands.setContent(content);
                   }
                 }}
                 editorProps={{
@@ -512,8 +592,30 @@ export function ChromelessPostEditor({
                     const hasImagePaste = handleImagePaste(view, event, uploadFn);
                     if (hasImagePaste) return true;
 
-                    // If no image, let the Markdown extension handle the paste
-                    // The Markdown extension will automatically convert markdown syntax
+                    // Check if clipboard contains text with markdown
+                    const text = event.clipboardData?.getData('text/plain');
+                    if (!text) return false;
+
+                    // Check if text contains markdown syntax (multiline flag for headings)
+                    const hasMarkdown = /^#{1,6}\s|!\[.+\]\(.+\)|\[.+\]\(.+\)|\*\*.+\*\*|\*[^*]+\*|`.+`/m.test(text);
+
+                    if (hasMarkdown) {
+                      // Prevent default paste
+                      event.preventDefault();
+
+                      // Get editor instance from view
+                      const { state } = view;
+                      const { selection } = state;
+                      const editor = (view as any).editor;
+
+                      if (editor) {
+                        parseAndInsertMarkdown(editor, text, selection.from, selection.to);
+                      }
+
+                      return true;
+                    }
+
+                    // Let default handler process non-markdown text
                     return false;
                   },
                 }}
