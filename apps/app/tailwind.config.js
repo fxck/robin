@@ -66,8 +66,9 @@ export default {
       },
       boxShadow: {
         'glass': '0 8px 32px rgba(0, 0, 0, 0.4)',
-        'accent': '0 10px 30px rgba(168, 85, 247, 0.3)',
-        'accent-lg': '0 20px 40px rgba(168, 85, 247, 0.4)',
+        'accent': '0 8px 24px rgba(245, 158, 11, 0.15)',
+        'accent-lg': '0 16px 32px rgba(245, 158, 11, 0.2)',
+        'accent-hover': '0 12px 32px rgba(245, 158, 11, 0.25)',
       },
       animation: {
         'fade-in': 'fadeIn 0.4s ease-out',
