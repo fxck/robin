@@ -30,7 +30,7 @@ export const {
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const forgetPassword = async ({ email, redirectTo }: { email: string; redirectTo?: string }) => {
-  const response = await fetch(`${baseURL}/api/auth/request-password-reset`, {
+  const response = await fetch(`${baseURL}/auth/request-password-reset`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -46,7 +46,7 @@ export const forgetPassword = async ({ email, redirectTo }: { email: string; red
 };
 
 export const resetPassword = async ({ newPassword, token }: { newPassword: string; token: string }) => {
-  const response = await fetch(`${baseURL}/api/auth/reset-password`, {
+  const response = await fetch(`${baseURL}/auth/reset-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

@@ -362,7 +362,7 @@ export function ChromelessPostEditor({
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
       {/* Main Editor Container */}
-      <div className="h-full overflow-y-auto pt-24 pb-32">
+      <div className="h-full overflow-y-auto pt-32 pb-32">
         <div className="max-w-4xl mx-auto px-8">
           {/* Cover Image Section */}
           <div className="mb-12">
@@ -453,7 +453,7 @@ export function ChromelessPostEditor({
               rows={1}
               className={cn(
                 'w-full resize-none overflow-hidden',
-                'bg-transparent border-none outline-none',
+                'bg-transparent border-none outline-none focus:outline-none focus:ring-0',
                 'text-5xl font-bold text-white',
                 'placeholder:text-gray-700',
                 'leading-tight'
@@ -463,7 +463,7 @@ export function ChromelessPostEditor({
           </div>
 
           {/* Content Editor */}
-          <div className="mb-20">
+          <div className="mb-20 min-h-[60vh]">
             <EditorRoot>
               <EditorContent
                 initialContent={initialContent}
@@ -471,13 +471,13 @@ export function ChromelessPostEditor({
                 editorProps={{
                   attributes: {
                     class: cn(
-                      'prose prose-lg prose-invert max-w-none',
+                      'prose prose-lg prose-invert max-w-none min-h-[60vh]',
                       'focus:outline-none',
                       'prose-headings:font-bold prose-headings:text-white',
                       'prose-h1:text-4xl prose-h1:mt-8 prose-h1:mb-4',
                       'prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4',
                       'prose-h3:text-2xl prose-h3:mt-6 prose-h3:mb-3',
-                      'prose-p:text-gray-300 prose-p:leading-relaxed prose-p:my-4',
+                      'prose-p:text-gray-300 prose-p:leading-relaxed prose-p:my-0 prose-p:mb-4',
                       'prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline',
                       'prose-strong:text-white prose-strong:font-semibold',
                       'prose-em:text-gray-300',
