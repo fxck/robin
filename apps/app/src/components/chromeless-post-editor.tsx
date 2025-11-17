@@ -504,7 +504,7 @@ export function ChromelessPostEditor({
       <div className="h-full overflow-y-auto">
 
         {/* Hero Section with Cover Image - EXACTLY like post detail */}
-        <section className="relative min-h-[70vh] flex items-end pb-12 md:pb-16">
+        <section className="relative min-h-[max(60vh,600px)] flex items-end pb-12 md:pb-16">
           {/* Hero Background Image with gradient overlay */}
           {coverImage ? (
             <div className="absolute inset-0 z-0 group">
@@ -530,16 +530,20 @@ export function ChromelessPostEditor({
               />
             </div>
           ) : (
-            // No cover - fullscreen upload area
+            // No cover - upload area positioned above title
             <div
               {...getCoverRootProps()}
               className={cn(
-                'absolute inset-0 z-0 flex items-center justify-center cursor-pointer transition-all duration-300',
-                'bg-gradient-to-b from-gray-900 to-black',
+                'absolute top-0 left-0 right-0 z-0 cursor-pointer transition-all duration-300',
+                'bg-gradient-to-b from-gray-900 to-transparent',
                 isDragActive
                   ? 'bg-amber-500/5'
                   : 'hover:bg-white/[0.02]'
               )}
+              style={{
+                height: 'calc(100% - 280px)', // Leave space for title at bottom
+                minHeight: '200px', // Ensure upload area is visible
+              }}
             >
               <input {...getCoverInputProps()} />
 
@@ -549,16 +553,16 @@ export function ChromelessPostEditor({
               )}
 
               {/* Centered upload prompt */}
-              <div className="flex flex-col items-center gap-6 px-8">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-8 pointer-events-none">
                 {isUploadingCover ? (
                   <>
-                    <Loader2 size={64} className="text-amber-400 animate-spin" />
-                    <p className="text-base text-gray-400">Uploading cover image...</p>
+                    <Loader2 size={48} className="text-amber-400 animate-spin" />
+                    <p className="text-sm text-gray-400">Uploading cover image...</p>
                   </>
                 ) : (
                   <>
                     <ImagePlus
-                      size={72}
+                      size={56}
                       className={cn(
                         'transition-all duration-300',
                         isDragActive ? 'text-amber-400 scale-110' : 'text-gray-600 group-hover:text-gray-500'
@@ -566,12 +570,12 @@ export function ChromelessPostEditor({
                     />
                     <div className="text-center">
                       <p className={cn(
-                        'text-lg font-medium mb-2 transition-colors duration-300',
+                        'text-base font-medium mb-1.5 transition-colors duration-300',
                         isDragActive ? 'text-amber-400' : 'text-gray-400'
                       )}>
                         {isDragActive ? 'Drop your image here' : 'Drag & drop your cover image'}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         or click to browse • Max 10MB • PNG, JPG, GIF, WebP
                       </p>
                     </div>

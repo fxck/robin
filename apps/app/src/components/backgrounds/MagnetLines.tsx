@@ -72,10 +72,10 @@ export default function MagnetLines({
     setCanvasSize();
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
+      // Store absolute mouse position
       mouseRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+        x: e.clientX,
+        y: e.clientY
       };
     };
 
@@ -93,13 +93,17 @@ export default function MagnetLines({
 
       const time = timestamp * 0.001 * animationSpeed;
 
+      // Convert absolute mouse position to canvas-relative coordinates
+      const mouseX = mouseRef.current.x - rect.left;
+      const mouseY = mouseRef.current.y - rect.top;
+
       linesRef.current.forEach((line) => {
         // Calculate base wave motion
         const baseOffset = Math.sin(time + line.offset) * 8;
 
         // Calculate distance to mouse
-        const dx = mouseRef.current.x - line.x;
-        const dy = mouseRef.current.y - rect.height / 2;
+        const dx = mouseX - line.x;
+        const dy = mouseY - rect.height / 2;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         // Apply magnetic effect - bend the X position
