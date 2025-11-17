@@ -119,8 +119,8 @@ export default function MagnetLines({
           const t = i / segments;
           const y = t * rect.height;
 
-          // Calculate base wave motion (subtle idle animation)
-          const baseOffset = Math.sin(time + line.offset + t * 0.5) * 2;
+          // Calculate base wave motion (extremely subtle idle animation)
+          const baseOffset = Math.sin(time + line.offset + t * 0.5) * 0.5;
 
           // Calculate distance from this segment point to mouse
           const dx = mouseX - line.x;
@@ -133,43 +133,32 @@ export default function MagnetLines({
           if (distance < magnetRadius && mouseInZone) {
             // Exponential falloff for more natural magnetic feel
             const normalizedDist = distance / magnetRadius;
-            const force = Math.pow(1 - normalizedDist, 2) * magnetStrength;
+            const force = Math.pow(1 - normalizedDist, 3) * magnetStrength; // Cubic falloff for gentler attraction
 
-            // Apply force with directional component
-            targetOffset += dx * (force / 80);
+            // Apply very subtle force with directional component
+            targetOffset += dx * (force / 200); // Much weaker (was /80)
 
-            // Add ripple/wave disturbance emanating from mouse (even when stationary)
-            const rippleFrequency = 3.5;
-            const rippleSpeed = 2.0;
-            const ripplePhase = distance * 0.015 - mouseActiveTimeRef.current * rippleSpeed;
-            const rippleWave = Math.sin(ripplePhase * rippleFrequency) * force * 0.15;
+            // Add extremely subtle ripple/wave disturbance
+            const rippleFrequency = 2.0; // Slower frequency
+            const rippleSpeed = 0.8; // Much slower
+            const ripplePhase = distance * 0.008 - mouseActiveTimeRef.current * rippleSpeed;
+            const rippleWave = Math.sin(ripplePhase * rippleFrequency) * force * 0.02; // Much weaker
             targetOffset += rippleWave;
 
-            // Add shimmer effect - high frequency oscillation (10x smaller)
-            const shimmerFrequency = 8;
-            const shimmer = Math.sin(distance * 0.1 + mouseActiveTimeRef.current * 5) * force * 0.008;
+            // Barely perceptible shimmer
+            const shimmer = Math.sin(distance * 0.05 + mouseActiveTimeRef.current * 2) * force * 0.003;
             targetOffset += shimmer;
-
-            // Add circular wave pattern around mouse
-            const angle = Math.atan2(dy, dx);
-            const circularWave = Math.sin(angle * 4 + mouseActiveTimeRef.current * 3) * force * 0.1;
-            targetOffset += circularWave;
-
-            // Add perpendicular wave for organic feel
-            const perpendicular = Math.sin(dy * 0.01 + time * 2) * force * 0.1;
-            targetOffset += perpendicular;
           }
 
           // Physics-based smooth interpolation with momentum
           // Spring-damper system for gravitational imprint
 
-          // Slower attraction (decreased stiffness = more delay)
-          const stiffness = 0.008; // Lower = slower to respond, more delay
+          // Very slow attraction
+          const stiffness = 0.003; // Much slower response
 
-          // Higher damping when moving toward target (slower attraction)
-          // Much higher damping when returning (5x slower return)
+          // Very high damping for slow, heavy movement
           const isReturning = Math.abs(targetOffset) < Math.abs(line.currentOffsets[i]);
-          const damping = isReturning ? 0.95 : 0.88; // Much higher when returning = 5x slower return
+          const damping = isReturning ? 0.97 : 0.93; // Both much slower
 
           // Calculate spring force
           const springForce = (targetOffset - line.currentOffsets[i]) * stiffness;
