@@ -153,7 +153,7 @@ export function AppBar() {
                   <Button
                     variant="soft"
                     size="2"
-                    className="w-full justify-start font-medium text-[15px] h-10 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/20 hover:border-amber-500/30"
+                    className="w-full justify-start font-medium text-[15px] h-10 bg-blue-500/10 hover:bg-blue-500/15 text-blue-400 border border-blue-500/20 hover:border-blue-500/30"
                   >
                     <PenLine size={16} strokeWidth={2} />
                     Write
@@ -215,7 +215,7 @@ export function AppBar() {
                 <Button
                   variant="soft"
                   size="2"
-                  className="w-full justify-center font-medium text-[15px] h-10 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/20 hover:border-amber-500/30"
+                  className="w-full justify-center font-medium text-[15px] h-10 bg-blue-500/10 hover:bg-blue-500/15 text-blue-400 border border-blue-500/20 hover:border-blue-500/30"
                 >
                   Sign In
                 </Button>

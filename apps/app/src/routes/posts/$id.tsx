@@ -292,7 +292,7 @@ function PostPage() {
       <Container size="reading" className="py-12">
         <article
           id="article-content"
-          className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:scroll-mt-32 prose-p:text-text-primary prose-p:leading-relaxed prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline prose-code:text-amber-300 prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10"
+          className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:scroll-mt-32 prose-p:text-text-primary prose-p:leading-relaxed prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-code:text-blue-300 prose-pre:bg-bg-elevated prose-pre:border prose-pre:border-white/10"
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
