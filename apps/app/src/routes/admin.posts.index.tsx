@@ -185,7 +185,7 @@ function AdminPostsPage() {
               </div>
             </div>
             <Link to="/admin/posts/new" style={{ textDecoration: 'none' }}>
-              <Button size="3" className="bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-semibold shadow-accent hover:shadow-accent-hover">
+              <Button size="3" className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold shadow-accent hover:shadow-accent-hover">
                 <PlusCircle size={18} />
                 New Post
               </Button>
@@ -318,8 +318,8 @@ function AdminPostsPage() {
                 align="center"
                 className="mt-4 p-3 rounded-lg"
                 style={{
-                  background: 'rgba(245, 158, 11, 0.1)',
-                  border: '1px solid rgba(245, 158, 11, 0.2)',
+                  background: 'rgba(26, 115, 232, 0.1)',
+                  border: '1px solid rgba(26, 115, 232, 0.2)',
                 }}
               >
                 <Text size="2" weight="medium" style={{ color: 'var(--color-text-primary)' }}>

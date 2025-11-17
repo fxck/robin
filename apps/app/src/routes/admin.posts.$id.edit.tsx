@@ -320,10 +320,10 @@ function EditPostPage() {
       {/* Non-blocking draft restore banner */}
       {showDraftBanner && pendingDraft && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-md">
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 backdrop-blur-xl shadow-2xl">
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 backdrop-blur-xl shadow-2xl">
             <div className="flex items-start gap-3">
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-amber-400 mb-1">
+                <h3 className="text-sm font-semibold text-blue-400 mb-1">
                   Newer local changes found
                 </h3>
                 <p className="text-xs text-gray-400">
@@ -333,7 +333,7 @@ function EditPostPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleRestoreDraft}
-                  className="px-3 py-1.5 text-xs font-medium bg-amber-500 hover:bg-amber-600 text-black rounded-lg transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
                 >
                   Restore
                 </button>

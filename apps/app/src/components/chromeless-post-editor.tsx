@@ -424,7 +424,7 @@ export function ChromelessPostEditor({
     }),
     TiptapLink.configure({
       HTMLAttributes: {
-        class: 'text-amber-400 underline decoration-amber-400/30 hover:decoration-amber-400 transition-colors',
+        class: 'text-blue-400 underline decoration-blue-400/30 hover:decoration-blue-400 transition-colors',
       },
     }),
     TiptapUnderline,

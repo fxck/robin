@@ -165,7 +165,7 @@ function ResetPasswordPage() {
                           passwordStrength === 'strong'
                             ? 'var(--green-9)'
                             : passwordStrength === 'medium'
-                            ? 'var(--amber-9)'
+                            ? 'var(--blue-9)'
                             : 'var(--red-9)',
                         borderRadius: 2,
                       }}
@@ -176,7 +176,7 @@ function ResetPasswordPage() {
                         passwordStrength === 'strong'
                           ? 'green'
                           : passwordStrength === 'medium'
-                          ? 'amber'
+                          ? 'blue'
                           : 'red'
                       }
                     >

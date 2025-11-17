@@ -109,7 +109,7 @@ function VerifyEmailPage() {
                     The verification link may have expired or is invalid.{' '}
                     <button
                       onClick={() => navigate({ to: '/' })}
-                      className="text-amber-400 hover:text-amber-300 underline"
+                      className="text-blue-400 hover:text-blue-300 underline"
                     >
                       Go to home
                     </button>

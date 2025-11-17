@@ -199,7 +199,7 @@ function SettingsPage() {
                   className={`
                     relative w-40 h-40 rounded-full cursor-pointer
                     transition-all duration-300 group
-                    ${isDragActive ? 'ring-4 ring-amber-500 scale-105' : 'ring-2 ring-amber-500/20 hover:ring-amber-500/50'}
+                    ${isDragActive ? 'ring-4 ring-blue-500 scale-105' : 'ring-2 ring-blue-500/20 hover:ring-blue-500/50'}
                     ${isUploading ? 'opacity-60 cursor-not-allowed' : ''}
                   `}
                 >
@@ -212,7 +212,7 @@ function SettingsPage() {
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
                       <User className="h-20 w-20 text-white" />
                     </div>
                   )}
@@ -290,7 +290,7 @@ function SettingsPage() {
                     size="3"
                     onClick={handleUpdateProfile}
                     disabled={updateProfileMutation.isPending || name === user?.name}
-                    className="bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 transition-all text-black font-semibold shadow-accent hover:shadow-accent-hover"
+                    className="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all text-white font-semibold shadow-accent hover:shadow-accent-hover"
                   >
                     {updateProfileMutation.isPending ? (
                       <>

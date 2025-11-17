@@ -54,7 +54,7 @@ function RootComponent() {
     <ErrorBoundary>
       <HeadContent />
       <QueryClientProvider client={queryClient}>
-        <Theme appearance="dark" accentColor="amber" radius="medium" scaling="100%">
+        <Theme appearance="dark" accentColor="blue" radius="medium" scaling="100%">
           <Box
             style={{
               minHeight: '100vh',

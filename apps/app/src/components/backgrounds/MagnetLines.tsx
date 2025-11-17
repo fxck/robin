@@ -145,9 +145,9 @@ export default function MagnetLines({
             const rippleWave = Math.sin(ripplePhase * rippleFrequency) * force * 0.15;
             targetOffset += rippleWave;
 
-            // Add shimmer effect - high frequency oscillation (5x more subtle)
+            // Add shimmer effect - high frequency oscillation (10x smaller)
             const shimmerFrequency = 8;
-            const shimmer = Math.sin(distance * 0.1 + mouseActiveTimeRef.current * 5) * force * 0.016;
+            const shimmer = Math.sin(distance * 0.1 + mouseActiveTimeRef.current * 5) * force * 0.008;
             targetOffset += shimmer;
 
             // Add circular wave pattern around mouse
@@ -167,9 +167,9 @@ export default function MagnetLines({
           const stiffness = 0.008; // Lower = slower to respond, more delay
 
           // Higher damping when moving toward target (slower attraction)
-          // Lower damping when returning (faster return)
+          // Much higher damping when returning (5x slower return)
           const isReturning = Math.abs(targetOffset) < Math.abs(line.currentOffsets[i]);
-          const damping = isReturning ? 0.75 : 0.88; // Lower when returning = faster return
+          const damping = isReturning ? 0.95 : 0.88; // Much higher when returning = 5x slower return
 
           // Calculate spring force
           const springForce = (targetOffset - line.currentOffsets[i]) * stiffness;
