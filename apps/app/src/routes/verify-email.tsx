@@ -43,7 +43,7 @@ function VerifyEmailPage() {
         }
 
         setStatus('success');
-        toast.success('Email verified successfully!');
+        toast.success('Email verified successfully! You are now signed in.');
 
         // Redirect to content manager after 2 seconds
         setTimeout(() => {
@@ -91,7 +91,7 @@ function VerifyEmailPage() {
                     Email Verified!
                   </Heading>
                   <Text size="3" color="gray" align="center">
-                    Your email has been successfully verified. Redirecting you to Content Manager...
+                    Your email has been successfully verified and you're now signed in. Redirecting you to Content Manager...
                   </Text>
                 </>
               )}

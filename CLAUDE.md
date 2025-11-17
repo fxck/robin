@@ -180,9 +180,10 @@ robin/
 **`@robin/auth`:**
 - Server-side: `createAuth(db, config)` factory (Better Auth instance)
 - Client-side: Import from `@robin/auth/client` in React components
-- Configured for cross-domain cookies (SameSite=none, Secure, Partitioned)
+- Configured for cross-domain cookies (SameSite=lax for same domain)
 - Redis-backed session storage for performance
-- Email verification enabled (auto-signin even if unverified)
+- Email verification required - users must verify email before signing in
+- Auto-signin after email verification enabled
 
 **`@robin/types`:**
 - Shared TypeScript types
@@ -202,7 +203,21 @@ robin/
    - Email/password + OAuth (GitHub, Google)
    - Email verification with nodemailer
 3. Frontend auth via `@robin/auth/client` and TanStack Query
-4. Cross-domain cookies configured for SameSite=none (app and API on different domains)
+4. Cookies configured for SameSite=lax (same domain deployment)
+
+**Sign Up Flow:**
+1. User creates account via email/password
+2. Account created but user is NOT signed in
+3. Verification email sent with token
+4. User must click verification link in email
+5. Upon verification, user is automatically signed in
+6. Welcome email sent only after successful verification
+7. User redirected to Content Manager
+
+**Sign In Flow:**
+1. User attempts to sign in with email/password
+2. If email not verified, sign in fails with error message
+3. If verified, user is signed in and redirected to Content Manager
 
 ### Redis Usage
 

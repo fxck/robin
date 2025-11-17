@@ -87,8 +87,8 @@ export function createAuth(db: Database, config: {
 
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: true, // Enable email verification (but users can still use the app)
-      autoSignIn: true, // Auto sign-in even if email is not verified
+      requireEmailVerification: true, // Users must verify email before they can sign in
+      autoSignIn: false, // Do not auto sign-in until email is verified
       sendResetPassword: async ({ user, url }) => {
         // Password reset email
         if (config.emailConfig) {
@@ -133,7 +133,7 @@ export function createAuth(db: Database, config: {
 
     emailVerification: {
       sendOnSignUp: true,
-      autoSignInAfterVerification: false,
+      autoSignInAfterVerification: true,
       sendVerificationEmail: async ({ user, url, token }) => {
         console.log('[Better Auth] Verification URL generated:', url);
         console.log('[Better Auth] Token:', token);
@@ -164,12 +164,13 @@ export function createAuth(db: Database, config: {
 
     databaseHooks: {
       user: {
-        create: {
+        update: {
           after: async (user) => {
-            // Send welcome email after user creation
-            console.log('[Better Auth] Sending welcome email to:', user.email);
+            // Send welcome email only after email verification
+            // Better Auth sets emailVerified to true when user verifies their email
+            if (user.emailVerified && config.emailConfig) {
+              console.log('[Better Auth] User verified email, sending welcome email to:', user.email);
 
-            if (config.emailConfig) {
               try {
                 await sendEmail({
                   to: user.email,
@@ -178,7 +179,7 @@ export function createAuth(db: Database, config: {
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                       <h1 style="color: #8b5cf6;">Welcome to Robin!</h1>
                       <p>Hi ${user.name || 'there'},</p>
-                      <p>Thanks for joining Robin! We're excited to have you as part of our community.</p>
+                      <p>Thanks for verifying your email and joining Robin! We're excited to have you as part of our community.</p>
                       <p>Robin is a modern blogging platform where you can share your thoughts, ideas, and stories with the world.</p>
                       <h2 style="color: #8b5cf6; font-size: 18px; margin-top: 30px;">Getting Started</h2>
                       <ul style="line-height: 1.8;">
@@ -197,7 +198,7 @@ export function createAuth(db: Database, config: {
                 console.log('[Better Auth] Welcome email sent successfully to:', user.email);
               } catch (error) {
                 console.error('[Better Auth] Failed to send welcome email:', error);
-                // Don't throw - we don't want to fail user creation if email fails
+                // Don't throw - we don't want to fail user update if email fails
               }
             }
           },

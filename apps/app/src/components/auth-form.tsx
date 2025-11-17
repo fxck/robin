@@ -60,10 +60,12 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
           // Reset form after successful signup
           form.reset();
 
-          // Since autoSignIn is enabled, user is now signed in
-          toast.success('Account created! A verification email has been sent to confirm your address.', {
-            duration: 4000,
+          // User must verify email before signing in
+          toast.success('Account created! Please check your email to verify your address before signing in.', {
+            duration: 5000,
           });
+
+          // Don't call onSuccess for signup - user isn't signed in yet
         } else {
           const result = await signIn.email({
             email: value.email,
@@ -78,16 +80,18 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
           form.reset();
 
           toast.success('Signed in successfully!');
-        }
 
-        // Navigate to dashboard after successful auth
-        onSuccess?.();
+          // Navigate to dashboard after successful sign in
+          onSuccess?.();
+        }
       } catch (error) {
         // Handle specific error cases
         const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
 
         if (errorMessage.includes('already exists')) {
           toast.error('An account with this email already exists');
+        } else if (errorMessage.includes('not verified') || errorMessage.includes('verify')) {
+          toast.error('Please verify your email before signing in. Check your inbox for the verification link.');
         } else if (errorMessage.includes('Invalid') || errorMessage.includes('incorrect')) {
           toast.error('Invalid email or password');
         } else if (errorMessage.includes('rate limit')) {
