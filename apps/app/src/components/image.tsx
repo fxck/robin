@@ -1,11 +1,11 @@
 import { useState, useEffect, CSSProperties } from 'react';
 import { Box } from '@radix-ui/themes';
-import { ImageIcon } from 'lucide-react';
 import {
-  generateGradientPlaceholder,
   generateInitialsPlaceholder,
   generateIconPlaceholder,
   getSkeletonPlaceholder,
+  generateAbstractBubblePlaceholder,
+  generateTinyBlurPlaceholder,
 } from '../utils/image-placeholder';
 
 export interface ImageProps {
@@ -20,7 +20,7 @@ export interface ImageProps {
   /** Aspect ratio for placeholder (e.g., 16/9, 1, 4/3) */
   aspectRatio?: number;
   /** Placeholder type */
-  placeholder?: 'gradient' | 'initials' | 'icon' | 'skeleton' | 'none';
+  placeholder?: 'blur' | 'initials' | 'icon' | 'skeleton' | 'bubbles' | 'none';
   /** Text for initials placeholder (e.g., user name, post title) */
   placeholderText?: string;
   /** Icon type for icon placeholder */
@@ -34,15 +34,16 @@ export interface ImageProps {
 }
 
 /**
- * Enhanced Image component with automatic placeholders and loading states
+ * Enhanced Image component with blur-up placeholders and loading states
  *
  * Features:
- * - Automatic gradient placeholders
+ * - Blur-up technique for existing images (tiny blurred preview → full image)
+ * - Abstract blurry bubbles for non-existing images
  * - Initials-based avatars
  * - Icon placeholders
  * - Skeleton loading states
  * - Graceful error handling
- * - Smooth fade-in transitions
+ * - Extremely smooth transitions
  */
 export function Image({
   src,
@@ -50,7 +51,7 @@ export function Image({
   className,
   style,
   aspectRatio = 16 / 9,
-  placeholder = 'gradient',
+  placeholder = 'blur',
   placeholderText,
   placeholderIcon = 'image',
   onLoad,
@@ -93,15 +94,21 @@ export function Image({
     const seed = placeholderText || alt || 'default';
 
     switch (placeholder) {
+      case 'blur':
+        // If we have an image, show tiny blurred preview, otherwise show bubbles
+        return src && !hasError
+          ? generateTinyBlurPlaceholder(seed, aspectRatio)
+          : generateAbstractBubblePlaceholder(seed, aspectRatio);
+      case 'bubbles':
+        return generateAbstractBubblePlaceholder(seed, aspectRatio);
       case 'initials':
         return generateInitialsPlaceholder(seed);
       case 'icon':
         return generateIconPlaceholder(placeholderIcon);
       case 'skeleton':
         return getSkeletonPlaceholder(aspectRatio);
-      case 'gradient':
       default:
-        return ''; // Will use CSS gradient background
+        return generateTinyBlurPlaceholder(seed, aspectRatio);
     }
   };
 
@@ -115,53 +122,25 @@ export function Image({
         position: 'relative',
         width: '100%',
         overflow: 'hidden',
-        backgroundColor: 'var(--gray-3)',
+        backgroundColor: '#1a1a1a',
         ...style,
       }}
     >
-      {/* Placeholder */}
-      {shouldShowPlaceholder && (
+      {/* Blur-up Placeholder - shown underneath the image */}
+      {placeholderUrl && (
         <Box
           style={{
             position: 'absolute',
             inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background:
-              placeholder === 'gradient'
-                ? generateGradientPlaceholder(placeholderText || alt || 'default')
-                : placeholderUrl
-                ? `url(${placeholderUrl})`
-                : 'var(--gray-4)',
+            backgroundImage: `url(${placeholderUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            filter: 'blur(20px)',
+            transform: 'scale(1.1)', // Scale up slightly to hide blur edges
+            opacity: shouldShowPlaceholder || isLoading ? 1 : 0,
+            transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
-        >
-          {/* Icon overlay for gradient placeholders without content */}
-          {placeholder === 'gradient' && !placeholderUrl && (
-            <ImageIcon
-              size={48}
-              style={{
-                color: 'rgba(255, 255, 255, 0.8)',
-                filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
-              }}
-            />
-          )}
-
-          {/* Loading shimmer animation */}
-          {isLoading && !hasError && (
-            <Box
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background:
-                  'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
-                animation: 'shimmer 2s infinite',
-              }}
-            />
-          )}
-        </Box>
+        />
       )}
 
       {/* Actual Image */}
@@ -172,27 +151,17 @@ export function Image({
           onLoad={handleLoad}
           onError={handleError}
           style={{
+            position: 'relative',
             width: '100%',
             height: '100%',
             objectFit,
             display: 'block',
             opacity: isLoading ? 0 : 1,
-            transition: 'opacity 0.3s ease-in-out',
+            transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            zIndex: 1,
           }}
         />
       )}
-
-      {/* Inject shimmer animation keyframes */}
-      <style>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-      `}</style>
     </Box>
   );
 }

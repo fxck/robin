@@ -138,7 +138,7 @@ export function FileUpload({
               <Image
                 src={preview}
                 alt="Upload preview"
-                placeholder="gradient"
+                placeholder="blur"
                 placeholderText="Upload"
                 objectFit="contain"
                 style={{

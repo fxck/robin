@@ -35,7 +35,7 @@ export function PostCard({ post }: PostCardProps) {
           <Image
             src={post.coverImageThumb || post.coverImage}
             alt={post.title}
-            placeholder="gradient"
+            placeholder="blur"
             placeholderText={post.title}
             aspectRatio={16 / 9}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"

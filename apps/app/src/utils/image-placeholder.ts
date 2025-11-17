@@ -4,6 +4,124 @@
  */
 
 /**
+ * Seeded random number generator for consistent randomness
+ */
+function seededRandom(seed: string): () => number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+
+  return () => {
+    hash = (hash * 9301 + 49297) % 233280;
+    return hash / 233280;
+  };
+}
+
+/**
+ * Generate abstract blurry bubble placeholder for non-existing images
+ * Creates random dark pastel colored bubbles with extreme blur
+ */
+export function generateAbstractBubblePlaceholder(seed = '', aspectRatio = 16/9): string {
+  const random = seededRandom(seed);
+
+  // Dark pastel color palette
+  const darkPastelColors = [
+    '#4a5568', '#5a4a68', '#684a5a', '#68594a',
+    '#4a6857', '#4a5f68', '#5d4a68', '#684a4a',
+    '#3d5a5f', '#5f3d5a', '#5a5f3d', '#3d4a5f',
+    '#5f4a3d', '#4a3d5f', '#3d5f4a', '#5f5a3d'
+  ];
+
+  const width = 100;
+  const height = Math.round(width / aspectRatio);
+
+  // Generate 8-12 random bubbles
+  const bubbleCount = Math.floor(random() * 5) + 8;
+  const bubbles: string[] = [];
+
+  for (let i = 0; i < bubbleCount; i++) {
+    const cx = random() * 100;
+    const cy = random() * 100;
+    const r = random() * 40 + 20; // Radius between 20-60
+    const color = darkPastelColors[Math.floor(random() * darkPastelColors.length)];
+    const opacity = random() * 0.4 + 0.3; // Opacity between 0.3-0.7
+
+    bubbles.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity="${opacity}"/>`);
+  }
+
+  const svg = `
+    <svg width="${width}" height="${height}" viewBox="0 0 100 ${100 / aspectRatio}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="blur">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="15"/>
+        </filter>
+      </defs>
+      <rect width="100" height="${100 / aspectRatio}" fill="#1a1a1a"/>
+      <g filter="url(#blur)">
+        ${bubbles.join('\n        ')}
+      </g>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+}
+
+/**
+ * Generate a tiny blurred thumbnail placeholder (LQIP - Low Quality Image Placeholder)
+ * This creates a 100x100px blurred version for the blur-up effect
+ */
+export function generateTinyBlurPlaceholder(seed = '', aspectRatio = 16/9): string {
+  const random = seededRandom(seed);
+
+  // Dark pastel colors for a more sophisticated look
+  const colors = [
+    '#4a5568', '#5a4a68', '#684a5a', '#68594a',
+    '#4a6857', '#4a5f68', '#5d4a68', '#684a4a',
+    '#3d5a5f', '#5f3d5a', '#5a5f3d', '#3d4a5f',
+    '#5f4a3d', '#4a3d5f', '#3d5f4a', '#5f5a3d'
+  ];
+
+  const width = 100;
+  const height = Math.round(width / aspectRatio);
+
+  // Create a gradient with 3-4 color stops
+  const stopCount = Math.floor(random() * 2) + 3;
+  const stops: string[] = [];
+
+  for (let i = 0; i < stopCount; i++) {
+    const offset = (i / (stopCount - 1)) * 100;
+    const color = colors[Math.floor(random() * colors.length)];
+    stops.push(`<stop offset="${offset}%" style="stop-color:${color};stop-opacity:1" />`);
+  }
+
+  // Random gradient angle
+  const angle = random() * 360;
+  const rad = (angle * Math.PI) / 180;
+  const x1 = 50 + Math.cos(rad) * 50;
+  const y1 = 50 + Math.sin(rad) * 50;
+  const x2 = 50 - Math.cos(rad) * 50;
+  const y2 = 50 - Math.sin(rad) * 50;
+
+  const svg = `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
+          ${stops.join('\n          ')}
+        </linearGradient>
+        <filter id="blur">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="8"/>
+        </filter>
+      </defs>
+      <rect width="${width}" height="${height}" fill="url(#grad)" filter="url(#blur)"/>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+}
+
+/**
  * Generate a gradient placeholder based on a seed (like user ID or post ID)
  */
 export function generateGradientPlaceholder(seed = ''): string {

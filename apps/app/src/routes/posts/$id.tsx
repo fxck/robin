@@ -213,6 +213,9 @@ function PostPage() {
             <Image
               src={post.coverImage}
               alt={post.title}
+              placeholder="blur"
+              placeholderText={post.title}
+              aspectRatio={16 / 9}
               className="w-full h-full object-cover"
             />
             {/* Gradient overlay inside cover: transparent (top) → background color (bottom) */}

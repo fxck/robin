@@ -14,10 +14,10 @@ export function ImageShowcase() {
           Image Placeholder Showcase
         </Text>
 
-        {/* Gradient Placeholders */}
+        {/* Bubble Placeholders */}
         <Box>
           <Text size="5" weight="bold" mb="4">
-            Gradient Placeholders
+            Abstract Bubble Placeholders
           </Text>
           <Grid columns="3" gap="4">
             <Card>
@@ -25,7 +25,7 @@ export function ImageShowcase() {
                 <Image
                   src={null}
                   alt="Post 1"
-                  placeholder="gradient"
+                  placeholder="bubbles"
                   placeholderText="Beautiful Sunset"
                   aspectRatio={16 / 9}
                   style={{ height: '200px' }}
@@ -41,7 +41,7 @@ export function ImageShowcase() {
                 <Image
                   src={null}
                   alt="Post 2"
-                  placeholder="gradient"
+                  placeholder="bubbles"
                   placeholderText="Mountain View"
                   aspectRatio={16 / 9}
                   style={{ height: '200px' }}
@@ -57,7 +57,7 @@ export function ImageShowcase() {
                 <Image
                   src={null}
                   alt="Post 3"
-                  placeholder="gradient"
+                  placeholder="bubbles"
                   placeholderText="City Lights"
                   aspectRatio={16 / 9}
                   style={{ height: '200px' }}
@@ -291,7 +291,7 @@ export function ImageShowcase() {
                 <Image
                   src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400"
                   alt="Mountain"
-                  placeholder="gradient"
+                  placeholder="bubbles"
                   placeholderText="Mountain"
                   aspectRatio={16 / 9}
                   style={{ height: '200px' }}

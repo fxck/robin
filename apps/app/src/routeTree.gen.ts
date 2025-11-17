@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as TestPlaceholdersRouteImport } from './routes/test-placeholders'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -24,6 +25,11 @@ import { Route as AdminPostsIdEditRouteImport } from './routes/admin.posts.$id.e
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestPlaceholdersRoute = TestPlaceholdersRouteImport.update({
+  id: '/test-placeholders',
+  path: '/test-placeholders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/test-placeholders': typeof TestPlaceholdersRoute
   '/verify-email': typeof VerifyEmailRoute
   '/posts/$id': typeof PostsIdRoute
   '/posts': typeof PostsIndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/test-placeholders': typeof TestPlaceholdersRoute
   '/verify-email': typeof VerifyEmailRoute
   '/posts/$id': typeof PostsIdRoute
   '/posts': typeof PostsIndexRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
+  '/test-placeholders': typeof TestPlaceholdersRoute
   '/verify-email': typeof VerifyEmailRoute
   '/posts/$id': typeof PostsIdRoute
   '/posts/': typeof PostsIndexRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/settings'
+    | '/test-placeholders'
     | '/verify-email'
     | '/posts/$id'
     | '/posts'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/settings'
+    | '/test-placeholders'
     | '/verify-email'
     | '/posts/$id'
     | '/posts'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/settings'
+    | '/test-placeholders'
     | '/verify-email'
     | '/posts/$id'
     | '/posts/'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
+  TestPlaceholdersRoute: typeof TestPlaceholdersRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   PostsIdRoute: typeof PostsIdRoute
   PostsIndexRoute: typeof PostsIndexRoute
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-placeholders': {
+      id: '/test-placeholders'
+      path: '/test-placeholders'
+      fullPath: '/test-placeholders'
+      preLoaderRoute: typeof TestPlaceholdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
+  TestPlaceholdersRoute: TestPlaceholdersRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   PostsIdRoute: PostsIdRoute,
   PostsIndexRoute: PostsIndexRoute,
