@@ -1,4 +1,4 @@
-import { defineEventHandler, getQuery } from 'h3';
+import { defineEventHandler, getQuery, createError } from 'h3';
 import { z } from 'zod';
 import { eq, desc, and, isNull, sql } from 'drizzle-orm';
 import { db } from '../../../services/db';
@@ -6,6 +6,7 @@ import { schema } from '@robin/database';
 import { getCache, setCache, getCounter, setCounter } from '../../../services/redis';
 import { log } from '../../../utils/logger';
 import { rewriteImageUrlsInObject } from '../../../utils/cdn';
+import { optionalAuth } from '../../../utils/auth-guard';
 
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -18,7 +19,36 @@ const querySchema = z.object({
 export default defineEventHandler(async (event) => {
   // Parse and validate query params
   const query = getQuery(event);
-  const params = querySchema.parse(query);
+  let params = querySchema.parse(query);
+
+  // Check authentication for protected queries
+  const currentUser = await optionalAuth(event);
+
+  // Security check: only allow querying non-published posts if authenticated and requesting own posts
+  if (params.status !== 'published') {
+    if (!currentUser) {
+      throw createError({
+        statusCode: 401,
+        message: 'Authentication required to view draft posts',
+      });
+    }
+    // If querying by userId, must be the current user
+    if (params.userId && params.userId !== currentUser.id) {
+      throw createError({
+        statusCode: 403,
+        message: 'You can only view your own draft posts',
+      });
+    }
+    // If not specifying userId but requesting drafts/all, auto-filter to current user
+    if (!params.userId) {
+      params.userId = currentUser.id;
+    }
+  }
+
+  // Security check: if filtering by userId for another user, force published only
+  if (params.userId && currentUser?.id !== params.userId) {
+    params.status = 'published';
+  }
 
   const offset = (params.page - 1) * params.limit;
 

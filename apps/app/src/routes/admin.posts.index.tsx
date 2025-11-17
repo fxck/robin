@@ -43,9 +43,18 @@ function AdminPostsPage() {
   // Bulk selection state
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
 
+  // Get current user session
+  const { data: session } = authClient.useSession();
+
   const { data, isLoading } = useQuery<PostsListResponse>({
-    queryKey: ['admin-posts'],
-    queryFn: () => api.get<PostsListResponse>('/posts?status=all&limit=100'),
+    queryKey: ['admin-posts', session?.user?.id],
+    queryFn: () => {
+      // Only fetch posts for the current user
+      const userId = session?.user?.id;
+      if (!userId) throw new Error('User not authenticated');
+      return api.get<PostsListResponse>(`/posts?status=all&limit=100&userId=${userId}`);
+    },
+    enabled: !!session?.user?.id, // Only run query if user is authenticated
   });
 
   const deleteMutation = useMutation({
