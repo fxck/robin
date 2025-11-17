@@ -101,39 +101,56 @@ export default function MagnetLines({
 
       linesRef.current.forEach((line) => {
         // Calculate base wave motion
-        const baseOffset = Math.sin(time + line.offset) * 5;
+        const baseOffset = Math.sin(time + line.offset) * 3;
 
-        // Calculate distance to mouse
-        const dx = mouseX - line.x;
-        const dy = mouseY - rect.height / 2;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        // Calculate multiple control points along the line for full-length bending
+        const segments = 5;
+        const points: { x: number; y: number }[] = [];
 
-        // Apply magnetic effect - bend the X position with stronger force
-        let targetOffsetX = baseOffset;
-        if (distance < magnetRadius && mouseRef.current.x > -500) {
-          const force = (1 - distance / magnetRadius) * magnetStrength;
-          // Stronger attraction - multiply by 2
-          targetOffsetX += dx * (force / 50);
+        for (let i = 0; i <= segments; i++) {
+          const t = i / segments;
+          const y = t * rect.height;
+
+          // Calculate distance from this point on the line to the mouse
+          const dx = mouseX - line.x;
+          const dy = mouseY - y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          // Apply magnetic effect at this point
+          let offsetX = baseOffset * (1 - t * 0.3); // Reduce wave at bottom
+          if (distance < magnetRadius && mouseRef.current.x > -500) {
+            const force = (1 - distance / magnetRadius) * magnetStrength;
+            // Apply force proportional to distance
+            offsetX += dx * (force / 100);
+          }
+
+          points.push({ x: line.x + offsetX, y });
         }
 
         // Smooth interpolation with delay (gravitational imprint)
-        // Slower return creates the "gravitational imprint" effect
-        const returnSpeed = 0.03;
-        line.currentOffsetX += (targetOffsetX - line.currentOffsetX) * returnSpeed;
+        const returnSpeed = 0.04;
 
-        const currentX = line.x + line.currentOffsetX;
-
-        // Draw line from top to bottom with curve
+        // Draw line using cubic bezier curves through all points
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = lineWidth;
         ctx.globalAlpha = opacity;
 
         ctx.beginPath();
-        ctx.moveTo(line.x, 0);
+        ctx.moveTo(points[0].x, points[0].y);
 
-        // Use quadratic curve to create smooth bend
-        const controlY = rect.height / 2;
-        ctx.quadraticCurveTo(currentX, controlY, line.x, rect.height);
+        // Draw smooth curve through all points
+        for (let i = 1; i < points.length; i++) {
+          const prevPoint = points[i - 1];
+          const currentPoint = points[i];
+
+          const cpX1 = prevPoint.x;
+          const cpY1 = prevPoint.y + (currentPoint.y - prevPoint.y) * 0.33;
+          const cpX2 = currentPoint.x;
+          const cpY2 = prevPoint.y + (currentPoint.y - prevPoint.y) * 0.66;
+
+          ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, currentPoint.x, currentPoint.y);
+        }
+
         ctx.stroke();
       });
 
