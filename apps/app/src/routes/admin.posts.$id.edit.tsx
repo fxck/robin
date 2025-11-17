@@ -48,6 +48,12 @@ function EditPostPage() {
   const storageKey = `post_${id}`;
   const hasCheckedDraftRef = useRef(false);
 
+  // Use ref for version to avoid stale closure issues
+  const versionRef = useRef(version);
+  useEffect(() => {
+    versionRef.current = version;
+  }, [version]);
+
   // Initialize form from server data OR localStorage draft (non-blocking)
   useEffect(() => {
     if (!data?.post || initialized) return;
@@ -85,16 +91,19 @@ function EditPostPage() {
 
   // Handler for restoring draft from banner
   const handleRestoreDraft = useCallback(() => {
-    if (pendingDraft) {
+    if (pendingDraft && data?.post) {
       setTitle(pendingDraft.title);
       setContent(pendingDraft.content);
       setCoverImage(pendingDraft.coverImage || '');
       setStatus(pendingDraft.status);
-      setVersion(pendingDraft.version);
+      // CRITICAL: Always use server version, not draft version
+      // Draft version might be stale if post was updated elsewhere
+      setVersion(data.post.version);
+      console.log('[Edit] Restored draft with server version:', data.post.version, '(draft had version:', pendingDraft.version, ')');
       setShowDraftBanner(false);
       setPendingDraft(null);
     }
-  }, [pendingDraft]);
+  }, [pendingDraft, data]);
 
   // Handler for dismissing draft banner
   const handleDismissDraft = useCallback(() => {
@@ -109,9 +118,10 @@ function EditPostPage() {
   // Autosave with proper version tracking
   const autosave = useAutosave<UpdatePostInput, PostResponse>(
     async (updateData) => {
+      console.log('[Edit Autosave] Sending PATCH with version:', versionRef.current);
       return api.patch<PostResponse>(`/posts/${id}`, {
         ...updateData,
-        version, // Use current version for optimistic locking
+        version: versionRef.current, // Use ref to get latest version
       });
     },
     {
@@ -120,6 +130,8 @@ function EditPostPage() {
       maxRetries: 3,
       onSaveSuccess: (response) => {
         const post = response.post;
+
+        console.log('[Edit Autosave] Save success, updating version from', versionRef.current, 'to', post.version);
 
         // Update version from server response immediately
         // This is crucial to prevent 409 on next save
@@ -133,6 +145,7 @@ function EditPostPage() {
         queryClient.invalidateQueries({ queryKey: ['posts'], exact: false });
       },
       onSaveError: (error) => {
+        console.error('[Edit Autosave] Save error:', error);
         if (error.message?.includes('409')) {
           // Version conflict - refetch to get latest version
           queryClient.invalidateQueries({ queryKey: ['post', id] });
@@ -156,7 +169,7 @@ function EditPostPage() {
       content,
       coverImage: coverImage || undefined,
       status,
-      version,
+      version: versionRef.current, // Use ref to get latest version
       postId: id,
       lastModified: Date.now(),
     };
@@ -167,7 +180,7 @@ function EditPostPage() {
         content,
         coverImage: coverImage || undefined,
         status,
-        version,
+        version: versionRef.current, // Use ref for consistency
       },
       draftData
     );

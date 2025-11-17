@@ -40,6 +40,20 @@ export default defineEventHandler(async (event) => {
     .where(and(eq(schema.posts.id, id), isNull(schema.posts.deletedAt)))
     .limit(1);
 
+  log.info('Fetched post for update', {
+    postId: id,
+    found: !!existingPost,
+    postData: existingPost ? {
+      id: existingPost.id,
+      userId: existingPost.userId,
+      userIdType: typeof existingPost.userId,
+      title: existingPost.title,
+      status: existingPost.status,
+      version: existingPost.version,
+    } : null,
+    requestId: event.context.requestId,
+  });
+
   if (!existingPost) {
     throw createError({
       statusCode: 404,
@@ -48,7 +62,21 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check ownership
+  log.info('Checking post ownership', {
+    postId: id,
+    postUserId: existingPost.userId,
+    sessionUserId: user.id,
+    match: existingPost.userId === user.id,
+    requestId: event.context.requestId,
+  });
+
   if (existingPost.userId !== user.id) {
+    log.warn('Ownership check failed', {
+      postId: id,
+      postUserId: existingPost.userId,
+      sessionUserId: user.id,
+      requestId: event.context.requestId,
+    });
     throw createError({
       statusCode: 403,
       message: 'You do not have permission to edit this post',
