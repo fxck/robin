@@ -12,7 +12,7 @@ import {
   Select,
   Checkbox,
 } from '@radix-ui/themes';
-import { PlusCircle, Edit, Trash2, Eye, Search, X, Heart, FileText, TrendingUp, BarChart3 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Eye, Search, X, Heart, FileText, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { api } from '../lib/api-client';
@@ -167,7 +167,6 @@ function AdminPostsPage() {
   };
 
   const publishedPosts = allPosts.filter(p => p.status === 'published');
-  const draftPosts = allPosts.filter(p => p.status === 'draft');
   const totalViews = allPosts.reduce((acc, p) => acc + p.views, 0);
   const totalLikes = allPosts.reduce((acc, p) => acc + p.likesCount, 0);
 
@@ -194,158 +193,157 @@ function AdminPostsPage() {
           </Flex>
         </div>
 
-        {/* Stats Row */}
-        <div className="glass-surface p-6 mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {/* Total Posts */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <FileText className="h-3.5 w-3.5" style={{ color: 'var(--color-text-tertiary)' }} />
-                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
-                  Total Posts
-                </div>
+        {/* Compact Stats Row - No Card */}
+        <Flex gap="8" wrap="wrap" align="center" className="mb-8">
+          {/* Total Posts */}
+          <Flex align="center" gap="3">
+            <FileText className="h-5 w-5" style={{ color: 'var(--color-text-tertiary)' }} />
+            <div>
+              <div className="text-xs uppercase tracking-wider font-medium" style={{ color: 'var(--color-text-tertiary)' }}>
+                Total Posts
               </div>
-              <div className="text-admin-stat-value text-white">
+              <div className="text-2xl font-bold text-white mt-0.5">
                 {allPosts.length}
               </div>
             </div>
+          </Flex>
 
-            {/* Published */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Eye className="h-3.5 w-3.5 text-green-400" />
-                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
-                  Published
-                </div>
+          {/* Published */}
+          <Flex align="center" gap="3">
+            <Eye className="h-5 w-5 text-green-400" />
+            <div>
+              <div className="text-xs uppercase tracking-wider font-medium" style={{ color: 'var(--color-text-tertiary)' }}>
+                Published
               </div>
-              <div className="text-admin-stat-value text-white">
+              <div className="text-2xl font-bold text-white mt-0.5">
                 {publishedPosts.length}
               </div>
             </div>
+          </Flex>
 
-            {/* Total Views */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-3.5 w-3.5 text-blue-400" />
-                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
-                  Total Views
-                </div>
+          {/* Total Views */}
+          <Flex align="center" gap="3">
+            <TrendingUp className="h-5 w-5 text-blue-400" />
+            <div>
+              <div className="text-xs uppercase tracking-wider font-medium" style={{ color: 'var(--color-text-tertiary)' }}>
+                Total Views
               </div>
-              <div className="text-admin-stat-value text-white">
+              <div className="text-2xl font-bold text-white mt-0.5">
                 {totalViews.toLocaleString()}
               </div>
             </div>
+          </Flex>
 
-            {/* Total Likes */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Heart className="h-3.5 w-3.5 text-pink-400" />
-                <div className="text-admin-stat-label" style={{ color: 'var(--color-text-tertiary)' }}>
-                  Total Likes
-                </div>
+          {/* Total Likes */}
+          <Flex align="center" gap="3">
+            <Heart className="h-5 w-5 text-pink-400" />
+            <div>
+              <div className="text-xs uppercase tracking-wider font-medium" style={{ color: 'var(--color-text-tertiary)' }}>
+                Total Likes
               </div>
-              <div className="text-admin-stat-value text-white">
+              <div className="text-2xl font-bold text-white mt-0.5">
                 {totalLikes.toLocaleString()}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="glass-surface p-5 mb-6">
-          <Flex gap="3" wrap="wrap" align="center">
-            {/* Search */}
-            <Box style={{ flex: '1', minWidth: '280px' }}>
-              <TextField.Root
-                placeholder="Search posts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                size="2"
-              >
-                <TextField.Slot>
-                  <Search size={15} style={{ color: 'var(--color-text-tertiary)' }} />
-                </TextField.Slot>
-                {searchQuery && (
-                  <TextField.Slot>
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="hover:bg-white/10 rounded p-0.5 transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
-                  </TextField.Slot>
-                )}
-              </TextField.Root>
-            </Box>
-
-            {/* Status Filter */}
-            <Select.Root value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-              <Select.Trigger style={{ minWidth: '140px' }}>
-                <Text size="2">Status: {statusFilter === 'all' ? 'All' : statusFilter === 'published' ? 'Published' : 'Draft'}</Text>
-              </Select.Trigger>
-              <Select.Content>
-                <Select.Item value="all">All Status</Select.Item>
-                <Select.Item value="published">Published</Select.Item>
-                <Select.Item value="draft">Draft</Select.Item>
-              </Select.Content>
-            </Select.Root>
-
-            {/* Date Filter */}
-            <Select.Root value={dateFilter} onValueChange={(v) => setDateFilter(v as any)}>
-              <Select.Trigger style={{ minWidth: '140px' }}>
-                <Text size="2">Date: {dateFilter === 'all' ? 'All Time' : dateFilter === 'today' ? 'Today' : dateFilter === 'week' ? 'Past Week' : 'Past Month'}</Text>
-              </Select.Trigger>
-              <Select.Content>
-                <Select.Item value="all">All Time</Select.Item>
-                <Select.Item value="today">Today</Select.Item>
-                <Select.Item value="week">Past Week</Select.Item>
-                <Select.Item value="month">Past Month</Select.Item>
-              </Select.Content>
-            </Select.Root>
-
-            {/* Clear Filters */}
-            {hasActiveFilters && (
-              <Button variant="soft" size="2" onClick={clearFilters}>
-                <X size={14} />
-                Clear
-              </Button>
-            )}
           </Flex>
+        </Flex>
 
-          {/* Bulk Actions */}
-          {selectedPosts.size > 0 && (
-            <Flex
-              gap="3"
-              align="center"
-              className="mt-4 p-3 rounded-lg"
-              style={{
-                background: 'rgba(245, 158, 11, 0.1)',
-                border: '1px solid rgba(245, 158, 11, 0.2)',
-              }}
-            >
-              <Text size="2" weight="medium" style={{ color: 'var(--color-text-primary)' }}>
-                {selectedPosts.size} selected
-              </Text>
-              <Button size="2" variant="soft" color="red" onClick={() => setBulkDeleteDialog(true)}>
-                <Trash2 size={14} />
-                Delete
-              </Button>
-              <Button size="2" variant="ghost" onClick={() => setSelectedPosts(new Set())}>
-                Clear
-              </Button>
-            </Flex>
-          )}
-
-          {/* Results info */}
-          {hasActiveFilters && (
-            <Text size="1" className="mt-3 block" style={{ color: 'var(--color-text-tertiary)' }}>
-              Showing {filteredPosts.length} of {allPosts.length} posts
-            </Text>
-          )}
-        </div>
-
-        {/* Posts Table */}
+        {/* Unified Table Card with Integrated Controls */}
         <div className="glass-surface overflow-hidden">
+          {/* Search and Filters - Inside Table Card */}
+          <div className="border-b border-white/5 p-5">
+            <Flex gap="3" wrap="wrap" align="center">
+              {/* Search */}
+              <Box style={{ flex: '1', minWidth: '280px' }}>
+                <TextField.Root
+                  placeholder="Search posts..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  size="2"
+                >
+                  <TextField.Slot>
+                    <Search size={15} style={{ color: 'var(--color-text-tertiary)' }} />
+                  </TextField.Slot>
+                  {searchQuery && (
+                    <TextField.Slot>
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="hover:bg-white/10 rounded p-0.5 transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </TextField.Slot>
+                  )}
+                </TextField.Root>
+              </Box>
+
+              {/* Status Filter */}
+              <Select.Root value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+                <Select.Trigger style={{ minWidth: '140px' }}>
+                  <Text size="2">Status: {statusFilter === 'all' ? 'All' : statusFilter === 'published' ? 'Published' : 'Draft'}</Text>
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">All Status</Select.Item>
+                  <Select.Item value="published">Published</Select.Item>
+                  <Select.Item value="draft">Draft</Select.Item>
+                </Select.Content>
+              </Select.Root>
+
+              {/* Date Filter */}
+              <Select.Root value={dateFilter} onValueChange={(v) => setDateFilter(v as any)}>
+                <Select.Trigger style={{ minWidth: '140px' }}>
+                  <Text size="2">Date: {dateFilter === 'all' ? 'All Time' : dateFilter === 'today' ? 'Today' : dateFilter === 'week' ? 'Past Week' : 'Past Month'}</Text>
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">All Time</Select.Item>
+                  <Select.Item value="today">Today</Select.Item>
+                  <Select.Item value="week">Past Week</Select.Item>
+                  <Select.Item value="month">Past Month</Select.Item>
+                </Select.Content>
+              </Select.Root>
+
+              {/* Clear Filters */}
+              {hasActiveFilters && (
+                <Button variant="soft" size="2" onClick={clearFilters}>
+                  <X size={14} />
+                  Clear
+                </Button>
+              )}
+            </Flex>
+
+            {/* Bulk Actions */}
+            {selectedPosts.size > 0 && (
+              <Flex
+                gap="3"
+                align="center"
+                className="mt-4 p-3 rounded-lg"
+                style={{
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  border: '1px solid rgba(245, 158, 11, 0.2)',
+                }}
+              >
+                <Text size="2" weight="medium" style={{ color: 'var(--color-text-primary)' }}>
+                  {selectedPosts.size} selected
+                </Text>
+                <Button size="2" variant="soft" color="red" onClick={() => setBulkDeleteDialog(true)}>
+                  <Trash2 size={14} />
+                  Delete
+                </Button>
+                <Button size="2" variant="ghost" onClick={() => setSelectedPosts(new Set())}>
+                  Clear
+                </Button>
+              </Flex>
+            )}
+
+            {/* Results info */}
+            {hasActiveFilters && (
+              <Text size="1" className="mt-3 block" style={{ color: 'var(--color-text-tertiary)' }}>
+                Showing {filteredPosts.length} of {allPosts.length} posts
+              </Text>
+            )}
+          </div>
+
+          {/* Posts Table */}
           {isLoading ? (
             <Box py="9">
               <Text align="center" color="gray">Loading...</Text>
