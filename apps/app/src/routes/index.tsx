@@ -102,13 +102,13 @@ function Index() {
           <div className="relative w-full h-full">
             {/* Magnetic vertical lines that bend toward cursor */}
             <MagnetLines
-              lineCount={50}
-              magnetStrength={80}
-              magnetRadius={400}
+              lineCount={60}
+              magnetStrength={120}
+              magnetRadius={450}
               lineColor="#2a2a2a"
               lineWidth={1.5}
               opacity={0.5}
-              animationSpeed={0.5}
+              animationSpeed={0.4}
             />
             {/* Gradient fade to background color at bottom */}
             <div

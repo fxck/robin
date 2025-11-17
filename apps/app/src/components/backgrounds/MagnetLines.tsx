@@ -18,7 +18,8 @@ type Line = {
   baseY: number;
   speed: number;
   offset: number;
-  currentOffsetX: number;
+  currentOffsets: number[]; // Track offset for each segment
+  velocities: number[]; // Velocity for each segment for momentum
 };
 
 export default function MagnetLines({
@@ -54,7 +55,8 @@ export default function MagnetLines({
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
 
-      // Initialize lines
+      // Initialize lines with segments
+      const segments = 8; // More segments for smoother bending
       linesRef.current = Array.from({ length: lineCount }, (_, i) => {
         const spacing = rect.width / (lineCount - 1);
         const x = i * spacing;
@@ -66,7 +68,8 @@ export default function MagnetLines({
           baseY: rect.height / 2,
           speed: 0.05 + Math.random() * 0.05,
           offset: Math.random() * Math.PI * 2,
-          currentOffsetX: 0
+          currentOffsets: new Array(segments + 1).fill(0),
+          velocities: new Array(segments + 1).fill(0)
         };
       });
     };
@@ -100,37 +103,62 @@ export default function MagnetLines({
       const mouseY = mouseRef.current.y - rect.top;
 
       linesRef.current.forEach((line) => {
-        // Calculate base wave motion
-        const baseOffset = Math.sin(time + line.offset) * 3;
-
-        // Calculate multiple control points along the line for full-length bending
-        const segments = 5;
+        const segments = line.currentOffsets.length - 1;
         const points: { x: number; y: number }[] = [];
 
         for (let i = 0; i <= segments; i++) {
           const t = i / segments;
           const y = t * rect.height;
 
-          // Calculate distance from this point on the line to the mouse
+          // Calculate base wave motion (subtle idle animation)
+          const baseOffset = Math.sin(time + line.offset + t * 0.5) * 2;
+
+          // Calculate distance from this segment point to mouse
           const dx = mouseX - line.x;
           const dy = mouseY - y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Apply magnetic effect at this point
-          let offsetX = baseOffset * (1 - t * 0.3); // Reduce wave at bottom
+          // Calculate target offset with magnetic force
+          let targetOffset = baseOffset;
           if (distance < magnetRadius && mouseRef.current.x > -500) {
-            const force = (1 - distance / magnetRadius) * magnetStrength;
-            // Apply force proportional to distance
-            offsetX += dx * (force / 100);
+            // Exponential falloff for more natural magnetic feel
+            const normalizedDist = distance / magnetRadius;
+            const force = Math.pow(1 - normalizedDist, 2) * magnetStrength;
+
+            // Apply force with directional component
+            targetOffset += dx * (force / 80);
+
+            // Add slight perpendicular wave for organic feel
+            const perpendicular = Math.sin(dy * 0.01 + time * 2) * force * 0.1;
+            targetOffset += perpendicular;
           }
 
-          points.push({ x: line.x + offsetX, y });
+          // Physics-based smooth interpolation with momentum
+          // Spring-damper system for gravitational imprint
+          const stiffness = 0.015; // How quickly it responds
+          const damping = 0.85; // How much momentum is preserved
+
+          // Calculate spring force
+          const springForce = (targetOffset - line.currentOffsets[i]) * stiffness;
+
+          // Update velocity with spring force and damping
+          line.velocities[i] = line.velocities[i] * damping + springForce;
+
+          // Update position with velocity
+          line.currentOffsets[i] += line.velocities[i];
+
+          // Apply slight drag when far from target for stability
+          if (Math.abs(targetOffset - line.currentOffsets[i]) < 0.1) {
+            line.velocities[i] *= 0.9;
+          }
+
+          points.push({
+            x: line.x + line.currentOffsets[i],
+            y
+          });
         }
 
-        // Smooth interpolation with delay (gravitational imprint)
-        const returnSpeed = 0.04;
-
-        // Draw line using cubic bezier curves through all points
+        // Draw smooth curve using Catmull-Rom spline for natural flow
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = lineWidth;
         ctx.globalAlpha = opacity;
@@ -138,17 +166,21 @@ export default function MagnetLines({
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
 
-        // Draw smooth curve through all points
-        for (let i = 1; i < points.length; i++) {
-          const prevPoint = points[i - 1];
-          const currentPoint = points[i];
+        // Smooth curve through all control points
+        for (let i = 0; i < points.length - 1; i++) {
+          const p0 = points[Math.max(0, i - 1)];
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          const p3 = points[Math.min(points.length - 1, i + 2)];
 
-          const cpX1 = prevPoint.x;
-          const cpY1 = prevPoint.y + (currentPoint.y - prevPoint.y) * 0.33;
-          const cpX2 = currentPoint.x;
-          const cpY2 = prevPoint.y + (currentPoint.y - prevPoint.y) * 0.66;
+          // Catmull-Rom to Bezier conversion for smooth curves
+          const tension = 0.5;
+          const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
+          const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
+          const cp2x = p2.x - (p3.x - p1.x) / 6 * tension;
+          const cp2y = p2.y - (p3.y - p1.y) / 6 * tension;
 
-          ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, currentPoint.x, currentPoint.y);
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
         }
 
         ctx.stroke();
