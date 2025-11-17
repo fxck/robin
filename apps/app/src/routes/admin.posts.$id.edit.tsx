@@ -150,10 +150,11 @@ function EditPostPage() {
     }
   );
 
-  // Trigger autosave when content changes
+  // Trigger autosave when content changes (only in draft mode)
   useEffect(() => {
     if (!initialized) return;
     if (!title.trim() && !content.trim()) return;
+    if (status !== 'draft') return; // Only autosave in draft mode
 
     const draftData = {
       title,
@@ -175,7 +176,7 @@ function EditPostPage() {
       },
       draftData
     );
-     
+
     // Intentionally exclude: autosave (stable ref), version (included in data, not trigger)
   }, [title, content, coverImage, status, initialized]);
 
