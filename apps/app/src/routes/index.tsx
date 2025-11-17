@@ -11,7 +11,7 @@ import { Flex } from '../components/layout/Flex';
 import { Heading } from '../components/typography/Heading';
 import { Text } from '../components/typography/Text';
 import { PostCard } from '../components/posts/PostCard';
-import FloatingLines from '../components/backgrounds/FloatingLines';
+import MagnetLines from '../components/backgrounds/MagnetLines';
 import { cn } from '../lib/utils';
 
 export const Route = createFileRoute('/')({
@@ -100,76 +100,15 @@ function Index() {
           }}
         >
           <div className="relative w-full h-full">
-            {/* Layer 1: Deep background waves - slow, ethereal */}
-            <FloatingLines
-              linesGradient={['#0a0a0f', '#12101a', '#0f0a15', '#1a0f1f']}
-              enabledWaves={['bottom']}
-              lineCount={[24]}
-              lineDistance={[1.2]}
-              bottomWavePosition={{ x: 1.5, y: -0.9, rotate: 0.8 }}
-              animationSpeed={0.2}
-              interactive={true}
-              bendRadius={8.0}
-              bendStrength={-0.6}
-              mouseDamping={0.03}
-              parallax={true}
-              parallaxStrength={0.4}
-              mixBlendMode="screen"
-            />
-
-            {/* Layer 2: Mid-ground diagonal sweep - medium energy */}
-            <FloatingLines
-              linesGradient={['#1a1520', '#221830', '#2a1a38', '#1f1528']}
-              enabledWaves={['middle', 'bottom']}
-              lineCount={[18, 14]}
-              lineDistance={[1.8, 2.2]}
-              middleWavePosition={{ x: 12, y: -0.2, rotate: -0.7 }}
-              bottomWavePosition={{ x: 5, y: -0.6, rotate: 1.2 }}
-              animationSpeed={0.35}
-              interactive={true}
-              bendRadius={5.5}
-              bendStrength={-0.5}
-              mouseDamping={0.05}
-              parallax={true}
-              parallaxStrength={0.25}
-              mixBlendMode="lighten"
-            />
-
-            {/* Layer 3: Foreground dynamic lines - high energy, interactive */}
-            <FloatingLines
-              linesGradient={['#2a2035', '#342842', '#3e2f4a', '#2f2438', '#3a2945']}
-              enabledWaves={['top', 'middle', 'bottom']}
-              lineCount={[16, 20, 12]}
-              lineDistance={[2.8, 1.6, 3.2]}
-              topWavePosition={{ x: 20, y: 0.9, rotate: -0.9 }}
-              middleWavePosition={{ x: 10, y: 0.15, rotate: 0.5 }}
-              bottomWavePosition={{ x: 2.5, y: -0.4, rotate: -1.1 }}
-              animationSpeed={0.55}
-              interactive={true}
-              bendRadius={3.5}
-              bendStrength={-0.7}
-              mouseDamping={0.08}
-              parallax={true}
-              parallaxStrength={0.12}
-              mixBlendMode="screen"
-            />
-
-            {/* Layer 4: Accent sparkle layer - subtle highlights */}
-            <FloatingLines
-              linesGradient={['#4a3555', '#5a4065', '#3d2e48']}
-              enabledWaves={['top', 'middle']}
-              lineCount={[8, 10]}
-              lineDistance={[4.5, 3.8]}
-              topWavePosition={{ x: 25, y: 1.2, rotate: 0.6 }}
-              middleWavePosition={{ x: 15, y: 0.4, rotate: -0.4 }}
-              animationSpeed={0.7}
-              interactive={true}
-              bendRadius={2.5}
-              bendStrength={-0.8}
-              mouseDamping={0.12}
-              parallax={true}
-              parallaxStrength={0.08}
-              mixBlendMode="lighten"
+            {/* Magnetic vertical lines that bend toward cursor */}
+            <MagnetLines
+              lineCount={60}
+              magnetStrength={120}
+              magnetRadius={250}
+              lineColor="#5a4065"
+              lineWidth={1.5}
+              opacity={0.4}
+              animationSpeed={0.6}
             />
             {/* Gradient fade to background color at bottom */}
             <div
@@ -232,39 +171,34 @@ function Index() {
       <Section spacing="lg">
         <Container size="standard">
           <Flex direction="col" gap="8">
-            {/* Filter Tabs */}
-            <Flex gap="4" className="mb-2">
-              <button
-                onClick={() => setView('all')}
-                className={cn(
-                  'group relative px-8 py-4 rounded-xl text-base font-semibold transition-all duration-300',
-                  'border-2 backdrop-blur-sm',
-                  view === 'all'
-                    ? 'bg-amber-500/10 border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/20'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20 hover:text-gray-200'
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  <Sparkles size={20} className={cn('transition-all duration-300', view === 'all' ? 'animate-pulse' : '')} />
+            {/* Filter Tabs - Centered */}
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex gap-2 p-1.5 bg-white/5 rounded-lg border border-white/10">
+                <button
+                  onClick={() => setView('all')}
+                  className={cn(
+                    'px-6 py-2.5 rounded-md text-sm font-medium transition-all duration-200',
+                    view === 'all'
+                      ? 'bg-white text-black'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  )}
+                >
                   Latest
-                </span>
-              </button>
-              <button
-                onClick={() => setView('trending')}
-                className={cn(
-                  'group relative px-8 py-4 rounded-xl text-base font-semibold transition-all duration-300',
-                  'border-2 backdrop-blur-sm',
-                  view === 'trending'
-                    ? 'bg-amber-500/10 border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/20'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20 hover:text-gray-200'
-                )}
-              >
-                <span className="flex items-center gap-2">
-                  <TrendingUp size={20} className={cn('transition-all duration-300', view === 'trending' ? 'animate-pulse' : '')} />
+                </button>
+                <button
+                  onClick={() => setView('trending')}
+                  className={cn(
+                    'px-6 py-2.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5',
+                    view === 'trending'
+                      ? 'bg-white text-black'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  )}
+                >
+                  <TrendingUp size={16} />
                   Trending
-                </span>
-              </button>
-            </Flex>
+                </button>
+              </div>
+            </div>
 
             {/* Posts Grid */}
             {isLoading ? (
