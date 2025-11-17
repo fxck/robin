@@ -83,8 +83,9 @@ export default function MagnetLines({
       mouseRef.current = { x: -1000, y: -1000 };
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseleave', handleMouseLeave);
+    // Hook to window instead of canvas to track mouse everywhere
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseleave', handleMouseLeave);
 
     const animate = (timestamp: number) => {
       const rect = canvas.getBoundingClientRect();
@@ -159,8 +160,8 @@ export default function MagnetLines({
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('resize', handleResize);
     };
   }, [lineCount, magnetStrength, magnetRadius, lineColor, lineWidth, opacity, animationSpeed]);
@@ -170,7 +171,7 @@ export default function MagnetLines({
       ref={canvasRef}
       className="absolute inset-0 w-full h-full"
       style={{
-        pointerEvents: 'auto'
+        pointerEvents: 'none'
       }}
     />
   );

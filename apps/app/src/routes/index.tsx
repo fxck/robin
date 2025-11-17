@@ -105,9 +105,9 @@ function Index() {
               lineCount={50}
               magnetStrength={100}
               magnetRadius={220}
-              lineColor="#1a1a1a"
-              lineWidth={1}
-              opacity={0.25}
+              lineColor="#2a2a2a"
+              lineWidth={1.5}
+              opacity={0.5}
               animationSpeed={0.5}
             />
             {/* Gradient fade to background color at bottom */}
@@ -172,12 +172,12 @@ function Index() {
         <Container size="standard">
           <Flex direction="col" gap="8">
             {/* Filter Tabs - Centered */}
-            <div className="flex justify-center mb-8">
-              <div className="inline-flex gap-2 p-1.5 bg-white/5 rounded-lg border border-white/10">
+            <div className="flex justify-center mb-12">
+              <div className="inline-flex gap-2 p-2 bg-white/5 rounded-xl border border-white/10">
                 <button
                   onClick={() => setView('all')}
                   className={cn(
-                    'px-6 py-2.5 rounded-md text-sm font-medium transition-all duration-200',
+                    'px-8 py-3 rounded-lg text-base font-medium transition-all duration-200',
                     view === 'all'
                       ? 'bg-white text-black'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -188,13 +188,13 @@ function Index() {
                 <button
                   onClick={() => setView('trending')}
                   className={cn(
-                    'px-6 py-2.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5',
+                    'px-8 py-3 rounded-lg text-base font-medium transition-all duration-200 flex items-center gap-2',
                     view === 'trending'
                       ? 'bg-white text-black'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
                   )}
                 >
-                  <TrendingUp size={16} />
+                  <TrendingUp size={18} />
                   Trending
                 </button>
               </div>

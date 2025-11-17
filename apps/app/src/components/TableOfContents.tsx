@@ -174,7 +174,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
         <div className="flex items-center gap-3">
           <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-amber-400 to-amber-500"
               style={{
                 width: `${scrollProgress}%`,
               }}
