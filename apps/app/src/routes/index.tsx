@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { Button } from '@radix-ui/themes';
@@ -156,12 +156,12 @@ function Index() {
 
             {/* CTA Button - Centered */}
             <div className="flex justify-center mt-12">
-              <a href="/posts" className="no-underline">
+              <Link to="/posts" className="no-underline">
                 <button className="hero-cta-btn">
                   <Sparkles size={20} strokeWidth={2.5} />
                   <span>Explore Stories</span>
                 </button>
-              </a>
+              </Link>
             </div>
           </div>
         </Container>
@@ -172,7 +172,7 @@ function Index() {
         <Container size="standard">
           <Flex direction="col" gap="8">
             {/* Filter Tabs - Centered */}
-            <div className="flex justify-center mb-12">
+            <div className="flex justify-center items-center w-full mb-12">
               <div className="inline-flex gap-2 p-2 bg-white/5 rounded-xl border border-white/10">
                 <button
                   onClick={() => setView('all')}
