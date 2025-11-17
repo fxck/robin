@@ -103,8 +103,8 @@ function Index() {
             {/* Magnetic vertical lines that bend toward cursor */}
             <MagnetLines
               lineCount={50}
-              magnetStrength={100}
-              magnetRadius={220}
+              magnetStrength={150}
+              magnetRadius={250}
               lineColor="#2a2a2a"
               lineWidth={1.5}
               opacity={0.5}

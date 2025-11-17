@@ -18,6 +18,7 @@ type Line = {
   baseY: number;
   speed: number;
   offset: number;
+  currentOffsetX: number;
 };
 
 export default function MagnetLines({
@@ -64,7 +65,8 @@ export default function MagnetLines({
           targetY: rect.height / 2,
           baseY: rect.height / 2,
           speed: 0.05 + Math.random() * 0.05,
-          offset: Math.random() * Math.PI * 2
+          offset: Math.random() * Math.PI * 2,
+          currentOffsetX: 0
         };
       });
     };
@@ -99,23 +101,27 @@ export default function MagnetLines({
 
       linesRef.current.forEach((line) => {
         // Calculate base wave motion
-        const baseOffset = Math.sin(time + line.offset) * 8;
+        const baseOffset = Math.sin(time + line.offset) * 5;
 
         // Calculate distance to mouse
         const dx = mouseX - line.x;
         const dy = mouseY - rect.height / 2;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Apply magnetic effect - bend the X position
-        let offsetX = baseOffset;
+        // Apply magnetic effect - bend the X position with stronger force
+        let targetOffsetX = baseOffset;
         if (distance < magnetRadius && mouseRef.current.x > -500) {
           const force = (1 - distance / magnetRadius) * magnetStrength;
-          offsetX += dx * (force / 100);
+          // Stronger attraction - multiply by 2
+          targetOffsetX += dx * (force / 50);
         }
 
-        // Smooth interpolation
-        line.targetX = line.x + offsetX;
-        const currentX = line.targetX;
+        // Smooth interpolation with delay (gravitational imprint)
+        // Slower return creates the "gravitational imprint" effect
+        const returnSpeed = 0.03;
+        line.currentOffsetX += (targetOffsetX - line.currentOffsetX) * returnSpeed;
+
+        const currentX = line.x + line.currentOffsetX;
 
         // Draw line from top to bottom with curve
         ctx.strokeStyle = lineColor;
@@ -129,27 +135,6 @@ export default function MagnetLines({
         const controlY = rect.height / 2;
         ctx.quadraticCurveTo(currentX, controlY, line.x, rect.height);
         ctx.stroke();
-
-        // Draw glow at control point if near mouse
-        if (distance < magnetRadius && mouseRef.current.x > -500) {
-          const glowIntensity = (1 - distance / magnetRadius) * 0.4;
-          const gradient = ctx.createRadialGradient(
-            currentX,
-            controlY,
-            0,
-            currentX,
-            controlY,
-            40
-          );
-          gradient.addColorStop(0, `${lineColor}${Math.floor(glowIntensity * 255).toString(16).padStart(2, '0')}`);
-          gradient.addColorStop(1, 'transparent');
-
-          ctx.fillStyle = gradient;
-          ctx.globalAlpha = 0.6;
-          ctx.beginPath();
-          ctx.arc(currentX, controlY, 40, 0, Math.PI * 2);
-          ctx.fill();
-        }
       });
 
       rafRef.current = requestAnimationFrame(animate);
