@@ -44,17 +44,20 @@ export default defineEventHandler(async (event) => {
         excerpt: schema.posts.excerpt,
         slug: schema.posts.slug,
         coverImage: schema.posts.coverImage,
+        coverImageThumb: schema.posts.coverImageThumb,
         publishedAt: schema.posts.publishedAt,
         createdAt: schema.posts.createdAt,
         views: schema.posts.views,
         likesCount: schema.posts.likesCount,
         author: {
-          id: schema.posts.userId,
-          name: sql<string>`'Author'`,
-          image: sql<string | null>`null`,
+          id: schema.users.id,
+          name: schema.users.name,
+          email: schema.users.email,
+          image: schema.users.image,
         },
       })
       .from(schema.posts)
+      .innerJoin(schema.users, eq(schema.posts.userId, schema.users.id))
       .where(
         and(
           ne(schema.posts.id, id), // Exclude current post

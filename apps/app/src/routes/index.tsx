@@ -204,7 +204,7 @@ function Index() {
             {/* Hero Subtitle */}
             <Text
               size="lg"
-              className="hero-subtitle mb-0 max-w-2xl mx-auto leading-relaxed"
+              className="hero-subtitle mb-10 max-w-2xl mx-auto leading-relaxed"
               style={{
                 fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
                 lineHeight: '1.7',
@@ -214,6 +214,16 @@ function Index() {
               A modern platform for sharing ideas, stories, and insights.
               Join our community of writers and readers.
             </Text>
+
+            {/* CTA Button - Centered */}
+            <div className="flex justify-center mt-12">
+              <a href="/posts" className="no-underline">
+                <button className="hero-cta-btn">
+                  <Sparkles size={20} strokeWidth={2.5} />
+                  <span>Explore Stories</span>
+                </button>
+              </a>
+            </div>
           </div>
         </Container>
       </Section>

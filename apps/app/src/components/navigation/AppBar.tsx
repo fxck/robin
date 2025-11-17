@@ -46,62 +46,54 @@ export function AppBar() {
         isVisible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'
       )}
     >
-      <nav ref={navRef} className="fluid-glass-appbar relative py-4 px-8 mx-auto max-w-[1400px]">
-        <Flex align="center" justify="between">
-          {/* Logo - 3D Cube */}
-          <Link to="/" className="logo-link no-underline">
-            <div className="logo-cube">
-              <div className="cube-inner">
-                <div className="cube-face cube-front">R</div>
-                <div className="cube-face cube-back">R</div>
-                <div className="cube-face cube-left">R</div>
-                <div className="cube-face cube-right">R</div>
-                <div className="cube-face cube-top">R</div>
-                <div className="cube-face cube-bottom">R</div>
-              </div>
+      {/* Container for split layout */}
+      <div className="mx-auto max-w-[1400px] flex items-start justify-between">
+        {/* Left: Floating Cube */}
+        <Link to="/" className="logo-link-floating no-underline">
+          <div className="logo-cube">
+            <div className="cube-inner">
+              <div className="cube-face cube-front">R</div>
+              <div className="cube-face cube-back">R</div>
+              <div className="cube-face cube-left">R</div>
+              <div className="cube-face cube-right">R</div>
+              <div className="cube-face cube-top">R</div>
+              <div className="cube-face cube-bottom">R</div>
             </div>
-          </Link>
+          </div>
+        </Link>
 
-          {/* Desktop Navigation */}
+        {/* Right: Floating Glass Navigation Panel */}
+        <nav ref={navRef} className="apple-glass-nav">
           <Flex align="center" gap="3" className="hidden lg:flex">
-            <Link
-              to="/posts"
-              className="no-underline"
-            >
-              <span className="nav-btn">
-                Explore
-              </span>
-            </Link>
-
-            {session?.user && (
+            {session?.user ? (
               <>
-                <Link to="/admin/posts/new" className="no-underline">
-                  <button className="nav-btn-primary">
-                    <PenLine size={16} strokeWidth={2.5} />
-                    Write
-                  </button>
-                </Link>
-
+                {/* Content Manager - Left */}
                 <Link to="/admin/posts" className="no-underline">
-                  <button className="nav-btn">
+                  <button className="nav-text-btn">
                     <LayoutDashboard size={16} strokeWidth={2.5} />
                     Content Manager
                   </button>
                 </Link>
 
+                {/* Write - Right of Content Manager */}
+                <Link to="/admin/posts/new" className="no-underline">
+                  <button className="nav-text-btn">
+                    <PenLine size={16} strokeWidth={2.5} />
+                    Write
+                  </button>
+                </Link>
+
+                {/* Avatar - Large, no chip wrapper */}
                 <div className="ml-2">
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger>
-                      <button className="profile-btn">
+                      <button className="avatar-btn">
                         <Avatar
-                          size="1"
+                          size="3"
                           src={session.user.image || undefined}
-                          fallback={<User size={15} strokeWidth={2.5} />}
+                          fallback={<User size={20} strokeWidth={2.5} />}
                           radius="full"
                         />
-                        <span className="max-w-[100px] truncate">
-                          {session.user.name || session.user.email?.split('@')[0]}
-                        </span>
                       </button>
                     </DropdownMenu.Trigger>
 
@@ -127,9 +119,7 @@ export function AppBar() {
                   </DropdownMenu.Root>
                 </div>
               </>
-            )}
-
-            {!session?.user && (
+            ) : (
               <Link to="/auth" className="no-underline">
                 <button className="nav-btn-primary">
                   Sign In
@@ -146,26 +136,18 @@ export function AppBar() {
           >
             {isMobileMenuOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
           </button>
-        </Flex>
-      </nav>
+        </nav>
+      </div>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden glass-surface mx-4 mt-3 p-5 animate-slide-up">
           <Flex direction="col" gap="2">
-            <Link
-              to="/posts"
-              className="no-underline px-3 py-2.5 rounded-lg text-[15px] font-medium text-gray-400 hover:text-gray-100 hover:bg-white/5 transition-all duration-200 block"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Explore
-            </Link>
-
             {session?.user ? (
               <>
                 <Link
                   to="/admin/posts/new"
-                  className="no-underline mt-1"
+                  className="no-underline"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Button
@@ -227,7 +209,7 @@ export function AppBar() {
             ) : (
               <Link
                 to="/auth"
-                className="no-underline mt-1"
+                className="no-underline"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <Button
