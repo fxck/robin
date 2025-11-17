@@ -35,6 +35,7 @@ export default function MagnetLines({
   const linesRef = useRef<Line[]>([]);
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const rafRef = useRef<number>(0);
+  const mouseActiveTimeRef = useRef<number>(0); // Track how long mouse has been in active zone
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -102,6 +103,14 @@ export default function MagnetLines({
       const mouseX = mouseRef.current.x - rect.left;
       const mouseY = mouseRef.current.y - rect.top;
 
+      // Track if mouse is in active zone
+      const mouseInZone = mouseRef.current.x > -500;
+      if (mouseInZone) {
+        mouseActiveTimeRef.current += 0.016; // Increment time (assuming ~60fps)
+      } else {
+        mouseActiveTimeRef.current = 0;
+      }
+
       linesRef.current.forEach((line) => {
         const segments = line.currentOffsets.length - 1;
         const points: { x: number; y: number }[] = [];
@@ -120,7 +129,8 @@ export default function MagnetLines({
 
           // Calculate target offset with magnetic force
           let targetOffset = baseOffset;
-          if (distance < magnetRadius && mouseRef.current.x > -500) {
+
+          if (distance < magnetRadius && mouseInZone) {
             // Exponential falloff for more natural magnetic feel
             const normalizedDist = distance / magnetRadius;
             const force = Math.pow(1 - normalizedDist, 2) * magnetStrength;
@@ -128,7 +138,24 @@ export default function MagnetLines({
             // Apply force with directional component
             targetOffset += dx * (force / 80);
 
-            // Add slight perpendicular wave for organic feel
+            // Add ripple/wave disturbance emanating from mouse (even when stationary)
+            const rippleFrequency = 3.5;
+            const rippleSpeed = 2.0;
+            const ripplePhase = distance * 0.015 - mouseActiveTimeRef.current * rippleSpeed;
+            const rippleWave = Math.sin(ripplePhase * rippleFrequency) * force * 0.15;
+            targetOffset += rippleWave;
+
+            // Add shimmer effect - high frequency oscillation
+            const shimmerFrequency = 8;
+            const shimmer = Math.sin(distance * 0.1 + mouseActiveTimeRef.current * 5) * force * 0.08;
+            targetOffset += shimmer;
+
+            // Add circular wave pattern around mouse
+            const angle = Math.atan2(dy, dx);
+            const circularWave = Math.sin(angle * 4 + mouseActiveTimeRef.current * 3) * force * 0.1;
+            targetOffset += circularWave;
+
+            // Add perpendicular wave for organic feel
             const perpendicular = Math.sin(dy * 0.01 + time * 2) * force * 0.1;
             targetOffset += perpendicular;
           }
