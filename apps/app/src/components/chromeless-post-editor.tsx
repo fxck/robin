@@ -635,7 +635,8 @@ export function ChromelessPostEditor({
                   'font-serif font-bold text-text-primary',
                   'placeholder:text-gray-700',
                   // Match EXACT display typography from Heading component
-                  'text-display leading-display tracking-display'
+                  'text-display leading-display tracking-display',
+                  'p-0 m-0'
                 )}
                 style={{
                   textShadow: '0 2px 20px rgba(0, 0, 0, 0.8)'

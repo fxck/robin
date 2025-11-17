@@ -99,20 +99,75 @@ function Index() {
           }}
         >
           <div className="relative w-full h-full">
+            {/* Layer 1: Deep background waves - slow, ethereal */}
             <FloatingLines
-              linesGradient={['#1a1a1a', '#151515', '#1f1f1f']}
-              enabledWaves={['top', 'middle', 'bottom']}
-              lineCount={[12, 16, 10]}
-              lineDistance={[2.5, 2, 2.8]}
-              topWavePosition={{ x: 15, y: 0.8, rotate: -0.5 }}
-              middleWavePosition={{ x: 8, y: 0.1, rotate: 0.3 }}
-              bottomWavePosition={{ x: 3, y: -0.5, rotate: 0.6 }}
-              animationSpeed={0.4}
+              linesGradient={['#0a0a0f', '#12101a', '#0f0a15', '#1a0f1f']}
+              enabledWaves={['bottom']}
+              lineCount={[24]}
+              lineDistance={[1.2]}
+              bottomWavePosition={{ x: 1.5, y: -0.9, rotate: 0.8 }}
+              animationSpeed={0.2}
               interactive={true}
-              bendRadius={4.0}
-              bendStrength={-0.4}
+              bendRadius={8.0}
+              bendStrength={-0.6}
+              mouseDamping={0.03}
               parallax={true}
-              parallaxStrength={0.15}
+              parallaxStrength={0.4}
+              mixBlendMode="screen"
+            />
+
+            {/* Layer 2: Mid-ground diagonal sweep - medium energy */}
+            <FloatingLines
+              linesGradient={['#1a1520', '#221830', '#2a1a38', '#1f1528']}
+              enabledWaves={['middle', 'bottom']}
+              lineCount={[18, 14]}
+              lineDistance={[1.8, 2.2]}
+              middleWavePosition={{ x: 12, y: -0.2, rotate: -0.7 }}
+              bottomWavePosition={{ x: 5, y: -0.6, rotate: 1.2 }}
+              animationSpeed={0.35}
+              interactive={true}
+              bendRadius={5.5}
+              bendStrength={-0.5}
+              mouseDamping={0.05}
+              parallax={true}
+              parallaxStrength={0.25}
+              mixBlendMode="lighten"
+            />
+
+            {/* Layer 3: Foreground dynamic lines - high energy, interactive */}
+            <FloatingLines
+              linesGradient={['#2a2035', '#342842', '#3e2f4a', '#2f2438', '#3a2945']}
+              enabledWaves={['top', 'middle', 'bottom']}
+              lineCount={[16, 20, 12]}
+              lineDistance={[2.8, 1.6, 3.2]}
+              topWavePosition={{ x: 20, y: 0.9, rotate: -0.9 }}
+              middleWavePosition={{ x: 10, y: 0.15, rotate: 0.5 }}
+              bottomWavePosition={{ x: 2.5, y: -0.4, rotate: -1.1 }}
+              animationSpeed={0.55}
+              interactive={true}
+              bendRadius={3.5}
+              bendStrength={-0.7}
+              mouseDamping={0.08}
+              parallax={true}
+              parallaxStrength={0.12}
+              mixBlendMode="screen"
+            />
+
+            {/* Layer 4: Accent sparkle layer - subtle highlights */}
+            <FloatingLines
+              linesGradient={['#4a3555', '#5a4065', '#3d2e48']}
+              enabledWaves={['top', 'middle']}
+              lineCount={[8, 10]}
+              lineDistance={[4.5, 3.8]}
+              topWavePosition={{ x: 25, y: 1.2, rotate: 0.6 }}
+              middleWavePosition={{ x: 15, y: 0.4, rotate: -0.4 }}
+              animationSpeed={0.7}
+              interactive={true}
+              bendRadius={2.5}
+              bendStrength={-0.8}
+              mouseDamping={0.12}
+              parallax={true}
+              parallaxStrength={0.08}
               mixBlendMode="lighten"
             />
             {/* Gradient fade to background color at bottom */}
