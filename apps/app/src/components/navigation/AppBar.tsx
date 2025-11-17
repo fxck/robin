@@ -63,7 +63,7 @@ export function AppBar() {
         </Link>
 
         {/* Right: Floating Glass Navigation Panel */}
-        <nav ref={navRef} className="apple-glass-nav">
+        <nav ref={navRef} className={cn(session?.user ? "apple-glass-nav" : "")}>
           <Flex align="center" gap="3" className="hidden lg:flex">
             {session?.user ? (
               <>
@@ -130,7 +130,7 @@ export function AppBar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden mobile-menu-btn"
+            className={cn("lg:hidden", session?.user ? "mobile-menu-btn" : "nav-btn-primary")}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
