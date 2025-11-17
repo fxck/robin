@@ -145,9 +145,9 @@ export default function MagnetLines({
             const rippleWave = Math.sin(ripplePhase * rippleFrequency) * force * 0.15;
             targetOffset += rippleWave;
 
-            // Add shimmer effect - high frequency oscillation
+            // Add shimmer effect - high frequency oscillation (5x more subtle)
             const shimmerFrequency = 8;
-            const shimmer = Math.sin(distance * 0.1 + mouseActiveTimeRef.current * 5) * force * 0.08;
+            const shimmer = Math.sin(distance * 0.1 + mouseActiveTimeRef.current * 5) * force * 0.016;
             targetOffset += shimmer;
 
             // Add circular wave pattern around mouse
@@ -162,8 +162,14 @@ export default function MagnetLines({
 
           // Physics-based smooth interpolation with momentum
           // Spring-damper system for gravitational imprint
-          const stiffness = 0.015; // How quickly it responds
-          const damping = 0.85; // How much momentum is preserved
+
+          // Slower attraction (decreased stiffness = more delay)
+          const stiffness = 0.008; // Lower = slower to respond, more delay
+
+          // Higher damping when moving toward target (slower attraction)
+          // Lower damping when returning (faster return)
+          const isReturning = Math.abs(targetOffset) < Math.abs(line.currentOffsets[i]);
+          const damping = isReturning ? 0.75 : 0.88; // Lower when returning = faster return
 
           // Calculate spring force
           const springForce = (targetOffset - line.currentOffsets[i]) * stiffness;
@@ -174,9 +180,9 @@ export default function MagnetLines({
           // Update position with velocity
           line.currentOffsets[i] += line.velocities[i];
 
-          // Apply slight drag when far from target for stability
+          // Apply drag when near target for stability
           if (Math.abs(targetOffset - line.currentOffsets[i]) < 0.1) {
-            line.velocities[i] *= 0.9;
+            line.velocities[i] *= 0.88;
           }
 
           points.push({
