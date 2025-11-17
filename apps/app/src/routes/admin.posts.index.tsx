@@ -442,6 +442,7 @@ function AdminPostsPage() {
                         <Button
                           size="2"
                           variant="soft"
+                          color="gray"
                           onClick={() => navigate({ to: `/posts/${post.id}` })}
                         >
                           <Eye size={16} />

@@ -288,7 +288,7 @@ export function AuthForm({ mode, onSuccess, onToggleMode }: AuthFormProps) {
                   type="submit"
                   size="3"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all shadow-accent hover:shadow-accent-hover text-black font-semibold"
+                  className="w-full bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all shadow-accent hover:shadow-accent-hover text-white font-semibold"
                 >
                   {isSubmitting
                     ? 'Loading...'
