@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { Container, Flex, Heading, Text, Spinner } from '@radix-ui/themes';
 import { toast } from 'sonner';
+import { useSession } from '../lib/auth';
 
 export const Route = createFileRoute('/verify-email')({
   component: VerifyEmailPage,
@@ -15,6 +16,7 @@ function VerifyEmailPage() {
   const { token } = Route.useSearch();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { refetch: refetchSession } = useSession();
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -44,6 +46,9 @@ function VerifyEmailPage() {
 
         setStatus('success');
         toast.success('Email verified successfully! You are now signed in.');
+
+        // Refetch session to update auth state immediately
+        refetchSession();
 
         // Redirect to content manager after 2 seconds
         setTimeout(() => {

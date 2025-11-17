@@ -210,24 +210,26 @@ function PostPage() {
         {/* Hero Background Image with internal gradient overlay */}
         {post.coverImage && (
           <div className="absolute inset-0 z-0">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              placeholder="blur"
-              placeholderText={post.title}
-              aspectRatio={16 / 9}
-              className="w-full h-full object-cover"
-            />
+            <div className="absolute inset-0">
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                placeholder="blur"
+                placeholderText={post.title}
+                aspectRatio={16 / 9}
+                className="w-full h-full object-cover"
+              />
+            </div>
             {/* Gradient overlay inside cover: transparent (top) → background color (bottom) */}
             <div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none z-10"
               style={{
                 backgroundImage: 'linear-gradient(to bottom, transparent -30%, #111110 93%)',
               }}
             />
             {/* Extended gradient below cover: background color (top) → transparent (bottom) */}
             <div
-              className="absolute left-0 right-0 h-[60px] pointer-events-none"
+              className="absolute left-0 right-0 h-[60px] pointer-events-none z-10"
               style={{
                 bottom: '-60px',
                 backgroundImage: 'linear-gradient(to bottom, #111110 0%, transparent 100%)',

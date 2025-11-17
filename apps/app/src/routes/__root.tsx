@@ -64,7 +64,7 @@ function RootComponent() {
             <AppBar />
             <Outlet />
           </Box>
-          <Toaster position="bottom-left" richColors closeButton expand={true} />
+          <Toaster position="bottom-left" richColors closeButton expand={true} theme="dark" />
           {import.meta.env.DEV && (
             <>
               <TanStackRouterDevtools position="bottom-right" />
