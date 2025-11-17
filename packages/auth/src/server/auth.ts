@@ -162,6 +162,49 @@ export function createAuth(db: Database, config: {
       },
     },
 
+    databaseHooks: {
+      user: {
+        create: {
+          after: async (user) => {
+            // Send welcome email after user creation
+            console.log('[Better Auth] Sending welcome email to:', user.email);
+
+            if (config.emailConfig) {
+              try {
+                await sendEmail({
+                  to: user.email,
+                  subject: 'Welcome to Robin!',
+                  html: `
+                    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                      <h1 style="color: #8b5cf6;">Welcome to Robin!</h1>
+                      <p>Hi ${user.name || 'there'},</p>
+                      <p>Thanks for joining Robin! We're excited to have you as part of our community.</p>
+                      <p>Robin is a modern blogging platform where you can share your thoughts, ideas, and stories with the world.</p>
+                      <h2 style="color: #8b5cf6; font-size: 18px; margin-top: 30px;">Getting Started</h2>
+                      <ul style="line-height: 1.8;">
+                        <li>Create your first post in the Content Manager</li>
+                        <li>Customize your profile settings</li>
+                        <li>Explore posts from other writers</li>
+                      </ul>
+                      <a href="${config.appURL}/admin/posts" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">Start Writing</a>
+                      <p style="margin-top: 30px;">If you have any questions or need help, feel free to reach out to our support team.</p>
+                      <p>Happy writing!</p>
+                      <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;" />
+                      <p style="color: #6b7280; font-size: 12px;">Sent from Robin App</p>
+                    </div>
+                  `,
+                }, config.emailConfig);
+                console.log('[Better Auth] Welcome email sent successfully to:', user.email);
+              } catch (error) {
+                console.error('[Better Auth] Failed to send welcome email:', error);
+                // Don't throw - we don't want to fail user creation if email fails
+              }
+            }
+          },
+        },
+      },
+    },
+
     plugins: [
       openAPI(),
     ],
