@@ -147,6 +147,10 @@ function EditPostPage() {
     if (!initialized) return;
     if (!title.trim() && !content.trim()) return;
 
+    console.log('[Edit Autosave] Title:', title);
+    console.log('[Edit Autosave] Content:', content);
+    console.log('[Edit Autosave] Content length:', content?.length || 0);
+
     const draftData = {
       title,
       content,

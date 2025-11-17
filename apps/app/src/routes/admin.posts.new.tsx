@@ -150,6 +150,10 @@ function NewPostPage() {
       return;
     }
 
+    console.log('[Autosave] Title:', title);
+    console.log('[Autosave] Content:', content);
+    console.log('[Autosave] Content length:', content?.length || 0);
+
     const draftData: DraftData = {
       title,
       content,

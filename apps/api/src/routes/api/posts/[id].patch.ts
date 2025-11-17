@@ -10,7 +10,7 @@ import { generateExcerpt } from '../../../utils/markdown';
 
 const updatePostSchema = z.object({
   title: z.string().min(1).max(200).optional(),
-  content: z.string().min(1).max(50000).optional(),
+  content: z.string().max(50000).optional(),
   coverImage: z.string().url().optional(),
   status: z.enum(['draft', 'published']).optional(),
   version: z.number().int(), // For optimistic locking
@@ -74,7 +74,11 @@ export default defineEventHandler(async (event) => {
     // Only regenerate slug if post is still a draft
     // This prevents breaking published post URLs
     if (existingPost.status === 'draft') {
-      updateData.slug = generateSlug(data.title);
+      const newSlug = generateSlug(data.title);
+      // Only update slug if it's different from current slug
+      if (newSlug !== existingPost.slug) {
+        updateData.slug = await generateUniqueSlug(user.id, newSlug, id);
+      }
     }
   }
 
@@ -142,4 +146,50 @@ function generateSlug(title: string): string {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .substring(0, 100);
+}
+
+/**
+ * Generate a unique slug for a user by appending a counter if needed
+ * @param userId - User ID
+ * @param baseSlug - Base slug to check
+ * @param excludePostId - Post ID to exclude from uniqueness check (for updates)
+ */
+async function generateUniqueSlug(userId: string, baseSlug: string, excludePostId?: string): Promise<string> {
+  let slug = baseSlug;
+  let counter = 1;
+
+  // Check if slug exists for this user (excluding current post)
+  while (true) {
+    const conditions = [
+      eq(schema.posts.userId, userId),
+      eq(schema.posts.slug, slug)
+    ];
+
+    // Exclude current post from check when updating
+    if (excludePostId) {
+      conditions.push(sql`${schema.posts.id} != ${excludePostId}`);
+    }
+
+    const existing = await db
+      .select({ id: schema.posts.id })
+      .from(schema.posts)
+      .where(and(...conditions))
+      .limit(1);
+
+    if (existing.length === 0) {
+      return slug;
+    }
+
+    // Append counter and try again
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+
+    // Safety limit to prevent infinite loops
+    if (counter > 100) {
+      throw createError({
+        statusCode: 500,
+        message: 'Unable to generate unique slug',
+      });
+    }
+  }
 }

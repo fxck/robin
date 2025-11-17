@@ -762,6 +762,8 @@ export function ChromelessPostEditor({
                   }}
                   onUpdate={({ editor }) => {
                     const markdown = editor.storage.markdown.getMarkdown();
+                    console.log('[Editor Update] Markdown content:', markdown);
+                    console.log('[Editor Update] Content length:', markdown?.length || 0);
                     onContentChange(markdown);
                   }}
                 >

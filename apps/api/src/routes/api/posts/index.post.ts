@@ -11,7 +11,7 @@ import { generateExcerpt } from '../../../utils/markdown';
 
 const createPostSchema = z.object({
   title: z.string().min(1).max(200),
-  content: z.string().min(1).max(50000),
+  content: z.string().max(50000).default(''),
   coverImage: z.string().url().optional(),
   status: z.enum(['draft', 'published']).default('draft'),
 });
