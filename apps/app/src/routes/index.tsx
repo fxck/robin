@@ -12,6 +12,7 @@ import { Heading } from '../components/typography/Heading';
 import { Text } from '../components/typography/Text';
 import { PostCard } from '../components/posts/PostCard';
 import FloatingLines from '../components/backgrounds/FloatingLines';
+import { cn } from '../lib/utils';
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -222,22 +223,37 @@ function Index() {
         <Container size="standard">
           <Flex direction="col" gap="8">
             {/* Filter Tabs */}
-            <Flex gap="3">
-              <Button
-                variant={view === 'all' ? 'solid' : 'soft'}
+            <Flex gap="4" className="mb-2">
+              <button
                 onClick={() => setView('all')}
-                size="2"
+                className={cn(
+                  'group relative px-8 py-4 rounded-xl text-base font-semibold transition-all duration-300',
+                  'border-2 backdrop-blur-sm',
+                  view === 'all'
+                    ? 'bg-amber-500/10 border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/20'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20 hover:text-gray-200'
+                )}
               >
-                Latest
-              </Button>
-              <Button
-                variant={view === 'trending' ? 'solid' : 'soft'}
+                <span className="flex items-center gap-2">
+                  <Sparkles size={20} className={cn('transition-all duration-300', view === 'all' ? 'animate-pulse' : '')} />
+                  Latest
+                </span>
+              </button>
+              <button
                 onClick={() => setView('trending')}
-                size="2"
+                className={cn(
+                  'group relative px-8 py-4 rounded-xl text-base font-semibold transition-all duration-300',
+                  'border-2 backdrop-blur-sm',
+                  view === 'trending'
+                    ? 'bg-amber-500/10 border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/20'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20 hover:text-gray-200'
+                )}
               >
-                <TrendingUp size={16} />
-                Trending
-              </Button>
+                <span className="flex items-center gap-2">
+                  <TrendingUp size={20} className={cn('transition-all duration-300', view === 'trending' ? 'animate-pulse' : '')} />
+                  Trending
+                </span>
+              </button>
             </Flex>
 
             {/* Posts Grid */}
