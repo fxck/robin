@@ -104,7 +104,7 @@ function ResetPasswordPage() {
                   </Callout.Text>
                 </Callout.Root>
 
-                <Button size="3" onClick={() => navigate({ to: '/forgot-password' })}>
+                <Button size="3" onClick={() => navigate({ to: '/forgot-password' })} style={{ width: '100%' }}>
                   Request New Link
                 </Button>
               </Flex>
@@ -246,7 +246,7 @@ function ResetPasswordPage() {
               </Callout.Text>
             </Callout.Root>
 
-                <Button size="3" type="submit" disabled={loading}>
+                <Button size="3" type="submit" disabled={loading} style={{ width: '100%' }}>
                   {loading ? 'Resetting...' : 'Reset Password'}
                 </Button>
               </Flex>

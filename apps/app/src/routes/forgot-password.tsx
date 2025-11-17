@@ -83,19 +83,20 @@ function ForgotPasswordPage() {
                   Click the link in the email to reset your password. The link will expire in 1 hour.
                 </Text>
 
-                <Flex direction="column" gap="2">
-                  <Button size="3" onClick={() => navigate({ to: '/auth' })}>
+                <Flex direction="column" gap="3">
+                  <Button size="3" onClick={() => navigate({ to: '/auth' })} style={{ width: '100%' }}>
                     <ArrowLeft size={16} />
                     Back to Sign In
                   </Button>
 
                   <Button
-                    size="2"
+                    size="3"
                     variant="ghost"
                     onClick={() => {
                       setSent(false);
                       setEmail('');
                     }}
+                    style={{ width: '100%' }}
                   >
                     Resend email
                   </Button>
@@ -142,12 +143,12 @@ function ForgotPasswordPage() {
                   </TextField.Slot>
                 </TextField.Root>
 
-                <Flex direction="column" gap="2">
-                  <Button size="3" type="submit" disabled={loading}>
+                <Flex direction="column" gap="3">
+                  <Button size="3" type="submit" disabled={loading} style={{ width: '100%' }}>
                     {loading ? 'Sending...' : 'Send Reset Link'}
                   </Button>
 
-                  <Link to="/auth" style={{ textDecoration: 'none' }}>
+                  <Link to="/auth" style={{ textDecoration: 'none', width: '100%' }}>
                     <Button size="3" variant="ghost" style={{ width: '100%' }}>
                       <ArrowLeft size={16} />
                       Back to Sign In
