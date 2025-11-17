@@ -99,7 +99,6 @@ function EditPostPage() {
       // CRITICAL: Always use server version, not draft version
       // Draft version might be stale if post was updated elsewhere
       setVersion(data.post.version);
-      console.log('[Edit] Restored draft with server version:', data.post.version, '(draft had version:', pendingDraft.version, ')');
       setShowDraftBanner(false);
       setPendingDraft(null);
     }
@@ -118,7 +117,6 @@ function EditPostPage() {
   // Autosave with proper version tracking
   const autosave = useAutosave<UpdatePostInput, PostResponse>(
     async (updateData) => {
-      console.log('[Edit Autosave] Sending PATCH with version:', versionRef.current);
       return api.patch<PostResponse>(`/posts/${id}`, {
         ...updateData,
         version: versionRef.current, // Use ref to get latest version
@@ -130,8 +128,6 @@ function EditPostPage() {
       maxRetries: 3,
       onSaveSuccess: (response) => {
         const post = response.post;
-
-        console.log('[Edit Autosave] Save success, updating version from', versionRef.current, 'to', post.version);
 
         // Update version from server response immediately
         // This is crucial to prevent 409 on next save
@@ -145,7 +141,6 @@ function EditPostPage() {
         queryClient.invalidateQueries({ queryKey: ['posts'], exact: false });
       },
       onSaveError: (error) => {
-        console.error('[Edit Autosave] Save error:', error);
         if (error.message?.includes('409')) {
           // Version conflict - refetch to get latest version
           queryClient.invalidateQueries({ queryKey: ['post', id] });
@@ -159,10 +154,6 @@ function EditPostPage() {
   useEffect(() => {
     if (!initialized) return;
     if (!title.trim() && !content.trim()) return;
-
-    console.log('[Edit Autosave] Title:', title);
-    console.log('[Edit Autosave] Content:', content);
-    console.log('[Edit Autosave] Content length:', content?.length || 0);
 
     const draftData = {
       title,

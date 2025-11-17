@@ -89,12 +89,12 @@ function Index() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <Section spacing="xl" className="relative pt-64 md:pt-72 pb-24 md:pb-32">
+      <Section spacing="xl" className="relative pt-64 md:pt-72 pb-24 md:pb-32" style={{ minHeight: '100vh' }}>
         {/* Floating Lines Background */}
         <div
           className="absolute inset-0 -z-10"
           style={{
-            minHeight: '100%',
+            minHeight: '100vh',
             background: 'var(--color-bg-base)'
           }}
         >
@@ -142,7 +142,7 @@ function Index() {
                 color: '#e8e8e8'
               }}
             >
-              Welcome to Robn
+              Welcome to Robin
             </Heading>
 
             {/* Hero Subtitle */}
