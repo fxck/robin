@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
+import { useState, useEffect } from 'react';
 import { api } from '../../lib/api-client';
 import { useSession } from '../../lib/auth';
 import { Image, TableOfContents, RelatedPosts } from '../../components';
@@ -119,46 +120,34 @@ function PostPage() {
   const { data: session } = useSession();
   const data = Route.useLoaderData();
 
+  // Local state for immediate UI updates
+  const [isLiked, setIsLiked] = useState(data?.post.isLiked || false);
+  const [likesCount, setLikesCount] = useState(data?.post.likesCount || 0);
+
+  // Sync with loader data when it changes
+  useEffect(() => {
+    if (data?.post) {
+      setIsLiked(data.post.isLiked || false);
+      setLikesCount(data.post.likesCount || 0);
+    }
+  }, [data?.post.isLiked, data?.post.likesCount]);
+
   const likeMutation = useMutation({
     mutationFn: () => api.post<{ liked: boolean; likesCount: number; message: string }>(`/posts/${id}/like`, {}),
     onMutate: async () => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['post', id] });
+      // Optimistically update local state immediately
+      const previousIsLiked = isLiked;
+      const previousLikesCount = likesCount;
 
-      // Snapshot the previous value
-      const previousData = queryClient.getQueryData<PostResponse>(['post', id]);
+      setIsLiked(!isLiked);
+      setLikesCount(isLiked ? Math.max(0, likesCount - 1) : likesCount + 1);
 
-      // Optimistically toggle the like state and count
-      if (previousData) {
-        const currentlyLiked = previousData.post.isLiked || false;
-        queryClient.setQueryData<PostResponse>(['post', id], {
-          ...previousData,
-          post: {
-            ...previousData.post,
-            isLiked: !currentlyLiked,
-            likesCount: currentlyLiked
-              ? Math.max(0, (previousData.post.likesCount || 0) - 1)
-              : (previousData.post.likesCount || 0) + 1,
-          },
-        });
-      }
-
-      return { previousData };
+      return { previousIsLiked, previousLikesCount };
     },
     onSuccess: (response) => {
       // Update with the actual server response
-      const currentData = queryClient.getQueryData<PostResponse>(['post', id]);
-
-      if (currentData) {
-        queryClient.setQueryData<PostResponse>(['post', id], {
-          ...currentData,
-          post: {
-            ...currentData.post,
-            isLiked: response.liked,
-            likesCount: response.likesCount,
-          },
-        });
-      }
+      setIsLiked(response.liked);
+      setLikesCount(response.likesCount);
 
       // Invalidate post lists to update like counts there too
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -166,8 +155,9 @@ function PostPage() {
     },
     onError: (_error: Error, _variables, context) => {
       // Rollback on error
-      if (context?.previousData) {
-        queryClient.setQueryData(['post', id], context.previousData);
+      if (context) {
+        setIsLiked(context.previousIsLiked);
+        setLikesCount(context.previousLikesCount);
       }
       toast.error(_error.message || 'Failed to like post');
     },
@@ -325,22 +315,22 @@ function PostPage() {
                   className={cn(
                     'transition-all duration-200',
                     likeMutation.isPending && 'animate-pulse',
-                    post.isLiked && 'text-red-500'
+                    isLiked && 'text-red-500'
                   )}
                 >
                   <Heart
                     size={18}
                     className={cn(
                       'transition-all duration-200',
-                      post.isLiked && 'fill-red-500'
+                      isLiked && 'fill-red-500'
                     )}
                   />
-                  {post.likesCount || 0}
+                  {likesCount}
                 </Button>
               ) : (
                 <Button size="3" variant="soft" disabled>
                   <Heart size={18} />
-                  {post.likesCount || 0}
+                  {likesCount}
                 </Button>
               )}
 
